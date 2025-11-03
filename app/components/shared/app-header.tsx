@@ -24,10 +24,10 @@ export function AppHeader() {
       </h1>
       <nav className="flex items-center gap-5">
         <ul className="flex items-center gap-4 text-sm">
-          <a href="#">Posts</a>
+          <a href="#">Home</a>
         </ul>
         <ul className="flex items-center gap-4 text-sm">
-          <a href="#">Scraps</a>
+          <a href="#">Notes</a>
         </ul>
         <ul className="flex items-center gap-4 text-sm">
           <a href="#">Works</a>
