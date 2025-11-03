@@ -1,0 +1,76 @@
+---
+title: "Next.js App Router Tips and Tricks"
+date: "2025-11-02"
+description: "Essential tips for working with Next.js 15 App Router"
+tags: ["nextjs", "react", "web-development"]
+---
+
+# Next.js App Router Tips and Tricks
+
+The Next.js App Router (introduced in Next.js 13 and stable in 14+) brings powerful new features for building React applications. Here are some essential tips.
+
+## Server Components by Default
+
+In the App Router, all components are Server Components by default. This means:
+
+- They run on the server
+- They don't add to the client-side JavaScript bundle
+- They can directly access backend resources
+
+```tsx
+// This is a Server Component by default
+export default async function Page() {
+  const data = await fetch('https://api.example.com/data');
+  return <div>{data.title}</div>;
+}
+```
+
+## Client Components
+
+To use client-side features like hooks, event listeners, or browser APIs, add the `"use client"` directive:
+
+```tsx
+"use client";
+
+import { useState } from "react";
+
+export default function Counter() {
+  const [count, setCount] = useState(0);
+  return <button onClick={() => setCount(count + 1)}>{count}</button>;
+}
+```
+
+## Static Generation with generateStaticParams
+
+For dynamic routes, use `generateStaticParams` to pre-render pages at build time:
+
+```tsx
+export async function generateStaticParams() {
+  const posts = await getPosts();
+  return posts.map((post) => ({
+    slug: post.slug,
+  }));
+}
+```
+
+## Metadata API
+
+The new Metadata API makes it easy to add SEO-friendly metadata:
+
+```tsx
+export const metadata = {
+  title: 'My Page',
+  description: 'This is my page description',
+};
+```
+
+## Best Practices
+
+1. **Keep Server Components at the top**: Place Server Components as high in the tree as possible
+2. **Use Client Components sparingly**: Only mark components as client components when needed
+3. **Leverage streaming**: Use `loading.tsx` files for better UX
+4. **Optimize images**: Always use the Next.js `Image` component
+
+## Conclusion
+
+The App Router is a powerful paradigm shift that enables better performance and developer experience. Start with Server Components and only add Client Components where interactivity is needed.

@@ -2,6 +2,7 @@
 
 import { APP_NAME } from "@/config";
 import { useWindowScroll } from "@/app/hooks";
+import Link from "next/link";
 
 export function AppHeader() {
   const [scrollPosition] = useWindowScroll();
@@ -25,10 +26,10 @@ export function AppHeader() {
       <div className="flex items-center gap-5">
         <nav className="flex items-center gap-5">
           <ul className="flex items-center gap-4 text-sm">
-            <a href="/notes">Notes</a>
+            <Link href="/notes">Notes</Link>
           </ul>
           <ul className="flex items-center gap-4 text-sm">
-            <a href="/playgrounds">Playgrounds</a>
+            <Link href="/playgrounds">Playgrounds</Link>
           </ul>
         </nav>
         <button className="text-sm rounded-xl px-3 py-1 bg-primary text-primary-foreground font-semibold cursor-pointer">

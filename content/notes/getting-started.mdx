@@ -1,0 +1,73 @@
+---
+title: "Getting Started with MDX Notes"
+date: "2025-11-03"
+description: "Learn how to write notes using MDX format with all its powerful features"
+tags: ["mdx", "tutorial", "getting-started"]
+---
+
+# Welcome to MDX Notes
+
+This is a sample note written in MDX format. MDX allows you to use JSX in your markdown content, making it incredibly powerful for creating rich, interactive documentation.
+
+## What is MDX?
+
+MDX is a format that lets you seamlessly use JSX in your markdown documents. You can import components, export metadata, and write JSX right in your markdown.
+
+## Features
+
+Here are some key features of this notes system:
+
+- **Frontmatter Support**: Add metadata like title, date, description, and tags
+- **Syntax Highlighting**: Code blocks with beautiful syntax highlighting
+- **GitHub Flavored Markdown**: Tables, task lists, and more
+- **Custom Components**: Use custom React components in your notes
+- **Static Generation**: All notes are pre-rendered at build time for optimal performance
+
+## Code Example
+
+Here's an example of how to use code blocks with syntax highlighting:
+
+```typescript
+interface Note {
+  slug: string;
+  metadata: NoteMetadata;
+  content: string;
+}
+
+export async function getNoteBySlug(slug: string): Promise<Note | null> {
+  const fullPath = path.join(notesDirectory, `${slug}.mdx`);
+  const fileContents = fs.readFileSync(fullPath, "utf8");
+  return { slug, metadata, content };
+}
+```
+
+## Lists
+
+### Unordered List
+- First item
+- Second item
+- Third item
+  - Nested item
+  - Another nested item
+
+### Ordered List
+1. Step one
+2. Step two
+3. Step three
+
+## Blockquotes
+
+> This is a blockquote. Use it to highlight important information or quotes from other sources.
+
+## Tables
+
+| Feature | Supported |
+|---------|-----------|
+| MDX | ✅ |
+| Syntax Highlighting | ✅ |
+| Custom Components | ✅ |
+| Static Generation | ✅ |
+
+## Conclusion
+
+This notes system provides a powerful way to write and organize your thoughts, tutorials, and documentation. Happy writing!
