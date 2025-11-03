@@ -22,17 +22,19 @@ export function AppHeader() {
       >
         {APP_NAME}
       </h1>
-      <nav className="flex items-center gap-5">
-        <ul className="flex items-center gap-4 text-sm">
-          <a href="#">Home</a>
-        </ul>
-        <ul className="flex items-center gap-4 text-sm">
-          <a href="#">Notes</a>
-        </ul>
-        <ul className="flex items-center gap-4 text-sm">
-          <a href="#">Works</a>
-        </ul>
-      </nav>
+      <div className="flex items-center gap-5">
+        <nav className="flex items-center gap-5">
+          <ul className="flex items-center gap-4 text-sm">
+            <a href="/notes">Notes</a>
+          </ul>
+          <ul className="flex items-center gap-4 text-sm">
+            <a href="/playgrounds">Playgrounds</a>
+          </ul>
+        </nav>
+        <button className="text-sm rounded-xl px-3 py-1 bg-primary text-primary-foreground font-semibold cursor-pointer">
+          ⌘K
+        </button>
+      </div>
     </div>
   );
 }
