@@ -7,6 +7,8 @@ export const metadata: Metadata = {
   description: "A collection of notes and thoughts",
 };
 
+export const dynamic = "force-static";
+
 export default async function NotesPage() {
   const notes = await getAllNoteMetadata();
 

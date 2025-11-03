@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
-    "build": "next build",
+    "generate:notes": "node scripts/generate-notes-data.mjs",
+    "dev": "pnpm generate:notes && next dev --turbopack",
+    "build": "pnpm generate:notes && next build",
     "start": "next start",
     "lint": "next lint",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",

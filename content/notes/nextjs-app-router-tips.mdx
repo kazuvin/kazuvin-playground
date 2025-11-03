@@ -20,7 +20,7 @@ In the App Router, all components are Server Components by default. This means:
 ```tsx
 // This is a Server Component by default
 export default async function Page() {
-  const data = await fetch('https://api.example.com/data');
+  const data = await fetch("https://api.example.com/data");
   return <div>{data.title}</div>;
 }
 ```
@@ -59,8 +59,8 @@ The new Metadata API makes it easy to add SEO-friendly metadata:
 
 ```tsx
 export const metadata = {
-  title: 'My Page',
-  description: 'This is my page description',
+  title: "My Page",
+  description: "This is my page description",
 };
 ```
 
