@@ -14,7 +14,8 @@ export function AppHeader() {
         isScrolled ? "ml-auto" : ""
       }`}
     >
-      <h1
+      <Link
+        href="/"
         className={`font-bold text-lg transition-all duration-300 ease-in-out whitespace-nowrap ${
           isScrolled
             ? "opacity-0 w-0 max-w-0 overflow-hidden mr-0"
@@ -22,7 +23,7 @@ export function AppHeader() {
         }`}
       >
         {APP_NAME}
-      </h1>
+      </Link>
       <div className="flex items-center gap-5">
         <nav className="flex items-center gap-5">
           <ul className="flex items-center gap-4 text-sm">
