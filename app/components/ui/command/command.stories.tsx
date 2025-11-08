@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from "@storybook/nextjs-vite";
 import { useState } from "react";
 import {
   Command,
-  CommandDialog,
   CommandEmpty,
   CommandGroup,
   CommandInput,
@@ -108,55 +107,6 @@ export const WithSearch: Story = {
           )}
         </CommandList>
       </Command>
-    );
-  },
-};
-
-export const DialogExample: Story = {
-  render: () => {
-    const [open, setOpen] = useState(false);
-
-    return (
-      <>
-        <button
-          onClick={() => setOpen(true)}
-          className="px-4 py-2 bg-primary text-primary-foreground rounded-md"
-        >
-          Open Command Menu
-        </button>
-        <CommandDialog open={open} onOpenChange={setOpen}>
-          <CommandInput placeholder="Type a command or search..." />
-          <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
-            <CommandGroup heading="Suggestions">
-              <CommandItem>
-                <span>Calendar</span>
-              </CommandItem>
-              <CommandItem>
-                <span>Search Emoji</span>
-              </CommandItem>
-              <CommandItem>
-                <span>Calculator</span>
-              </CommandItem>
-            </CommandGroup>
-            <CommandSeparator />
-            <CommandGroup heading="Settings">
-              <CommandItem>
-                <span>Profile</span>
-                <CommandShortcut>P</CommandShortcut>
-              </CommandItem>
-              <CommandItem>
-                <span>Billing</span>
-                <CommandShortcut>B</CommandShortcut>
-              </CommandItem>
-              <CommandItem>
-                <span>Settings</span>
-                <CommandShortcut>S</CommandShortcut>
-              </CommandItem>
-            </CommandGroup>
-          </CommandList>
-        </CommandDialog>
-      </>
     );
   },
 };

@@ -3,6 +3,7 @@
 import { APP_NAME } from "@/config";
 import { useWindowScroll } from "@/app/hooks";
 import Link from "next/link";
+import { CommandSearch } from "../command-search";
 
 export function AppHeader() {
   const [scrollPosition] = useWindowScroll();
@@ -33,9 +34,7 @@ export function AppHeader() {
             <Link href="/playgrounds">Playgrounds</Link>
           </ul>
         </nav>
-        <button className="text-sm rounded-xl px-3 py-1 bg-primary text-primary-foreground font-semibold cursor-pointer">
-          ⌘K
-        </button>
+        <CommandSearch />
       </div>
     </div>
   );
