@@ -1,0 +1,30 @@
+[
+  {
+    "type": "note",
+    "url": "/notes/getting-started",
+    "metadata": {
+      "title": "Getting Started with MDX Notes",
+      "date": "2025-11-03",
+      "description": "Learn how to write notes using MDX format with all its powerful features",
+      "tags": [
+        "mdx",
+        "tutorial",
+        "getting-started"
+      ]
+    }
+  },
+  {
+    "type": "note",
+    "url": "/notes/nextjs-app-router-tips",
+    "metadata": {
+      "title": "Next.js App Router Tips and Tricks",
+      "date": "2025-11-02",
+      "description": "Essential tips for working with Next.js 15 App Router",
+      "tags": [
+        "nextjs",
+        "react",
+        "web-development"
+      ]
+    }
+  }
+]

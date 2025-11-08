@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import type { SearchableItem } from "@/lib/types";
 import {
   Command,
@@ -13,54 +14,13 @@ import { Dialog, DialogContent, DialogTitle } from "@/app/components/ui/dialog";
 import { useKeyboardShortcut } from "@/app/hooks";
 import { useCommandSearch } from "./use-command-search";
 
-// モックデータ
-const MOCK_ITEMS: SearchableItem[] = [
-  {
-    type: "note",
-    url: "/notes/react-hooks",
-    metadata: {
-      title: "React Hooksの使い方",
-      date: "2024-06-01",
-      description: "useState, useEffect, useCallbackなどの基本的なフックの解説",
-      tags: ["React", "Hooks", "Frontend"],
-    },
-  },
-  {
-    type: "note",
-    url: "/notes/typescript-basics",
-    metadata: {
-      title: "TypeScript基礎",
-      date: "2024-06-02",
-      description: "型定義とジェネリクスの基本",
-      tags: ["TypeScript", "型安全"],
-    },
-  },
-  {
-    type: "playground",
-    url: "/playground/nextjs-app",
-    metadata: {
-      title: "Next.js App Router",
-      date: "2024-06-03",
-      description: "App Routerを使ったプロジェクトのサンプル",
-      tags: ["Next.js", "React", "App Router"],
-    },
-  },
-  {
-    type: "playground",
-    url: "/playground/tailwind-components",
-    metadata: {
-      title: "Tailwind CSS コンポーネント集",
-      date: "2024-06-04",
-      description: "再利用可能なUIコンポーネント",
-      tags: ["Tailwind", "CSS", "UI"],
-    },
-  },
-];
-
 /**
  * キーボードショートカット対応のCommand検索ダイアログ
  */
 export function CommandSearch() {
+  const [items, setItems] = useState<SearchableItem[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
   const {
     open,
     search,
@@ -69,7 +29,25 @@ export function CommandSearch() {
     handleSelect,
     handleOpen,
     handleClose,
-  } = useCommandSearch(MOCK_ITEMS);
+  } = useCommandSearch(items);
+
+  // ダイアログが開いたときにデータをfetch（初回のみ）
+  useEffect(() => {
+    if (open && items.length === 0 && !isLoading) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsLoading(true);
+      fetch("/notes-index.json")
+        .then((res): Promise<SearchableItem[]> => res.json())
+        .then((data: SearchableItem[]) => {
+          setItems(data);
+          setIsLoading(false);
+        })
+        .catch((error) => {
+          console.error("Failed to load notes index:", error);
+          setIsLoading(false);
+        });
+    }
+  }, [open, items.length, isLoading]);
 
   // キーボードショートカット (Cmd+K / Ctrl+K)
   useKeyboardShortcut(
@@ -125,7 +103,9 @@ export function CommandSearch() {
               onValueChange={setSearch}
             />
             <CommandList>
-              <CommandEmpty>検索結果が見つかりませんでした</CommandEmpty>
+              <CommandEmpty>
+                {isLoading ? "読み込み中..." : "検索結果が見つかりませんでした"}
+              </CommandEmpty>
               {Object.entries(itemsByType).map(([type, typeItems]) => (
                 <CommandGroup key={type} heading={type}>
                   {typeItems.map((item) => (

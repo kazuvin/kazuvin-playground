@@ -3,18 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "pnpm run generate:notes && next dev",
+    "build": "pnpm run generate:notes && next build",
     "start": "next start",
     "lint": "next lint",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
-    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "pnpm run generate:notes && opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "preview": "pnpm run generate:notes && opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "generate:notes": "tsx scripts/generate-notes-index.ts"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",
@@ -60,6 +61,7 @@
     "remark-gfm": "^4.0.1",
     "storybook": "^10.0.6",
     "tailwindcss": "^4",
+    "tsx": "^4.20.6",
     "typescript": "^5",
     "vitest": "^4.0.8",
     "wrangler": "^4.45.3"
