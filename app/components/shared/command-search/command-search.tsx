@@ -132,7 +132,7 @@ export function CommandSearch() {
                     <CommandItem
                       key={item.url}
                       onSelect={() => handleSelect(item.url)}
-                      value={item.metadata.title}
+                      value={`${item.metadata.title} ${item.metadata.tags?.join(" ") ?? ""}`}
                     >
                       <div className="flex items-center justify-between flex-1">
                         <div className="font-medium">{item.metadata.title}</div>
