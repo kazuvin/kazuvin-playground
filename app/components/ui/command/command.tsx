@@ -3,6 +3,7 @@
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Command as CommandPrimitive } from "cmdk";
+import { cn } from "@/lib/cn";
 
 function Command({
   className,
@@ -12,7 +13,10 @@ function Command({
   return (
     <CommandPrimitive
       ref={ref}
-      className={`flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground ${className || ""}`}
+      className={cn(
+        "flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground border border-border",
+        className,
+      )}
       {...props}
     />
   );
@@ -27,7 +31,7 @@ function CommandDialog({
     <DialogPrimitive.Root {...props}>
       <DialogPrimitive.Portal>
         <DialogPrimitive.Overlay className="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
-        <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-lg border bg-popover p-0 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]">
+        <DialogPrimitive.Content className="fixed left-1/2 top-1/2 z-50 max-h-[85vh] w-full max-w-lg -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-lg border border-border bg-popover p-0 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]">
           <Command className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
             {children}
           </Command>
@@ -43,11 +47,17 @@ function CommandInput({
   ...props
 }: React.ComponentProps<typeof CommandPrimitive.Input>) {
   return (
-    <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
+    <div
+      className="flex items-center border-border border-b px-3 gap-2"
+      cmdk-input-wrapper=""
+    >
       🔎
       <CommandPrimitive.Input
         ref={ref}
-        className={`flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 ${className || ""}`}
+        className={cn(
+          "flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50",
+          className,
+        )}
         {...props}
       />
     </div>
@@ -64,7 +74,10 @@ function CommandList({
   return (
     <CommandPrimitive.List
       ref={ref}
-      className={`max-h-[300px] overflow-y-auto overflow-x-hidden ${className || ""}`}
+      className={cn(
+        "max-h-[300px] overflow-y-auto overflow-x-hidden",
+        className,
+      )}
       {...props}
     />
   );
@@ -95,7 +108,10 @@ function CommandGroup({
   return (
     <CommandPrimitive.Group
       ref={ref}
-      className={`overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground ${className || ""}`}
+      className={cn(
+        "overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground",
+        className,
+      )}
       {...props}
     />
   );
@@ -111,7 +127,7 @@ function CommandSeparator({
   return (
     <CommandPrimitive.Separator
       ref={ref}
-      className={`-mx-1 h-px bg-border ${className || ""}`}
+      className={cn("-mx-1 h-px bg-border", className)}
       {...props}
     />
   );
@@ -126,7 +142,10 @@ function CommandItem({
   return (
     <CommandPrimitive.Item
       ref={ref}
-      className={`relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 ${className || ""}`}
+      className={cn(
+        "relative flex cursor-default select-none items-center gap-2 rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+        className,
+      )}
       {...props}
     />
   );
@@ -140,7 +159,10 @@ function CommandShortcut({
 }: React.HTMLAttributes<HTMLSpanElement>) {
   return (
     <span
-      className={`ml-auto text-xs tracking-widest text-muted-foreground ${className || ""}`}
+      className={cn(
+        "ml-auto text-xs tracking-widest text-muted-foreground",
+        className,
+      )}
       {...props}
     />
   );

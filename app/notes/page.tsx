@@ -1,5 +1,5 @@
 import { getAllNoteMetadata } from "@/lib/notes";
-import { NoteCard } from "@/app/components/notes/note-card";
+import { NoteCard } from "@/app/components/notes";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
