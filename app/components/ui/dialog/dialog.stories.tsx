@@ -51,7 +51,7 @@ export const WithFooter: Story = {
         <DialogHeader>
           <DialogTitle>Edit profile</DialogTitle>
           <DialogDescription>
-            Make changes to your profile here. Click save when you're done.
+            Make changes to your profile here.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -105,7 +105,7 @@ export const Controlled: Story = {
           <DialogHeader>
             <DialogTitle>Controlled Dialog</DialogTitle>
             <DialogDescription>
-              This dialog's open state is controlled by React state.
+              This dialog is controlled by React state.
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
