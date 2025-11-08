@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useWindowScroll } from "../use-window-scroll";
 
@@ -30,7 +31,7 @@ describe("useWindowScroll", () => {
     const { result } = renderHook(() => useWindowScroll());
     const [, scrollTo] = result.current;
 
-    const scrollToSpy = jest.spyOn(window, "scrollTo");
+    const scrollToSpy = vi.spyOn(window, "scrollTo");
 
     act(() => {
       scrollTo({ x: 150, y: 250, behavior: "smooth" });
@@ -49,7 +50,7 @@ describe("useWindowScroll", () => {
     const { result } = renderHook(() => useWindowScroll());
     const [, scrollTo] = result.current;
 
-    const scrollToSpy = jest.spyOn(window, "scrollTo");
+    const scrollToSpy = vi.spyOn(window, "scrollTo");
 
     act(() => {
       scrollTo({ x: 100, y: 100 });
@@ -68,7 +69,7 @@ describe("useWindowScroll", () => {
     const { result } = renderHook(() => useWindowScroll());
     const [, scrollTo] = result.current;
 
-    const scrollToSpy = jest.spyOn(window, "scrollTo");
+    const scrollToSpy = vi.spyOn(window, "scrollTo");
 
     act(() => {
       scrollTo({ x: 300 });
@@ -87,7 +88,7 @@ describe("useWindowScroll", () => {
     const { result } = renderHook(() => useWindowScroll());
     const [, scrollTo] = result.current;
 
-    const scrollToSpy = jest.spyOn(window, "scrollTo");
+    const scrollToSpy = vi.spyOn(window, "scrollTo");
 
     act(() => {
       scrollTo({ y: 400 });
@@ -103,14 +104,14 @@ describe("useWindowScroll", () => {
   });
 
   it("should clean up event listener on unmount", () => {
-    const removeEventListenerSpy = jest.spyOn(window, "removeEventListener");
+    const removeEventListenerSpy = vi.spyOn(window, "removeEventListener");
     const { unmount } = renderHook(() => useWindowScroll());
 
     unmount();
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith(
       "scroll",
-      expect.any(Function)
+      expect.any(Function),
     );
 
     removeEventListenerSpy.mockRestore();
