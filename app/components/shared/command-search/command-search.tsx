@@ -107,18 +107,6 @@ export function CommandSearch() {
     {} as Record<string, SearchableItem[]>,
   );
 
-  // タイプ名の日本語化
-  const getTypeLabel = (type: string) => {
-    switch (type) {
-      case "note":
-        return "ノート";
-      case "playground":
-        return "プレイグラウンド";
-      default:
-        return type;
-    }
-  };
-
   return (
     <>
       <button
@@ -139,7 +127,7 @@ export function CommandSearch() {
             <CommandList>
               <CommandEmpty>検索結果が見つかりませんでした</CommandEmpty>
               {Object.entries(itemsByType).map(([type, typeItems]) => (
-                <CommandGroup key={type} heading={getTypeLabel(type)}>
+                <CommandGroup key={type} heading={type}>
                   {typeItems.map((item) => (
                     <CommandItem
                       key={item.url}

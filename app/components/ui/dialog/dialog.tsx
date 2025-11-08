@@ -12,18 +12,16 @@ const DialogPortal = DialogPrimitive.Portal;
 
 const DialogClose = DialogPrimitive.Close;
 
+/* NOTE: Radix UI の DialogPrimitive.Overlay を用いるとレイアウトシフトが発生するため div で代用 */
 function DialogOverlay({
-  className,
   ref,
+  className,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
+}: React.ComponentProps<"div">) {
   return (
-    <DialogPrimitive.Overlay
+    <div
       ref={ref}
-      className={cn(
-        "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-        className,
-      )}
+      className={cn("fixed inset-0 z-50 bg-black/80", className)}
       {...props}
     />
   );

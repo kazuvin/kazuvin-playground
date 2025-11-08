@@ -17,6 +17,8 @@ export type KeyboardShortcutOptions = {
   stopPropagation?: boolean;
   /** ショートカットを有効にするか (デフォルト: true) */
   enabled?: boolean;
+  /** キャプチャフェーズでイベントを処理するか (デフォルト: false) */
+  capture?: boolean;
 };
 
 /**
@@ -53,6 +55,7 @@ export function useKeyboardShortcut(
     preventDefault = true,
     stopPropagation = false,
     enabled = true,
+    capture = false,
   } = options;
 
   // callbackの最新の参照を保持
@@ -87,10 +90,10 @@ export function useKeyboardShortcut(
       }
     };
 
-    document.addEventListener("keydown", handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown, { capture });
 
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown, { capture });
     };
-  }, [key, ctrlKey, metaKey, shiftKey, altKey, preventDefault, stopPropagation, enabled]);
+  }, [key, ctrlKey, metaKey, shiftKey, altKey, preventDefault, stopPropagation, enabled, capture]);
 }
