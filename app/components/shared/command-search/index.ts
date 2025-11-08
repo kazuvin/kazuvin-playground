@@ -1,2 +1,2 @@
 export * from "./command-search";
-export * from "./hooks";
+export * from "./use-command-search";

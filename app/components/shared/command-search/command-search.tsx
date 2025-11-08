@@ -11,7 +11,7 @@ import {
 } from "@/app/components/ui/command";
 import { Dialog, DialogContent, DialogTitle } from "@/app/components/ui/dialog";
 import { useKeyboardShortcut } from "@/app/hooks";
-import { useCommandSearch } from "./hooks";
+import { useCommandSearch } from "./use-command-search";
 
 // モックデータ
 const MOCK_ITEMS: SearchableItem[] = [
