@@ -134,20 +134,15 @@ export function CommandSearch() {
                       onSelect={() => handleSelect(item.url)}
                       value={item.metadata.title}
                     >
-                      <div className="flex flex-col gap-1 flex-1">
+                      <div className="flex items-center justify-between flex-1">
                         <div className="font-medium">{item.metadata.title}</div>
-                        {item.metadata.description && (
-                          <div className="text-xs text-muted-foreground line-clamp-1">
-                            {item.metadata.description}
-                          </div>
-                        )}
                         {item.metadata.tags &&
                           item.metadata.tags.length > 0 && (
                             <div className="flex gap-1 flex-wrap">
                               {item.metadata.tags.map((tag) => (
                                 <span
                                   key={tag}
-                                  className="text-xs bg-secondary text-secondary-foreground px-1.5 py-0.5 rounded"
+                                  className="text-xs bg-primary text-primary-foreground px-1.5 py-0.5 rounded"
                                 >
                                   {tag}
                                 </span>
