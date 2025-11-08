@@ -1,0 +1,38 @@
+
+> kazuvin-playground@0.1.0 build /Users/kazuya.miura/Develop/kazuvin-playground
+> next build
+
+Using vars defined in .dev.vars
+(node:25695) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Using vars defined in .dev.vars
+   ▲ Next.js 15.4.6
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully in 0ms
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/8) ...
+   Generating static pages (2/8) 
+   Generating static pages (4/8) 
+   Generating static pages (6/8) 
+ ✓ Generating static pages (8/8)
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                                 Size  First Load JS
+┌ ○ /                                      125 B        99.9 kB
+├ ○ /_not-found                            991 B         101 kB
+├ ○ /notes                                 159 B         103 kB
+└ ● /notes/[slug]                          125 B        99.9 kB
+    ├ /notes/getting-started
+    └ /notes/nextjs-app-router-tips
++ First Load JS shared by all            99.8 kB
+  ├ chunks/21af276c-c6a25280c707bbeb.js  54.1 kB
+  ├ chunks/26-1aee42c4694b1f19.js        43.7 kB
+  └ other shared chunks (total)          1.92 kB
+
+
+○  (Static)  prerendered as static content
+●  (SSG)     prerendered as static HTML (uses generateStaticParams)
+

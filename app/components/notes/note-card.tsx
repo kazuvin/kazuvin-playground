@@ -1,5 +1,5 @@
 import Link from "next/link";
-import type { NoteWithMetadata } from "@/lib/types/note";
+import type { NoteWithMetadata } from "@/lib/notes";
 import { formatDate } from "@/lib/utils";
 
 interface NoteCardProps {

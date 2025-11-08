@@ -1,6 +1,6 @@
-import fs from "fs";
-import path from "path";
 import matter from "gray-matter";
+import fs from "fs/promises";
+import path from "path";
 
 export interface NoteMetadata {
   title: string;
@@ -21,27 +21,27 @@ export interface NoteWithMetadata {
   metadata: NoteMetadata;
 }
 
-const notesDirectory = path.join(process.cwd(), "content/notes");
+// Define all note slugs statically - update this when adding new notes
+const ALL_NOTE_SLUGS = ["getting-started", "nextjs-app-router-tips"] as const;
+
+const NOTES_DIR = path.join(process.cwd(), "content/notes");
 
 /**
  * Get all note slugs for static path generation
- * This only runs at build time (SSG), so Node.js APIs are available
+ * Uses a static list instead of fs to work in Cloudflare Workers
  */
 export async function getNoteSlugs(): Promise<string[]> {
-  const files = fs.readdirSync(notesDirectory);
-  return files
-    .filter((file) => file.endsWith(".mdx"))
-    .map((file) => file.replace(/\.mdx$/, ""));
+  return [...ALL_NOTE_SLUGS];
 }
 
 /**
- * Get a specific note by slug
- * This only runs at build time (SSG), so Node.js APIs are available
+ * Get a specific note by slug using gray-matter
+ * Reads MDX file and parses frontmatter
  */
 export async function getNoteBySlug(slug: string): Promise<Note | null> {
   try {
-    const fullPath = path.join(notesDirectory, `${slug}.mdx`);
-    const fileContents = fs.readFileSync(fullPath, "utf8");
+    const filePath = path.join(NOTES_DIR, `${slug}.mdx`);
+    const fileContents = await fs.readFile(filePath, "utf8");
     const { data, content } = matter(fileContents);
 
     return {
@@ -61,27 +61,26 @@ export async function getNoteBySlug(slug: string): Promise<Note | null> {
 }
 
 /**
- * Get all notes with full content
- * This only runs at build time (SSG), so Node.js APIs are available
+ * Get all notes with metadata
+ * Uses gray-matter to parse frontmatter
  */
 export async function getAllNotes(): Promise<Note[]> {
   const slugs = await getNoteSlugs();
-  const notes = await Promise.all(
-    slugs.map((slug) => getNoteBySlug(slug))
-  );
+  const notes = await Promise.all(slugs.map((slug) => getNoteBySlug(slug)));
 
   // Filter out null values and sort by date (newest first)
   return notes
     .filter((note): note is Note => note !== null)
     .sort(
       (a, b) =>
-        new Date(b.metadata.date).getTime() - new Date(a.metadata.date).getTime()
+        new Date(b.metadata.date).getTime() -
+        new Date(a.metadata.date).getTime()
     );
 }
 
 /**
  * Get all note metadata only (for list pages)
- * This only runs at build time (SSG), so Node.js APIs are available
+ * Uses gray-matter to parse frontmatter
  */
 export async function getAllNoteMetadata(): Promise<NoteWithMetadata[]> {
   const notes = await getAllNotes();
