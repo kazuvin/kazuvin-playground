@@ -4,6 +4,58 @@ import { useWindowScroll } from "../use-window-scroll";
 
 describe("useWindowScroll", () => {
   beforeEach(() => {
+    // Mock window.scrollX and scrollY
+    Object.defineProperty(window, "scrollX", {
+      writable: true,
+      configurable: true,
+      value: 0,
+    });
+
+    Object.defineProperty(window, "scrollY", {
+      writable: true,
+      configurable: true,
+      value: 0,
+    });
+
+    // Mock window.scrollTo
+    const scrollToMock = vi.fn((x?: number | ScrollToOptions, y?: number) => {
+      if (typeof x === "object") {
+        if (x.left !== undefined) {
+          Object.defineProperty(window, "scrollX", {
+            writable: true,
+            configurable: true,
+            value: x.left,
+          });
+        }
+        if (x.top !== undefined) {
+          Object.defineProperty(window, "scrollY", {
+            writable: true,
+            configurable: true,
+            value: x.top,
+          });
+        }
+      } else if (typeof x === "number") {
+        Object.defineProperty(window, "scrollX", {
+          writable: true,
+          configurable: true,
+          value: x,
+        });
+        if (y !== undefined) {
+          Object.defineProperty(window, "scrollY", {
+            writable: true,
+            configurable: true,
+            value: y,
+          });
+        }
+      }
+    });
+
+    Object.defineProperty(window, "scrollTo", {
+      writable: true,
+      configurable: true,
+      value: scrollToMock,
+    });
+
     // Reset window scroll position before each test
     window.scrollTo(0, 0);
   });
