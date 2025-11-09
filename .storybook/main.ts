@@ -7,7 +7,7 @@ const config: StorybookConfig = {
     "@storybook/addon-docs",
     "@storybook/addon-a11y",
     "@storybook/addon-vitest",
-    "@storybook/addon-styling-webpack"
+    "@storybook/addon-styling-webpack",
   ],
   framework: {
     name: "@storybook/nextjs-vite",
@@ -16,4 +16,3 @@ const config: StorybookConfig = {
   staticDirs: ["../public"],
 };
 export default config;
-

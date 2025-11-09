@@ -44,7 +44,7 @@ export type KeyboardShortcutOptions = {
  */
 export function useKeyboardShortcut(
   options: KeyboardShortcutOptions,
-  callback: (event: KeyboardEvent) => void,
+  callback: (event: KeyboardEvent) => void
 ) {
   const {
     key,
@@ -95,5 +95,15 @@ export function useKeyboardShortcut(
     return () => {
       document.removeEventListener("keydown", handleKeyDown, { capture });
     };
-  }, [key, ctrlKey, metaKey, shiftKey, altKey, preventDefault, stopPropagation, enabled, capture]);
+  }, [
+    key,
+    ctrlKey,
+    metaKey,
+    shiftKey,
+    altKey,
+    preventDefault,
+    stopPropagation,
+    enabled,
+    capture,
+  ]);
 }

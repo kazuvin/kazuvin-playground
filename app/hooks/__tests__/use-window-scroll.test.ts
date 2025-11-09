@@ -163,7 +163,7 @@ describe("useWindowScroll", () => {
 
     expect(removeEventListenerSpy).toHaveBeenCalledWith(
       "scroll",
-      expect.any(Function),
+      expect.any(Function)
     );
 
     removeEventListenerSpy.mockRestore();

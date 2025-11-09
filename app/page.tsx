@@ -12,7 +12,7 @@ export default function Home() {
         {Array.from({ length: 8 }).map((_, index) => (
           <div
             key={index}
-            className="aspect-square border border-border rounded-2xl grid place-items-center text-2xl"
+            className="border-border grid aspect-square place-items-center rounded-2xl border text-2xl"
           ></div>
         ))}
       </section>

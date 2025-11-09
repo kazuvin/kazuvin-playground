@@ -12,10 +12,10 @@ export function NoteCard({ note }: NoteCardProps) {
   return (
     <Link
       href={`/notes/${note.slug}`}
-      className="block p-6 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 transition-colors bg-white dark:bg-gray-800"
+      className="block rounded-lg border border-gray-200 bg-white p-6 transition-colors hover:border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-gray-600"
     >
       <article>
-        <h2 className="text-2xl font-semibold mb-2 text-gray-900 dark:text-gray-100">
+        <h2 className="mb-2 text-2xl font-semibold text-gray-900 dark:text-gray-100">
           {note.metadata.title}
         </h2>
         <time
@@ -34,7 +34,7 @@ export function NoteCard({ note }: NoteCardProps) {
             {note.metadata.tags.map((tag) => (
               <span
                 key={tag}
-                className="px-2 py-1 text-xs rounded-full bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                className="rounded-full bg-gray-100 px-2 py-1 text-xs text-gray-700 dark:bg-gray-700 dark:text-gray-300"
               >
                 {tag}
               </span>

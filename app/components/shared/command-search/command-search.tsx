@@ -62,7 +62,7 @@ export function CommandSearch() {
       } else {
         handleOpen();
       }
-    },
+    }
   );
 
   const toggleOpen = () => {
@@ -82,19 +82,19 @@ export function CommandSearch() {
       acc[item.type].push(item);
       return acc;
     },
-    {} as Record<string, SearchableItem[]>,
+    {} as Record<string, SearchableItem[]>
   );
 
   return (
     <>
       <button
         onClick={toggleOpen}
-        className="text-sm rounded-xl px-3 py-1 bg-primary text-primary-foreground font-semibold cursor-pointer"
+        className="bg-primary text-primary-foreground cursor-pointer rounded-xl px-3 py-1 text-sm font-semibold"
       >
         ⌘K
       </button>
       <Dialog open={open} onOpenChange={handleClose}>
-        <DialogContent className="p-0 max-w-lg">
+        <DialogContent className="max-w-lg p-0">
           <DialogTitle className="sr-only">検索</DialogTitle>
           <Command>
             <CommandInput
@@ -114,15 +114,15 @@ export function CommandSearch() {
                       onSelect={() => handleSelect(item.url)}
                       value={`${item.metadata.title} ${item.metadata.tags?.join(" ") ?? ""}`}
                     >
-                      <div className="flex items-center justify-between flex-1">
+                      <div className="flex flex-1 items-center justify-between">
                         <div className="font-medium">{item.metadata.title}</div>
                         {item.metadata.tags &&
                           item.metadata.tags.length > 0 && (
-                            <div className="flex gap-1 flex-wrap">
+                            <div className="flex flex-wrap gap-1">
                               {item.metadata.tags.map((tag) => (
                                 <span
                                   key={tag}
-                                  className="text-xs bg-primary text-primary-foreground px-1.5 py-0.5 rounded"
+                                  className="bg-primary text-primary-foreground rounded px-1.5 py-0.5 text-xs"
                                 >
                                   {tag}
                                 </span>

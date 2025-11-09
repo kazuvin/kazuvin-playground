@@ -22,7 +22,10 @@ const nextConfig: NextConfig = {
 const withMDX = createMDX({
   extension: /\.mdx?$/,
   options: {
-    remarkPlugins: [remarkGfm, [remarkFrontmatter, { type: "yaml", marker: "-" }]],
+    remarkPlugins: [
+      remarkGfm,
+      [remarkFrontmatter, { type: "yaml", marker: "-" }],
+    ],
     rehypePlugins: [rehypeHighlight],
   },
 });

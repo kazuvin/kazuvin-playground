@@ -58,7 +58,7 @@ const NOTES_DIR = path.join(process.cwd(), "content/notes");
  * @returns ノートスラッグの配列
  */
 export async function getNoteSlugs(
-  options: NoteOptions = {},
+  options: NoteOptions = {}
 ): Promise<string[]> {
   const { includeDrafts = false } = options;
 
@@ -77,7 +77,7 @@ export async function getNoteSlugs(
       slugs.map(async (slug) => {
         const note = await getNoteBySlug(slug);
         return { slug, isDraft: note?.metadata.draft };
-      }),
+      })
     );
 
     return slugsWithMetadata
@@ -134,7 +134,7 @@ export async function getAllNotes(options: NoteOptions = {}): Promise<Note[]> {
     .sort(
       (a, b) =>
         new Date(b.metadata.date).getTime() -
-        new Date(a.metadata.date).getTime(),
+        new Date(a.metadata.date).getTime()
     );
 }
 
@@ -146,7 +146,7 @@ export async function getAllNotes(options: NoteOptions = {}): Promise<Note[]> {
  * @returns ノートメタデータの配列（日付順、新しい順）
  */
 export async function getAllNoteMetadata(
-  options: NoteOptions = {},
+  options: NoteOptions = {}
 ): Promise<NoteWithMetadata[]> {
   const notes = await getAllNotes(options);
   return notes.map((note) => ({

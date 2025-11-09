@@ -86,7 +86,7 @@ export const WithSearch: Story = {
     });
 
     return (
-      <Command className="rounded-lg border shadow-md w-[450px]">
+      <Command className="w-[450px] rounded-lg border shadow-md">
         <CommandInput
           placeholder="Type a command or search..."
           value={value}
@@ -113,7 +113,7 @@ export const WithSearch: Story = {
 
 export const WithKeyboardShortcuts: Story = {
   render: () => (
-    <Command className="rounded-lg border shadow-md w-[450px]">
+    <Command className="w-[450px] rounded-lg border shadow-md">
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
@@ -142,7 +142,7 @@ export const WithKeyboardShortcuts: Story = {
 
 export const MultipleGroups: Story = {
   render: () => (
-    <Command className="rounded-lg border shadow-md w-[450px]">
+    <Command className="w-[450px] rounded-lg border shadow-md">
       <CommandInput placeholder="Type a command or search..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
@@ -185,7 +185,7 @@ export const MultipleGroups: Story = {
 
 export const Empty: Story = {
   render: () => (
-    <Command className="rounded-lg border shadow-md w-[450px]">
+    <Command className="w-[450px] rounded-lg border shadow-md">
       <CommandInput placeholder="Search for something that doesn't exist..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>

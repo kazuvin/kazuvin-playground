@@ -11,16 +11,16 @@ export function AppHeader() {
 
   return (
     <div
-      className={`sticky flex items-center justify-between top-2 h-12 backdrop-blur-2xl py-3 px-6 rounded-2xl bg-foreground/5 ${
+      className={`bg-foreground/5 sticky top-2 flex h-12 items-center justify-between rounded-2xl px-6 py-3 backdrop-blur-2xl ${
         isScrolled ? "ml-auto" : ""
       }`}
     >
       <Link
         href="/"
-        className={`font-bold text-lg transition-all duration-300 ease-in-out whitespace-nowrap ${
+        className={`text-lg font-bold whitespace-nowrap transition-all duration-300 ease-in-out ${
           isScrolled
-            ? "opacity-0 w-0 max-w-0 overflow-hidden mr-0"
-            : "opacity-100 w-auto max-w-xs mr-4"
+            ? "mr-0 w-0 max-w-0 overflow-hidden opacity-0"
+            : "mr-4 w-auto max-w-xs opacity-100"
         }`}
       >
         {APP_NAME}

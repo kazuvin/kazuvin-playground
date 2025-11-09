@@ -26,11 +26,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased isolate mx-auto grid w-full max-w-2xl px-3 grid-cols-1 gap-10 pt-10 md:pb-24`}
-      >
-        <AppHeader />
-        {children}
+      <body className={`${geistSans.variable} ${geistMono.variable}`}>
+        <div className="mx-auto grid w-full max-w-2xl grid-cols-1 gap-10 px-3 pt-10 md:pb-24">
+          <AppHeader />
+          {children}
+        </div>
       </body>
     </html>
   );

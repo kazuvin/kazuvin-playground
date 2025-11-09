@@ -26,7 +26,7 @@ describe("clsx", () => {
 
   it("should handle mixed inputs", () => {
     expect(
-      clsx("foo", { bar: true, baz: false }, ["qux", { quux: true }]),
+      clsx("foo", { bar: true, baz: false }, ["qux", { quux: true }])
     ).toBe("foo bar qux quux");
   });
 
@@ -34,7 +34,7 @@ describe("clsx", () => {
     const isActive = true;
     const isDisabled = false;
     expect(clsx("btn", isActive && "active", isDisabled && "disabled")).toBe(
-      "btn active",
+      "btn active"
     );
   });
 
@@ -144,7 +144,7 @@ describe("cn", () => {
       buttonVariants.base,
       buttonVariants.variants.default,
       buttonVariants.sizes.lg,
-      "px-6", // Custom override
+      "px-6" // Custom override
     );
 
     expect(result).toContain("h-11");

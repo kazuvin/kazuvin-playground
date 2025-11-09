@@ -25,7 +25,7 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   render: () => (
     <Dialog>
-      <DialogTrigger className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+      <DialogTrigger className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 transition-colors">
         Open Dialog
       </DialogTrigger>
       <DialogContent>
@@ -44,7 +44,7 @@ export const Default: Story = {
 export const WithFooter: Story = {
   render: () => (
     <Dialog>
-      <DialogTrigger className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+      <DialogTrigger className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 transition-colors">
         Open Dialog
       </DialogTrigger>
       <DialogContent>
@@ -62,7 +62,7 @@ export const WithFooter: Story = {
             <input
               id="name"
               defaultValue="Pedro Duarte"
-              className="col-span-3 px-3 py-2 border border-border rounded-md bg-background"
+              className="border-border bg-background col-span-3 rounded-md border px-3 py-2"
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
@@ -75,14 +75,14 @@ export const WithFooter: Story = {
             <input
               id="username"
               defaultValue="@peduarte"
-              className="col-span-3 px-3 py-2 border border-border rounded-md bg-background"
+              className="border-border bg-background col-span-3 rounded-md border px-3 py-2"
             />
           </div>
         </div>
         <DialogFooter>
           <button
             type="submit"
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 transition-colors"
           >
             Save changes
           </button>
@@ -98,7 +98,7 @@ export const Controlled: Story = {
 
     return (
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+        <DialogTrigger className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 transition-colors">
           Open Controlled Dialog
         </DialogTrigger>
         <DialogContent>
@@ -116,13 +116,13 @@ export const Controlled: Story = {
           <DialogFooter>
             <button
               onClick={() => setOpen(false)}
-              className="px-4 py-2 border border-border rounded-md hover:bg-accent transition-colors"
+              className="border-border hover:bg-accent rounded-md border px-4 py-2 transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={() => setOpen(false)}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 transition-colors"
             >
               Confirm
             </button>
@@ -136,7 +136,7 @@ export const Controlled: Story = {
 export const CustomWidth: Story = {
   render: () => (
     <Dialog>
-      <DialogTrigger className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+      <DialogTrigger className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 transition-colors">
         Open Wide Dialog
       </DialogTrigger>
       <DialogContent className="max-w-3xl">
@@ -160,7 +160,7 @@ export const CustomWidth: Story = {
 export const ScrollableContent: Story = {
   render: () => (
     <Dialog>
-      <DialogTrigger className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+      <DialogTrigger className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 transition-colors">
         Open Scrollable Dialog
       </DialogTrigger>
       <DialogContent className="max-h-[85vh] overflow-y-auto">
@@ -170,7 +170,7 @@ export const ScrollableContent: Story = {
             Please read and accept our terms and conditions.
           </DialogDescription>
         </DialogHeader>
-        <div className="py-4 space-y-4">
+        <div className="space-y-4 py-4">
           {Array.from({ length: 20 }).map((_, i) => (
             <p key={i} className="text-sm">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do
@@ -180,7 +180,7 @@ export const ScrollableContent: Story = {
           ))}
         </div>
         <DialogFooter>
-          <button className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+          <button className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 transition-colors">
             Accept
           </button>
         </DialogFooter>
@@ -192,7 +192,7 @@ export const ScrollableContent: Story = {
 export const FormExample: Story = {
   render: () => (
     <Dialog>
-      <DialogTrigger className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors">
+      <DialogTrigger className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 transition-colors">
         Create Account
       </DialogTrigger>
       <DialogContent>
@@ -211,7 +211,7 @@ export const FormExample: Story = {
               id="email"
               type="email"
               placeholder="you@example.com"
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
+              className="border-border bg-background w-full rounded-md border px-3 py-2"
             />
           </div>
           <div className="space-y-2">
@@ -222,7 +222,7 @@ export const FormExample: Story = {
               id="password"
               type="password"
               placeholder="••••••••"
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
+              className="border-border bg-background w-full rounded-md border px-3 py-2"
             />
           </div>
           <div className="space-y-2">
@@ -233,14 +233,14 @@ export const FormExample: Story = {
               id="confirm"
               type="password"
               placeholder="••••••••"
-              className="w-full px-3 py-2 border border-border rounded-md bg-background"
+              className="border-border bg-background w-full rounded-md border px-3 py-2"
             />
           </div>
         </form>
         <DialogFooter>
           <button
             type="submit"
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 transition-colors"
           >
             Create Account
           </button>
@@ -253,7 +253,7 @@ export const FormExample: Story = {
 export const AlertDialog: Story = {
   render: () => (
     <Dialog>
-      <DialogTrigger className="px-4 py-2 bg-destructive text-destructive-foreground rounded-md hover:bg-destructive/90 transition-colors">
+      <DialogTrigger className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-md px-4 py-2 transition-colors">
         Delete Account
       </DialogTrigger>
       <DialogContent>
@@ -265,10 +265,10 @@ export const AlertDialog: Story = {
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <button className="px-4 py-2 border border-border rounded-md hover:bg-accent transition-colors">
+          <button className="border-border hover:bg-accent rounded-md border px-4 py-2 transition-colors">
             Cancel
           </button>
-          <button className="px-4 py-2 bg-destructive text-destructive-foreground rounded-md hover:bg-destructive/90 transition-colors">
+          <button className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-md px-4 py-2 transition-colors">
             Delete
           </button>
         </DialogFooter>

@@ -39,7 +39,9 @@ async function generateNotesIndex() {
       "utf-8"
     );
 
-    console.log(`✅ Generated ${searchableItems.length} notes to ${outputPath}`);
+    console.log(
+      `✅ Generated ${searchableItems.length} notes to ${outputPath}`
+    );
   } catch (error) {
     console.error("❌ Error generating notes index:", error);
     process.exit(1);
