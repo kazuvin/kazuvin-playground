@@ -1,5 +1,7 @@
 import { getAllNoteMetadata } from "@/lib/notes";
 import { NoteCard } from "@/app/components/notes";
+import { Typography } from "@/app/components/ui";
+import { PageHeader } from "@/app/components/shared";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -14,19 +16,15 @@ export default async function NotesPage() {
 
   return (
     <div>
-      <header className="mb-12">
-        <h1 className="mb-4 text-4xl font-bold text-gray-900 dark:text-gray-100">
-          Notes
-        </h1>
-        <p className="text-gray-600 dark:text-gray-400">
-          A collection of notes and thoughts
-        </p>
-      </header>
+      <PageHeader
+        title="Notes"
+        description="A collection of notes and thoughts"
+      />
 
       {notes.length === 0 ? (
-        <p className="text-gray-500 dark:text-gray-400">
+        <Typography variant="small">
           No notes yet. Check back later!
-        </p>
+        </Typography>
       ) : (
         <div className="grid gap-6">
           {notes.map((note) => (
