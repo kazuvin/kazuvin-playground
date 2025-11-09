@@ -17,13 +17,14 @@ function Typography({
   as,
   ...props
 }: TypographyProps) {
-  const Component = as || (variant.startsWith("h") ? variant : "p");
+  const Component = (as || (variant.startsWith("h") ? variant : "p")) as TypographyElement;
 
-  return (
-    <Component
-      className={cn(getTypographyClasses(variant), className)}
-      {...props}
-    />
+  return React.createElement(
+    Component,
+    {
+      className: cn(getTypographyClasses(variant), className),
+      ...props,
+    }
   );
 }
 
