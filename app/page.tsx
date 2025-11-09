@@ -10,6 +10,13 @@ import {
   TimelineSeparator,
   TimelineBody,
 } from "@/app/components/ui";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/app/components/ui/card";
 import notesIndex from "@/public/notes-index.json";
 import Link from "next/link";
 
@@ -77,27 +84,29 @@ export default function Home() {
                 <TimelineBody>
                   <div className="space-y-3">
                     {monthNotes.map((note) => (
-                      <Link
-                        key={note.url}
-                        href={note.url}
-                        className="block bg-muted rounded-md p-3 hover:bg-muted/80 transition-colors"
-                      >
-                        <h3 className="font-medium text-sm mb-1">
-                          {note.metadata.title}
-                        </h3>
-                        <p className="text-muted-foreground text-xs mb-2">
-                          {note.metadata.description}
-                        </p>
-                        <div className="flex flex-wrap gap-1">
-                          {note.metadata.tags.map((tag) => (
-                            <span
-                              key={tag}
-                              className="bg-background text-muted-foreground px-2 py-0.5 rounded text-xs"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
+                      <Link key={note.url} href={note.url}>
+                        <Card className="transition-colors hover:bg-accent">
+                          <CardHeader>
+                            <CardTitle className="text-sm">
+                              {note.metadata.title}
+                            </CardTitle>
+                            <CardDescription className="text-xs">
+                              {note.metadata.description}
+                            </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                            <div className="flex flex-wrap gap-1">
+                              {note.metadata.tags.map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="bg-secondary text-secondary-foreground px-2 py-0.5 rounded text-xs"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          </CardContent>
+                        </Card>
                       </Link>
                     ))}
                   </div>
