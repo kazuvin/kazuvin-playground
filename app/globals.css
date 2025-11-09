@@ -33,8 +33,12 @@
   --color-chart-5: oklch(73.9% 0.155 53);
 
   /** Animation */
-  --animate-fade-out: 0.2s ease fade-out;
   --animate-fade-in: 0.2s ease fade-in;
+  --animate-fade-out: 0.2s ease fade-out;
+  --animate-scale-in: 0.2s ease scale-in;
+  --animate-scale-out: 0.2s ease scale-out;
+  --animate-fade-scale-in: var(--animate-fade-in), var(--animate-scale-in);
+  --animate-fade-scale-out: var(--animate-fade-out), var(--animate-scale-out);
 
   /** keyframes */
   @keyframes fade-in {
@@ -52,6 +56,24 @@
     }
     to {
       opacity: 0;
+    }
+  }
+
+  @keyframes scale-in {
+    from {
+      transform: scale(0.95);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+
+  @keyframes scale-out {
+    from {
+      transform: scale(1);
+    }
+    to {
+      transform: scale(0.95);
     }
   }
 }

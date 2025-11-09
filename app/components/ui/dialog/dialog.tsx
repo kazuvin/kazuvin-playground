@@ -41,7 +41,7 @@ function DialogContent({
       <DialogPrimitive.Content
         ref={ref}
         className={cn(
-          "border-border bg-background data-[state=open]:animate-fade-in data-[state=closed]:animate-fade-out fixed top-1/2 left-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl border p-6 shadow-lg duration-200",
+          "border-border bg-background data-[state=open]:animate-fade-scale-in data-[state=closed]:animate-fade-scale-out fixed top-1/2 left-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-xl border p-6 shadow-lg duration-200",
           className
         )}
         {...props}
