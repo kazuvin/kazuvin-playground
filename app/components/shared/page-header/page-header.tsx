@@ -15,9 +15,7 @@ function PageHeader({
 }: PageHeaderProps) {
   return (
     <header className={cn("mb-12", className)} {...props}>
-      <Typography variant="h1" className="mb-4">
-        {title}
-      </Typography>
+      <Typography variant="h1">{title}</Typography>
       {description && <Typography variant="p">{description}</Typography>}
     </header>
   );
