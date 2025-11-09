@@ -1,6 +1,5 @@
 // For more info, see https://github.com/storybookjs/eslint-plugin-storybook#configuration-flat-config-format
 import storybook from "eslint-plugin-storybook";
-import tailwindcss from "eslint-plugin-tailwindcss";
 
 import { dirname } from "path";
 import { fileURLToPath } from "url";
@@ -16,7 +15,6 @@ const compat = new FlatCompat({
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
   ...storybook.configs["flat/recommended"],
-  ...tailwindcss.configs["flat/recommended"],
 ];
 
 export default eslintConfig;
