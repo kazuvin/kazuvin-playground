@@ -1,10 +1,15 @@
 export default function Home() {
   return (
     <div className="space-y-12">
-      <div className="space-y-3 leading-7 font-semibold">
-        <p>
-          Kazuvin
-          の遊び場です。実験的に作ったものを載せたり、スクラップをまとめたり。気が向いたらなにか書いたりします。
+      <div className="space-y-1 leading-7">
+        <p className="animate-fade-slide-up animation-forwards opacity-0">
+          Hello, my name is Kazuvin.
+        </p>
+        <p className="animate-fade-slide-up animation-delay-200 animation-forwards opacity-0">
+          This is my playground for experimenting with new web technologies
+        </p>
+        <p className="animate-fade-slide-up animation-delay-400 animation-forwards opacity-0">
+          Please take a look around and enjoy your stay!
         </p>
       </div>
 

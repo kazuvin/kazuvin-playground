@@ -11,7 +11,7 @@ export function AppHeader() {
 
   return (
     <div
-      className={`bg-foreground/5 sticky top-2 flex h-12 items-center justify-between rounded-2xl px-6 py-3 backdrop-blur-2xl ${
+      className={`bg-foreground/5 sticky top-2 z-20 flex h-12 items-center justify-between rounded-2xl px-6 py-3 backdrop-blur-2xl ${
         isScrolled ? "ml-auto" : ""
       }`}
     >
