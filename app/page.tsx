@@ -10,8 +10,42 @@ import {
   TimelineSeparator,
   TimelineBody,
 } from "@/app/components/ui";
+import notesIndex from "@/public/notes-index.json";
+import Link from "next/link";
+
+interface NoteMetadata {
+  title: string;
+  date: string;
+  description: string;
+  tags: string[];
+}
+
+interface NoteItem {
+  type: string;
+  url: string;
+  metadata: NoteMetadata;
+}
 
 export default function Home() {
+  const notes = notesIndex as NoteItem[];
+
+  const notesByMonth = notes.reduce((acc, note) => {
+    const date = new Date(note.metadata.date);
+    const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+    const monthLabel = `${date.getFullYear()}年${date.getMonth() + 1}月`;
+
+    if (!acc[monthKey]) {
+      acc[monthKey] = {
+        label: monthLabel,
+        notes: []
+      };
+    }
+    acc[monthKey].notes.push(note);
+    return acc;
+  }, {} as Record<string, { label: string; notes: NoteItem[] }>);
+
+  const sortedMonths = Object.entries(notesByMonth).sort(([a], [b]) => b.localeCompare(a));
+
   return (
     <div className="space-y-12">
       <div className="space-y-1 leading-7">
@@ -28,111 +62,49 @@ export default function Home() {
 
       <section className="animate-fade-slide-up animation-delay-600 animation-forwards opacity-0">
         <Timeline>
-          <TimelineItem>
-            <TimelineHeader>
-              <TimelineIndicator>
-                <TimelineDot isCompleted />
-              </TimelineIndicator>
-              <TimelineTitle>8月</TimelineTitle>
-            </TimelineHeader>
-            <TimelineContent>
-              <TimelineSeparator>
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineBody>
-                <div className="space-y-2">
-                  <div className="bg-muted rounded-md p-3">
-                    <code className="text-xs">
-                      git init && git commit -m &quot;Initial commit&quot;
-                    </code>
+          {sortedMonths.map(([monthKey, { label, notes: monthNotes }], index) => (
+            <TimelineItem key={monthKey}>
+              <TimelineHeader>
+                <TimelineIndicator>
+                  <TimelineDot isCompleted />
+                </TimelineIndicator>
+                <TimelineTitle>{label}</TimelineTitle>
+              </TimelineHeader>
+              <TimelineContent>
+                <TimelineSeparator>
+                  {index < sortedMonths.length - 1 && <TimelineConnector />}
+                </TimelineSeparator>
+                <TimelineBody>
+                  <div className="space-y-3">
+                    {monthNotes.map((note) => (
+                      <Link
+                        key={note.url}
+                        href={note.url}
+                        className="block bg-muted rounded-md p-3 hover:bg-muted/80 transition-colors"
+                      >
+                        <h3 className="font-medium text-sm mb-1">
+                          {note.metadata.title}
+                        </h3>
+                        <p className="text-muted-foreground text-xs mb-2">
+                          {note.metadata.description}
+                        </p>
+                        <div className="flex flex-wrap gap-1">
+                          {note.metadata.tags.map((tag) => (
+                            <span
+                              key={tag}
+                              className="bg-background text-muted-foreground px-2 py-0.5 rounded text-xs"
+                            >
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      </Link>
+                    ))}
                   </div>
-                  <p className="text-muted-foreground text-xs">
-                    Branch: main • Commit: a1b2c3d
-                  </p>
-                </div>
-              </TimelineBody>
-            </TimelineContent>
-          </TimelineItem>
-          <TimelineItem>
-            <TimelineHeader>
-              <TimelineIndicator>
-                <TimelineDot isCompleted />
-              </TimelineIndicator>
-              <TimelineTitle>7月</TimelineTitle>
-            </TimelineHeader>
-            <TimelineContent>
-              <TimelineSeparator>
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineBody>
-                <div className="text-muted-foreground space-y-1 text-xs">
-                  <p>✓ React 18.2.0</p>
-                  <p>✓ TypeScript 5.0.0</p>
-                  <p>✓ Tailwind CSS 3.3.0</p>
-                </div>
-              </TimelineBody>
-            </TimelineContent>
-          </TimelineItem>
-          <TimelineItem>
-            <TimelineHeader>
-              <TimelineIndicator>
-                <TimelineDot isCompleted />
-              </TimelineIndicator>
-              <TimelineTitle>6月</TimelineTitle>
-            </TimelineHeader>
-            <TimelineContent>
-              <TimelineSeparator>
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineBody>
-                <div className="text-muted-foreground space-y-1 text-xs">
-                  <p>✓ React 18.2.0</p>
-                  <p>✓ TypeScript 5.0.0</p>
-                  <p>✓ Tailwind CSS 3.3.0</p>
-                </div>
-              </TimelineBody>
-            </TimelineContent>
-          </TimelineItem>
-          <TimelineItem>
-            <TimelineHeader>
-              <TimelineIndicator>
-                <TimelineDot isCompleted />
-              </TimelineIndicator>
-              <TimelineTitle>5月</TimelineTitle>
-            </TimelineHeader>
-            <TimelineContent>
-              <TimelineSeparator>
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineBody>
-                <div className="text-muted-foreground space-y-1 text-xs">
-                  <p>✓ React 18.2.0</p>
-                  <p>✓ TypeScript 5.0.0</p>
-                  <p>✓ Tailwind CSS 3.3.0</p>
-                </div>
-              </TimelineBody>
-            </TimelineContent>
-          </TimelineItem>
-          <TimelineItem>
-            <TimelineHeader>
-              <TimelineIndicator>
-                <TimelineDot isCompleted />
-              </TimelineIndicator>
-              <TimelineTitle>4月</TimelineTitle>
-            </TimelineHeader>
-            <TimelineContent>
-              <TimelineSeparator>
-                <TimelineConnector />
-              </TimelineSeparator>
-              <TimelineBody>
-                <div className="text-muted-foreground space-y-1 text-xs">
-                  <p>✓ React 18.2.0</p>
-                  <p>✓ TypeScript 5.0.0</p>
-                  <p>✓ Tailwind CSS 3.3.0</p>
-                </div>
-              </TimelineBody>
-            </TimelineContent>
-          </TimelineItem>
+                </TimelineBody>
+              </TimelineContent>
+            </TimelineItem>
+          ))}
         </Timeline>
       </section>
     </div>
