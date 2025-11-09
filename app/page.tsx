@@ -26,7 +26,7 @@ export default function Home() {
         </p>
       </div>
 
-      <section>
+      <section className="animate-fade-slide-up animation-delay-600 animation-forwards opacity-0">
         <Timeline>
           <TimelineItem>
             <TimelineHeader>
@@ -80,6 +80,58 @@ export default function Home() {
               </TimelineIndicator>
               <TimelineTitle>6月</TimelineTitle>
             </TimelineHeader>
+            <TimelineContent>
+              <TimelineSeparator>
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineBody>
+                <div className="text-muted-foreground space-y-1 text-xs">
+                  <p>✓ React 18.2.0</p>
+                  <p>✓ TypeScript 5.0.0</p>
+                  <p>✓ Tailwind CSS 3.3.0</p>
+                </div>
+              </TimelineBody>
+            </TimelineContent>
+          </TimelineItem>
+          <TimelineItem>
+            <TimelineHeader>
+              <TimelineIndicator>
+                <TimelineDot isCompleted />
+              </TimelineIndicator>
+              <TimelineTitle>5月</TimelineTitle>
+            </TimelineHeader>
+            <TimelineContent>
+              <TimelineSeparator>
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineBody>
+                <div className="text-muted-foreground space-y-1 text-xs">
+                  <p>✓ React 18.2.0</p>
+                  <p>✓ TypeScript 5.0.0</p>
+                  <p>✓ Tailwind CSS 3.3.0</p>
+                </div>
+              </TimelineBody>
+            </TimelineContent>
+          </TimelineItem>
+          <TimelineItem>
+            <TimelineHeader>
+              <TimelineIndicator>
+                <TimelineDot isCompleted />
+              </TimelineIndicator>
+              <TimelineTitle>4月</TimelineTitle>
+            </TimelineHeader>
+            <TimelineContent>
+              <TimelineSeparator>
+                <TimelineConnector />
+              </TimelineSeparator>
+              <TimelineBody>
+                <div className="text-muted-foreground space-y-1 text-xs">
+                  <p>✓ React 18.2.0</p>
+                  <p>✓ TypeScript 5.0.0</p>
+                  <p>✓ Tailwind CSS 3.3.0</p>
+                </div>
+              </TimelineBody>
+            </TimelineContent>
           </TimelineItem>
         </Timeline>
       </section>
