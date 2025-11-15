@@ -6,7 +6,7 @@ import { cn } from "@/lib/cn";
 
 export function AppHeader({ className, ...props }: ComponentProps<"div">) {
   return (
-    <div
+    <header
       className={cn(
         "bg-background/50 flex h-12 items-center justify-between backdrop-blur-2xl",
         className
@@ -27,6 +27,6 @@ export function AppHeader({ className, ...props }: ComponentProps<"div">) {
         </nav>
         <CommandSearch />
       </div>
-    </div>
+    </header>
   );
 }

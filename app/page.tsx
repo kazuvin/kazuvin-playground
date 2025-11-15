@@ -60,7 +60,7 @@ export default function Home() {
 
   return (
     <div className="space-y-12">
-      <div className="space-y-1 leading-7">
+      <header className="space-y-1 leading-7">
         <div className="py-6 text-5xl">☕️</div>
         <p className="animate-fade-slide-up animation-forwards opacity-0">
           Hello, my name is Kazuvin.
@@ -71,7 +71,7 @@ export default function Home() {
         <p className="animate-fade-slide-up animation-delay-400 animation-forwards opacity-0">
           Please take a look around and enjoy your stay!
         </p>
-      </div>
+      </header>
 
       <section className="animate-fade-slide-up animation-delay-600 animation-forwards opacity-0">
         <Timeline>
