@@ -1,28 +1,19 @@
-"use client";
-
 import { APP_NAME } from "@/config";
-import { useWindowScroll } from "@/app/hooks";
 import Link from "next/link";
 import { CommandSearch } from "../command-search";
+import { ComponentProps } from "react";
+import { cn } from "@/lib/cn";
 
-export function AppHeader() {
-  const [scrollPosition] = useWindowScroll();
-  const isScrolled = scrollPosition.y >= 90;
-
+export function AppHeader({ className, ...props }: ComponentProps<"div">) {
   return (
     <div
-      className={`bg-foreground/5 sticky top-2 z-20 flex h-12 items-center justify-between rounded-2xl px-6 py-3 backdrop-blur-2xl ${
-        isScrolled ? "ml-auto" : ""
-      }`}
+      className={cn(
+        "bg-background/50 flex h-12 items-center justify-between backdrop-blur-2xl",
+        className
+      )}
+      {...props}
     >
-      <Link
-        href="/"
-        className={`text-lg font-bold whitespace-nowrap transition-all duration-300 ease-in-out ${
-          isScrolled
-            ? "mr-0 w-0 max-w-0 overflow-hidden opacity-0"
-            : "mr-4 w-auto max-w-xs opacity-100"
-        }`}
-      >
+      <Link href="/" className="font-bold">
         {APP_NAME}
       </Link>
       <div className="flex items-center gap-5">

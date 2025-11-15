@@ -16,7 +16,7 @@ function TimelineItem({
 function TimelineConnector({
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+}: React.ComponentProps<"div">) {
   return (
     <div
       className={cn(
@@ -28,7 +28,7 @@ function TimelineConnector({
   );
 }
 
-interface TimelineDotProps extends React.HTMLAttributes<HTMLDivElement> {
+interface TimelineDotProps extends React.ComponentProps<"div"> {
   isActive?: boolean;
   isCompleted?: boolean;
 }
@@ -53,7 +53,7 @@ function TimelineDot({
   );
 }
 
-interface TimelineIconProps extends React.HTMLAttributes<HTMLDivElement> {
+interface TimelineIconProps extends React.ComponentProps<"div"> {
   isActive?: boolean;
   isCompleted?: boolean;
 }
@@ -84,7 +84,7 @@ function TimelineIcon({
 function TimelineIndicator({
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+}: React.ComponentProps<"div">) {
   return (
     <div
       className={cn(
@@ -96,19 +96,13 @@ function TimelineIndicator({
   );
 }
 
-function TimelineHeader({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+function TimelineHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div className={cn("flex items-center gap-4 pb-2", className)} {...props} />
   );
 }
 
-function TimelineContent({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+function TimelineContent({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div className={cn("relative flex gap-4 pb-2", className)} {...props} />
   );
@@ -117,20 +111,17 @@ function TimelineContent({
 function TimelineSeparator({
   className,
   ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+}: React.ComponentProps<"div">) {
   return (
     <div className={cn("relative flex w-8 shrink-0", className)} {...props} />
   );
 }
 
-function TimelineBody({
-  className,
-  ...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+function TimelineBody({ className, ...props }: React.ComponentProps<"div">) {
   return <div className={cn("flex-1", className)} {...props} />;
 }
 
-interface TimelineTitleProps extends React.HTMLAttributes<HTMLDivElement> {
+interface TimelineTitleProps extends React.ComponentProps<"div"> {
   isActive?: boolean;
 }
 

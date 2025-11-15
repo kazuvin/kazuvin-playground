@@ -27,8 +27,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        <div className="mx-auto grid w-full max-w-2xl grid-cols-1 gap-10 px-3 pt-10 md:pb-24">
-          <AppHeader />
+        <AppHeader className="sticky top-0 z-20 mx-16 px-4" />
+        <div className="mx-auto grid w-full max-w-2xl grid-cols-1 gap-10 px-3 md:pb-24">
           {children}
         </div>
       </body>

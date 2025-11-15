@@ -87,6 +87,15 @@
       transform: translateY(0);
     }
   }
+
+  @keyframes slide-down {
+    from {
+      transform: translateY(-20px);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
 }
 
 @layer utilities {
