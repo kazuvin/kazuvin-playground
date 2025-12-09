@@ -1,3 +1,2 @@
-export { Typography } from "./typography";
-export type { TypographyProps } from "./typography";
-export type { TypographyVariant, TypographyElement } from "./variants";
+export * from "./typography";
+export * from "./variants";

@@ -1,0 +1,11 @@
+# act configuration for local CI testing
+# https://github.com/nektos/act
+
+# Use medium-sized Docker image for better compatibility
+-P ubuntu-latest=catthehacker/ubuntu:act-latest
+
+# Reuse Docker containers for faster runs
+--reuse
+
+# Bind workspace to avoid permission issues
+--bind

@@ -14,6 +14,15 @@ export default defineConfig({
     globals: true,
     environment: "happy-dom",
     projects: [
+      // Unit tests project
+      {
+        test: {
+          name: "unit",
+          include: ["**/*.test.ts", "**/*.test.tsx"],
+          exclude: ["**/*.stories.tsx", "node_modules/**"],
+        },
+      },
+      // Storybook tests project
       {
         extends: true,
         plugins: [
