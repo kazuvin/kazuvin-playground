@@ -1,4 +1,4 @@
-import { getNoteSlugs } from "@/lib/notes";
+import { getAllNoteSlugs } from "./actions";
 
 export default async function Page({
   params,
@@ -16,7 +16,7 @@ export default async function Page({
 }
 
 export async function generateStaticParams() {
-  const slugs = await getNoteSlugs();
+  const slugs = await getAllNoteSlugs();
   return slugs.map((slug) => ({ slug }));
 }
 

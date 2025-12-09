@@ -12,6 +12,7 @@
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
+    "ci:check": "pnpm run lint && pnpm exec tsc --noEmit && pnpm test:run && pnpm run build",
     "deploy": "pnpm run generate:notes && opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "preview": "pnpm run generate:notes && opennextjs-cloudflare build && opennextjs-cloudflare preview",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts",
@@ -30,7 +31,8 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "remark-frontmatter": "^5.0.0",
-    "tailwind-merge": "^3.3.1"
+    "tailwind-merge": "^3.3.1",
+    "valtio": "^2.2.0"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "^4.1.2",

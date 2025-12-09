@@ -1,8 +1,8 @@
-import { getAllNoteMetadata } from "@/lib/notes";
 import { NoteCard } from "@/app/components/notes";
 import { Typography } from "@/app/components/ui";
 import { PageHeader } from "@/app/components/shared";
 import type { Metadata } from "next";
+import { getNotes } from "./actions";
 
 export const metadata: Metadata = {
   title: "Notes",
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-static";
 
 export default async function NotesPage() {
-  const notes = await getAllNoteMetadata();
+  const notes = await getNotes();
 
   return (
     <div>
