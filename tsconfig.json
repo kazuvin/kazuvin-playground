@@ -10,11 +10,5 @@
     "types": ["node"]
   },
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "storybook-static",
-    "coverage",
-    ".wrangler"
-  ]
+  "exclude": ["node_modules", "dist", "storybook-static", "coverage", ".wrangler"]
 }

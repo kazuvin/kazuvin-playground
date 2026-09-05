@@ -1,15 +1,15 @@
-import { getCollection, type CollectionEntry } from "astro:content";
-import type { NoteSummary, SearchableItem } from "@/lib/types";
+import { type CollectionEntry, getCollection } from 'astro:content'
+import type { NoteSummary, SearchableItem } from '@/lib/types'
 
 /** notes コレクションのエントリ */
-export type NoteEntry = CollectionEntry<"notes">;
+export type NoteEntry = CollectionEntry<'notes'>
 
 /**
  * 日付を YYYY-MM-DD 形式の文字列に変換する
  * frontmatter は Date にパースされるが、UI と検索インデックスは文字列で扱う
  */
 function toDateString(date: Date): string {
-  return date.toISOString().slice(0, 10);
+  return date.toISOString().slice(0, 10)
 }
 
 /**
@@ -17,8 +17,8 @@ function toDateString(date: Date): string {
  * draft: true のノートは除外される
  */
 export async function getPublishedNotes(): Promise<NoteEntry[]> {
-  const notes = await getCollection("notes", ({ data }) => !data.draft);
-  return notes.sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+  const notes = await getCollection('notes', ({ data }) => !data.draft)
+  return notes.sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
 }
 
 /**
@@ -33,7 +33,7 @@ export function toNoteSummary(entry: NoteEntry): NoteSummary {
       description: entry.data.description,
       tags: entry.data.tags,
     },
-  };
+  }
 }
 
 /**
@@ -41,7 +41,7 @@ export function toNoteSummary(entry: NoteEntry): NoteSummary {
  */
 export function toSearchableItem(entry: NoteEntry): SearchableItem {
   return {
-    type: "note",
+    type: 'note',
     url: `/notes/${entry.id}`,
     metadata: {
       title: entry.data.title,
@@ -49,5 +49,5 @@ export function toSearchableItem(entry: NoteEntry): SearchableItem {
       description: entry.data.description,
       tags: entry.data.tags,
     },
-  };
+  }
 }

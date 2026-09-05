@@ -1,208 +1,208 @@
-import { describe, it, expect } from "vitest";
-import { groupNotesByMonth, sortMonthsDescending } from "./group-by-month";
-import type { SearchableItem } from "@/lib/types";
+import { describe, expect, it } from 'vitest'
+import type { SearchableItem } from '@/lib/types'
+import { groupNotesByMonth, sortMonthsDescending } from './group-by-month'
 
-describe("groupNotesByMonth", () => {
-  it("should group notes by month correctly", () => {
+describe('groupNotesByMonth', () => {
+  it('should group notes by month correctly', () => {
     const notes: SearchableItem[] = [
       {
-        type: "note",
-        url: "/notes/note1",
+        type: 'note',
+        url: '/notes/note1',
         metadata: {
-          title: "Note 1",
-          date: "2024-01-15",
-          description: "First note",
-          tags: ["tag1"],
+          title: 'Note 1',
+          date: '2024-01-15',
+          description: 'First note',
+          tags: ['tag1'],
         },
       },
       {
-        type: "note",
-        url: "/notes/note2",
+        type: 'note',
+        url: '/notes/note2',
         metadata: {
-          title: "Note 2",
-          date: "2024-01-20",
-          description: "Second note",
-          tags: ["tag2"],
+          title: 'Note 2',
+          date: '2024-01-20',
+          description: 'Second note',
+          tags: ['tag2'],
         },
       },
       {
-        type: "note",
-        url: "/notes/note3",
+        type: 'note',
+        url: '/notes/note3',
         metadata: {
-          title: "Note 3",
-          date: "2024-02-10",
-          description: "Third note",
-          tags: ["tag3"],
+          title: 'Note 3',
+          date: '2024-02-10',
+          description: 'Third note',
+          tags: ['tag3'],
         },
       },
-    ];
+    ]
 
-    const result = groupNotesByMonth(notes);
+    const result = groupNotesByMonth(notes)
 
-    expect(Object.keys(result)).toHaveLength(2);
-    expect(result["2024-01"]).toBeDefined();
-    expect(result["2024-01"].label).toBe("2024年1月");
-    expect(result["2024-01"].notes).toHaveLength(2);
-    expect(result["2024-02"]).toBeDefined();
-    expect(result["2024-02"].label).toBe("2024年2月");
-    expect(result["2024-02"].notes).toHaveLength(1);
-  });
+    expect(Object.keys(result)).toHaveLength(2)
+    expect(result['2024-01']).toBeDefined()
+    expect(result['2024-01'].label).toBe('2024年1月')
+    expect(result['2024-01'].notes).toHaveLength(2)
+    expect(result['2024-02']).toBeDefined()
+    expect(result['2024-02'].label).toBe('2024年2月')
+    expect(result['2024-02'].notes).toHaveLength(1)
+  })
 
-  it("should handle empty array", () => {
-    const notes: SearchableItem[] = [];
-    const result = groupNotesByMonth(notes);
+  it('should handle empty array', () => {
+    const notes: SearchableItem[] = []
+    const result = groupNotesByMonth(notes)
 
-    expect(Object.keys(result)).toHaveLength(0);
-  });
+    expect(Object.keys(result)).toHaveLength(0)
+  })
 
-  it("should handle single note", () => {
+  it('should handle single note', () => {
     const notes: SearchableItem[] = [
       {
-        type: "note",
-        url: "/notes/note1",
+        type: 'note',
+        url: '/notes/note1',
         metadata: {
-          title: "Note 1",
-          date: "2024-03-15",
-          description: "Single note",
-          tags: ["tag1"],
+          title: 'Note 1',
+          date: '2024-03-15',
+          description: 'Single note',
+          tags: ['tag1'],
         },
       },
-    ];
+    ]
 
-    const result = groupNotesByMonth(notes);
+    const result = groupNotesByMonth(notes)
 
-    expect(Object.keys(result)).toHaveLength(1);
-    expect(result["2024-03"]).toBeDefined();
-    expect(result["2024-03"].label).toBe("2024年3月");
-    expect(result["2024-03"].notes).toHaveLength(1);
-  });
+    expect(Object.keys(result)).toHaveLength(1)
+    expect(result['2024-03']).toBeDefined()
+    expect(result['2024-03'].label).toBe('2024年3月')
+    expect(result['2024-03'].notes).toHaveLength(1)
+  })
 
-  it("should pad month numbers with zero", () => {
+  it('should pad month numbers with zero', () => {
     const notes: SearchableItem[] = [
       {
-        type: "note",
-        url: "/notes/note1",
+        type: 'note',
+        url: '/notes/note1',
         metadata: {
-          title: "Note 1",
-          date: "2024-09-15",
-          description: "September note",
-          tags: ["tag1"],
+          title: 'Note 1',
+          date: '2024-09-15',
+          description: 'September note',
+          tags: ['tag1'],
         },
       },
-    ];
+    ]
 
-    const result = groupNotesByMonth(notes);
+    const result = groupNotesByMonth(notes)
 
-    expect(result["2024-09"]).toBeDefined();
-    expect(result["2024-09"].label).toBe("2024年9月");
-  });
+    expect(result['2024-09']).toBeDefined()
+    expect(result['2024-09'].label).toBe('2024年9月')
+  })
 
-  it("should handle notes from different years", () => {
+  it('should handle notes from different years', () => {
     const notes: SearchableItem[] = [
       {
-        type: "note",
-        url: "/notes/note1",
+        type: 'note',
+        url: '/notes/note1',
         metadata: {
-          title: "Note 1",
-          date: "2023-12-15",
-          description: "2023 note",
-          tags: ["tag1"],
+          title: 'Note 1',
+          date: '2023-12-15',
+          description: '2023 note',
+          tags: ['tag1'],
         },
       },
       {
-        type: "note",
-        url: "/notes/note2",
+        type: 'note',
+        url: '/notes/note2',
         metadata: {
-          title: "Note 2",
-          date: "2024-01-10",
-          description: "2024 note",
-          tags: ["tag2"],
+          title: 'Note 2',
+          date: '2024-01-10',
+          description: '2024 note',
+          tags: ['tag2'],
         },
       },
-    ];
+    ]
 
-    const result = groupNotesByMonth(notes);
+    const result = groupNotesByMonth(notes)
 
-    expect(Object.keys(result)).toHaveLength(2);
-    expect(result["2023-12"]).toBeDefined();
-    expect(result["2023-12"].label).toBe("2023年12月");
-    expect(result["2024-01"]).toBeDefined();
-    expect(result["2024-01"].label).toBe("2024年1月");
-  });
-});
+    expect(Object.keys(result)).toHaveLength(2)
+    expect(result['2023-12']).toBeDefined()
+    expect(result['2023-12'].label).toBe('2023年12月')
+    expect(result['2024-01']).toBeDefined()
+    expect(result['2024-01'].label).toBe('2024年1月')
+  })
+})
 
-describe("sortMonthsDescending", () => {
-  it("should sort months in descending order", () => {
+describe('sortMonthsDescending', () => {
+  it('should sort months in descending order', () => {
     const notesByMonth = {
-      "2024-01": { label: "2024年1月", notes: [] },
-      "2024-03": { label: "2024年3月", notes: [] },
-      "2024-02": { label: "2024年2月", notes: [] },
-    };
+      '2024-01': { label: '2024年1月', notes: [] },
+      '2024-03': { label: '2024年3月', notes: [] },
+      '2024-02': { label: '2024年2月', notes: [] },
+    }
 
-    const result = sortMonthsDescending(notesByMonth);
+    const result = sortMonthsDescending(notesByMonth)
 
-    expect(result).toHaveLength(3);
-    expect(result[0][0]).toBe("2024-03");
-    expect(result[1][0]).toBe("2024-02");
-    expect(result[2][0]).toBe("2024-01");
-  });
+    expect(result).toHaveLength(3)
+    expect(result[0][0]).toBe('2024-03')
+    expect(result[1][0]).toBe('2024-02')
+    expect(result[2][0]).toBe('2024-01')
+  })
 
-  it("should handle empty object", () => {
-    const notesByMonth = {};
-    const result = sortMonthsDescending(notesByMonth);
+  it('should handle empty object', () => {
+    const notesByMonth = {}
+    const result = sortMonthsDescending(notesByMonth)
 
-    expect(result).toHaveLength(0);
-  });
+    expect(result).toHaveLength(0)
+  })
 
-  it("should handle single month", () => {
+  it('should handle single month', () => {
     const notesByMonth = {
-      "2024-01": { label: "2024年1月", notes: [] },
-    };
+      '2024-01': { label: '2024年1月', notes: [] },
+    }
 
-    const result = sortMonthsDescending(notesByMonth);
+    const result = sortMonthsDescending(notesByMonth)
 
-    expect(result).toHaveLength(1);
-    expect(result[0][0]).toBe("2024-01");
-  });
+    expect(result).toHaveLength(1)
+    expect(result[0][0]).toBe('2024-01')
+  })
 
-  it("should sort across different years correctly", () => {
+  it('should sort across different years correctly', () => {
     const notesByMonth = {
-      "2023-12": { label: "2023年12月", notes: [] },
-      "2024-02": { label: "2024年2月", notes: [] },
-      "2024-01": { label: "2024年1月", notes: [] },
-      "2023-11": { label: "2023年11月", notes: [] },
-    };
+      '2023-12': { label: '2023年12月', notes: [] },
+      '2024-02': { label: '2024年2月', notes: [] },
+      '2024-01': { label: '2024年1月', notes: [] },
+      '2023-11': { label: '2023年11月', notes: [] },
+    }
 
-    const result = sortMonthsDescending(notesByMonth);
+    const result = sortMonthsDescending(notesByMonth)
 
-    expect(result).toHaveLength(4);
-    expect(result[0][0]).toBe("2024-02");
-    expect(result[1][0]).toBe("2024-01");
-    expect(result[2][0]).toBe("2023-12");
-    expect(result[3][0]).toBe("2023-11");
-  });
+    expect(result).toHaveLength(4)
+    expect(result[0][0]).toBe('2024-02')
+    expect(result[1][0]).toBe('2024-01')
+    expect(result[2][0]).toBe('2023-12')
+    expect(result[3][0]).toBe('2023-11')
+  })
 
-  it("should preserve note data in sorted result", () => {
+  it('should preserve note data in sorted result', () => {
     const notes: SearchableItem[] = [
       {
-        type: "note",
-        url: "/notes/note1",
+        type: 'note',
+        url: '/notes/note1',
         metadata: {
-          title: "Note 1",
-          date: "2024-01-15",
-          description: "First note",
-          tags: ["tag1"],
+          title: 'Note 1',
+          date: '2024-01-15',
+          description: 'First note',
+          tags: ['tag1'],
         },
       },
-    ];
+    ]
 
     const notesByMonth = {
-      "2024-01": { label: "2024年1月", notes },
-    };
+      '2024-01': { label: '2024年1月', notes },
+    }
 
-    const result = sortMonthsDescending(notesByMonth);
+    const result = sortMonthsDescending(notesByMonth)
 
-    expect(result[0][1].notes).toEqual(notes);
-    expect(result[0][1].label).toBe("2024年1月");
-  });
-});
+    expect(result[0][1].notes).toEqual(notes)
+    expect(result[0][1].label).toBe('2024年1月')
+  })
+})

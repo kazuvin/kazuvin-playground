@@ -1,54 +1,55 @@
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from 'react'
 
-export type WindowScrollPosition = {
-  x: number;
-  y: number;
-};
+export interface WindowScrollPosition {
+  x: number
+  y: number
+}
 
-export type ScrollToOptions = {
-  x?: number;
-  y?: number;
-  behavior?: ScrollBehavior;
-};
+export interface ScrollToOptions {
+  x?: number
+  y?: number
+  behavior?: ScrollBehavior
+}
 
-export function useWindowScroll(): [
-  WindowScrollPosition,
-  (options: ScrollToOptions) => void,
-] {
+export function useWindowScroll(): [WindowScrollPosition, (options: ScrollToOptions) => void] {
   const [scrollPosition, setScrollPosition] = useState<WindowScrollPosition>({
-    x: typeof window !== "undefined" ? window.scrollX : 0,
-    y: typeof window !== "undefined" ? window.scrollY : 0,
-  });
+    x: typeof window !== 'undefined' ? window.scrollX : 0,
+    y: typeof window !== 'undefined' ? window.scrollY : 0,
+  })
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') {
+      return
+    }
 
     const handleScroll = () => {
       setScrollPosition({
         x: window.scrollX,
         y: window.scrollY,
-      });
-    };
+      })
+    }
 
     // 初期値を設定
-    handleScroll();
+    handleScroll()
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener('scroll', handleScroll, { passive: true })
 
     return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
 
   const scrollTo = useCallback((options: ScrollToOptions) => {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') {
+      return
+    }
 
     window.scrollTo({
       left: options.x,
       top: options.y,
-      behavior: options.behavior || "smooth",
-    });
-  }, []);
+      behavior: options.behavior || 'smooth',
+    })
+  }, [])
 
-  return [scrollPosition, scrollTo];
+  return [scrollPosition, scrollTo]
 }

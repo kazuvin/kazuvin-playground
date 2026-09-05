@@ -1,15 +1,15 @@
 ---
-import AppHeader from "@/components/shared/app-header/app-header.astro";
-import BaseLayout from "./base-layout.astro";
+import AppHeader from './app-header.astro'
+import BaseLayout from './base-layout.astro'
 
-export interface Props {
+interface Props {
   /** ページ固有のタイトル */
-  title?: string;
+  title?: string
   /** ページ固有の説明 */
-  description?: string;
+  description?: string
 }
 
-const { title, description } = Astro.props;
+const { title, description } = Astro.props
 ---
 
 <BaseLayout title={title} description={description}>

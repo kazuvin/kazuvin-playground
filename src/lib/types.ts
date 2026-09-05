@@ -1,20 +1,20 @@
 /**
  * 検索可能なアイテムの種類
  */
-export type SearchableItemType = "note" | "playground";
+export type SearchableItemType = 'note' | 'playground'
 
 /**
  * 検索可能なアイテムの基本メタデータ
  */
-export interface SearchableMetadata {
+interface SearchableMetadata {
   /** タイトル */
-  title: string;
+  title: string
   /** 公開日 (YYYY-MM-DD形式) */
-  date: string;
+  date: string
   /** 説明 */
-  description?: string;
+  description?: string
   /** タグのリスト */
-  tags?: string[];
+  tags?: string[]
 }
 
 /**
@@ -25,11 +25,11 @@ export interface SearchableMetadata {
  */
 export interface SearchableItem {
   /** アイテムの種類 */
-  type: SearchableItemType;
+  type: SearchableItemType
   /** メタデータ */
-  metadata: SearchableMetadata;
+  metadata: SearchableMetadata
   /** 遷移先のURL */
-  url: string;
+  url: string
 }
 
 /**
@@ -40,18 +40,18 @@ export interface SearchableItem {
  */
 export interface NoteSummary {
   /** ノートのスラッグ */
-  slug: string;
+  slug: string
   /** ノートのメタデータ */
   metadata: {
     /** ノートのタイトル */
-    title: string;
+    title: string
     /** 公開日 (YYYY-MM-DD形式) */
-    date: string;
+    date: string
     /** ノートの説明 */
-    description?: string;
+    description?: string
     /** タグのリスト */
-    tags: string[];
-  };
+    tags: string[]
+  }
 }
 
 /**
@@ -59,7 +59,7 @@ export interface NoteSummary {
  */
 export interface NotesByMonth {
   /** 表示用の月ラベル (例: "2025年11月") */
-  label: string;
+  label: string
   /** その月に属するノート */
-  notes: SearchableItem[];
+  notes: SearchableItem[]
 }

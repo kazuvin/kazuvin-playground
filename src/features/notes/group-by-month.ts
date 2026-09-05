@@ -1,35 +1,33 @@
-import type { NotesByMonth, SearchableItem } from "@/lib/types";
+import { toMonthKey, toMonthLabel } from '@/lib/date'
+import type { NotesByMonth, SearchableItem } from '@/lib/types'
 
 /**
  * ノートを月ごとにグループ化する
  */
-export function groupNotesByMonth(
-  notes: SearchableItem[]
-): Record<string, NotesByMonth> {
+export function groupNotesByMonth(notes: SearchableItem[]): Record<string, NotesByMonth> {
   return notes.reduce(
     (acc, note) => {
-      const date = new Date(note.metadata.date);
-      const monthKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
-      const monthLabel = `${date.getFullYear()}年${date.getMonth() + 1}月`;
+      const monthKey = toMonthKey(note.metadata.date)
+      const monthLabel = toMonthLabel(note.metadata.date)
 
       if (!acc[monthKey]) {
         acc[monthKey] = {
           label: monthLabel,
           notes: [],
-        };
+        }
       }
-      acc[monthKey].notes.push(note);
-      return acc;
+      acc[monthKey].notes.push(note)
+      return acc
     },
-    {} as Record<string, NotesByMonth>
-  );
+    {} as Record<string, NotesByMonth>,
+  )
 }
 
 /**
  * 月ごとのノートを新しい順にソートする
  */
 export function sortMonthsDescending(
-  notesByMonth: Record<string, NotesByMonth>
+  notesByMonth: Record<string, NotesByMonth>,
 ): [string, NotesByMonth][] {
-  return Object.entries(notesByMonth).sort(([a], [b]) => b.localeCompare(a));
+  return Object.entries(notesByMonth).sort(([a], [b]) => b.localeCompare(a))
 }

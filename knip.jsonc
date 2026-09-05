@@ -1,0 +1,14 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  // .astro のページとレイアウトがエントリ。ここから辿れないファイルは使われていない。
+  // src/pages/ 配下はファイルの存在そのものが URL になるので、すべてエントリ扱いにする。
+  // astro.config.mjs / content.config.ts / .storybook は Astro・Storybook の
+  // プラグインが自動で拾うため、ここに書かない。
+  "entry": ["src/pages/**/*.{astro,ts}"],
+  "project": ["src/**/*.{ts,tsx,astro}"],
+  "ignoreDependencies": [
+    // globals.css の `@import "tailwindcss"` から使う。
+    // knip は CSS の import を辿らないので検出できない。
+    "tailwindcss"
+  ]
+}

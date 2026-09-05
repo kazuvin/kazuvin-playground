@@ -4,6 +4,7 @@ packages:
 onlyBuiltDependencies:
   - core-js-pure
   - esbuild
+  - lefthook
   - rclone.js
   - sharp
   - unrs-resolver

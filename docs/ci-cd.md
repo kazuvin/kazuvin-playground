@@ -21,13 +21,14 @@ CI ワークフローは以下の 3 つのジョブで構成されています�
 
 ```yaml
 - Run lint: pnpm run lint
-- Type check: pnpm exec tsc --noEmit
+- Type check: pnpm run typecheck
 ```
 
 **実行内容**:
 
-- ESLint によるコードスタイルチェック
-- TypeScript の型チェック
+- Biome による lint と整形チェック (`.ts` / `.tsx` / `.json` / `.css`)
+- Prettier による整形チェック (`.astro`)
+- `astro check` による型チェック (`.astro` を含む)
 
 #### 2. Test
 
@@ -35,7 +36,7 @@ CI ワークフローは以下の 3 つのジョブで構成されています�
 
 ```yaml
 - Install Playwright browsers
-- Run tests: pnpm test:run
+- Run tests: pnpm run test
 ```
 
 **実行内容**:
@@ -182,11 +183,14 @@ GitHub Actions では pnpm のキャッシュを活用しています：
 - name: Setup Node.js
   uses: actions/setup-node@v4
   with:
-    node-version: "20"
+    node-version-file: ".node-version"
     cache: "pnpm"
 ```
 
 これにより、2 回目以降の実行で依存関係のインストールが高速になります。
+
+Node のバージョンはローカルが `mise.toml`、CI が `.node-version` を見ます。
+どちらかを上げるときは両方を揃えてください。
 
 ### 並列実行
 
@@ -205,22 +209,18 @@ pnpm run lint
 自動修正する場合：
 
 ```bash
-pnpm run lint --fix
+pnpm run lint:fix
 ```
 
 ### 2. Type Check
 
 ```bash
-pnpm exec tsc --noEmit
+pnpm run typecheck
 ```
 
-### 3. Format Check
+### 3. Format
 
-```bash
-pnpm run format:check
-```
-
-自動整形する場合：
+`pnpm run lint` に整形チェックが含まれています。自動整形する場合：
 
 ```bash
 pnpm run format
@@ -229,7 +229,7 @@ pnpm run format
 ### 4. Test
 
 ```bash
-pnpm test:run
+pnpm run test
 ```
 
 ### 5. Build
@@ -240,13 +240,12 @@ pnpm run build
 
 ### すべてを一度に実行
 
-以下のスクリプトを追加することで、CI と同じチェックをローカルで実行できます：
+CI と同じチェックを通しで実行するスクリプトが `package.json` に定義済みです。
 
-```bash
-# package.json に追加
+```json
 {
   "scripts": {
-    "ci:check": "pnpm run lint && pnpm exec tsc --noEmit && pnpm test:run && pnpm run build"
+    "ci:check": "pnpm run lint && pnpm run typecheck && pnpm run test && pnpm run build"
   }
 }
 ```
@@ -266,7 +265,7 @@ pnpm run ci:check
 pnpm run lint
 
 # 自動修正を試みる
-pnpm run lint --fix
+pnpm run lint:fix
 
 # 残ったエラーを手動で修正
 ```
@@ -275,21 +274,22 @@ pnpm run lint --fix
 
 ```bash
 # エラーを確認
-pnpm exec tsc --noEmit
+pnpm run typecheck
 
 # 型定義を修正
-# 必要に応じて型アサーションを追加
+# @ts-ignore は lint で禁止しているので、握り潰すときは
+# @ts-expect-error に理由を添える
 ```
 
 ### Test エラー
 
 ```bash
 # ローカルでテストを実行
-pnpm test
+pnpm run test
 
 # 失敗したテストを修正
-# スナップショットの更新が必要な場合：
-pnpm test -u
+# 変更しながら確認する場合はウォッチで回す：
+pnpm run test:watch
 ```
 
 ### Build エラー
@@ -306,12 +306,17 @@ pnpm run build
 
 ## ベストプラクティス
 
-### 1. コミット前にチェック
+### 1. コミット前のチェックは自動で走る
+
+lefthook が pre-commit で Biome (staged なファイルのみ)、Prettier (`.astro`)、
+`astro check` を実行し、commit-msg で commitlint が Conventional Commits を検証します。
+`pnpm install` 時に `prepare` スクリプトからフックが同期されます。
+
+手動で通したい場合：
 
 ```bash
-# コミット前に必ず実行
 pnpm run lint
-pnpm exec tsc --noEmit
+pnpm run typecheck
 ```
 
 ### 2. PR 作成前にローカル CI を実行
@@ -321,21 +326,24 @@ pnpm exec tsc --noEmit
 act
 ```
 
-### 3. Git Hooks の活用
-
-[husky](https://typicode.github.io/husky/) などを使用して、コミット前に自動でチェックを実行できます。
-
-### 4. エディタの設定
+### 3. エディタの設定
 
 VS Code や WebStorm などのエディタで、保存時に自動整形や lint を実行するように設定すると便利です。
 
 #### VS Code の設定例 (.vscode/settings.json)
 
+`.vscode/settings.json` に設定済みです。`.astro` だけ Prettier に渡している点に注意
+してください (Biome はテンプレートを扱えないため)。
+
 ```json
 {
+  "editor.defaultFormatter": "biomejs.biome",
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": true
+    "source.fixAll.biome": "explicit"
+  },
+  "[astro]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "typescript.tsdk": "node_modules/typescript/lib"
 }
@@ -369,12 +377,13 @@ on:
 
 ### マトリックスビルド
 
-複数の Node.js バージョンでテストする場合：
+複数の Node.js バージョンでテストする場合 (`package.json` の `engines` を
+下回るバージョンは対象にできません):
 
 ```yaml
 strategy:
   matrix:
-    node-version: [18, 20, 22]
+    node-version: [24]
 ```
 
 ## 参考リンク
@@ -387,5 +396,5 @@ strategy:
 
 - CI は GitHub Actions で自動実行される
 - ローカルでは `act` を使って CI をテストできる
-- コミット前に `pnpm run lint` と `pnpm exec tsc --noEmit` を実行
+- コミット前のチェックは lefthook が自動で走らせる (`pnpm run lint` / `pnpm run typecheck` を手動で通してもよい)
 - PR 作成前に `act` でローカル CI を実行して問題を事前に検出

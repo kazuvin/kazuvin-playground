@@ -15,25 +15,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # pnpm のバージョンは package.json の packageManager から読む
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version-file: ".node-version"
           cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # Biome（ts/tsx/json/css）と Prettier（.astro）の両方を通す
       - name: Run lint
         run: pnpm run lint
 
       - name: Type check
-        run: pnpm run check
+        run: pnpm run typecheck
 
   test:
     name: Test
@@ -45,13 +45,11 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version-file: ".node-version"
           cache: "pnpm"
 
       - name: Install dependencies
@@ -61,7 +59,7 @@ jobs:
         run: pnpm exec playwright install --with-deps chromium
 
       - name: Run tests
-        run: pnpm test:run
+        run: pnpm run test
 
   build:
     name: Build
@@ -73,13 +71,11 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version-file: ".node-version"
           cache: "pnpm"
 
       - name: Install dependencies

@@ -7,7 +7,8 @@ claude.ai/design のプロジェクト **"Kotoba Design System"** からこの�
 - _Kotoba_ (ことば) は**プレースホルダ名**。ブランド・ロゴ・Figma ファイルは未提供で、
   すべて 1 通のブリーフから導出されている。実名が決まったらリネームする。
 
-トークン層は `src/styles/globals.css`、コンポーネントは `src/components/ui/{button,text,screen}` にある。
+トークン層は `src/styles/globals.css`、コンポーネントは `src/components/ui/{button,text,screen}.tsx` にある
+(クラス定義は各ファイル内の private な定数)。
 
 ---
 
@@ -253,13 +254,16 @@ tier-1 の画面端スペーシング (24 / 32 / 24) を供給するシェル。
 `Typography` からの移行対応:
 `variant="h1"` → `role="expression"` / `variant="p"` → `role="body"` / `variant="small"` → `role="support"`
 
-### tailwind-merge の拡張 (`lib/cn/cn.ts`)
+### `cn` の拡張 (`src/lib/cn.ts`)
 
-Kotoba の 7 role は `text-` プレフィックスを font-size として使う。tailwind-merge は
+クラス結合と競合解決は shadcn の [`cn`](https://github.com/shadcn-ui/cn) を使う
+(`clsx` + `tailwind-merge` のドロップイン後継。両方を 1 パッケージに統合している)。
+
+Kotoba の 7 role は `text-` プレフィックスを font-size として使う。`cn` の既定設定は
 標準スケールしか知らないため、素のままだと `text-label` を**テキスト色**と誤判定し、
 後続の色クラスで黙って捨ててしまう (ボタンが継承フォントサイズで描画される)。
-`extendTailwindMerge` で 7 role を `font-size` グループに登録して回避している。
-`lib/cn/cn.test.ts` に回帰テストあり。
+`cn/config` の `createCn` で 7 role を `font-size` グループに登録して回避している。
+`src/lib/cn.test.ts` に回帰テストあり。
 
 ### 未対応 / 既知の不整合
 

@@ -1,25 +1,25 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef } from 'react'
 
-export type KeyboardShortcutOptions = {
+export interface KeyboardShortcutOptions {
   /** キーの組み合わせ (例: "k", "Enter", "Escape") */
-  key: string;
+  key: string
   /** Ctrlキーが押されている必要があるか */
-  ctrlKey?: boolean;
+  ctrlKey?: boolean
   /** Metaキー(Cmd/Win)が押されている必要があるか */
-  metaKey?: boolean;
+  metaKey?: boolean
   /** Shiftキーが押されている必要があるか */
-  shiftKey?: boolean;
+  shiftKey?: boolean
   /** Altキーが押されている必要があるか */
-  altKey?: boolean;
+  altKey?: boolean
   /** デフォルトの動作を防ぐか (デフォルト: true) */
-  preventDefault?: boolean;
+  preventDefault?: boolean
   /** イベントの伝播を停止するか (デフォルト: false) */
-  stopPropagation?: boolean;
+  stopPropagation?: boolean
   /** ショートカットを有効にするか (デフォルト: true) */
-  enabled?: boolean;
+  enabled?: boolean
   /** キャプチャフェーズでイベントを処理するか (デフォルト: false) */
-  capture?: boolean;
-};
+  capture?: boolean
+}
 
 /**
  * キーボードショートカットを登録する汎用カスタムフック
@@ -44,7 +44,7 @@ export type KeyboardShortcutOptions = {
  */
 export function useKeyboardShortcut(
   options: KeyboardShortcutOptions,
-  callback: (event: KeyboardEvent) => void
+  callback: (event: KeyboardEvent) => void,
 ) {
   const {
     key,
@@ -56,54 +56,45 @@ export function useKeyboardShortcut(
     stopPropagation = false,
     enabled = true,
     capture = false,
-  } = options;
+  } = options
 
   // callbackの最新の参照を保持
-  const callbackRef = useRef(callback);
+  const callbackRef = useRef(callback)
 
   useEffect(() => {
-    callbackRef.current = callback;
-  }, [callback]);
+    callbackRef.current = callback
+  }, [callback])
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) {
+      return
+    }
 
     const handleKeyDown = (event: KeyboardEvent) => {
       // キーの一致をチェック
-      const keyMatch = event.key === key;
+      const keyMatch = event.key === key
 
       // 修飾キーのチェック
       // metaKeyとctrlKeyは OR 条件（どちらかが押されていればOK）
-      const modifierMatch =
-        (!metaKey && !ctrlKey) || event.metaKey || event.ctrlKey;
-      const shiftMatch = shiftKey === event.shiftKey;
-      const altMatch = altKey === event.altKey;
+      const modifierMatch = (!metaKey && !ctrlKey) || event.metaKey || event.ctrlKey
+      const shiftMatch = shiftKey === event.shiftKey
+      const altMatch = altKey === event.altKey
 
       if (keyMatch && modifierMatch && shiftMatch && altMatch) {
         if (preventDefault) {
-          event.preventDefault();
+          event.preventDefault()
         }
         if (stopPropagation) {
-          event.stopPropagation();
+          event.stopPropagation()
         }
-        callbackRef.current(event);
+        callbackRef.current(event)
       }
-    };
+    }
 
-    document.addEventListener("keydown", handleKeyDown, { capture });
+    document.addEventListener('keydown', handleKeyDown, { capture })
 
     return () => {
-      document.removeEventListener("keydown", handleKeyDown, { capture });
-    };
-  }, [
-    key,
-    ctrlKey,
-    metaKey,
-    shiftKey,
-    altKey,
-    preventDefault,
-    stopPropagation,
-    enabled,
-    capture,
-  ]);
+      document.removeEventListener('keydown', handleKeyDown, { capture })
+    }
+  }, [key, ctrlKey, metaKey, shiftKey, altKey, preventDefault, stopPropagation, enabled, capture])
 }

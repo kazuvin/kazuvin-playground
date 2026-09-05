@@ -2,21 +2,21 @@
 /* Kotoba loads three families, self-hosted: Source Sans 3 for Latin,
    Noto Sans JP for CJK, Geist Mono for code. The token layer names the
    "… Variable" families these packages register — see src/styles/globals.css. */
-import "@fontsource-variable/source-sans-3";
-import "@fontsource-variable/noto-sans-jp";
-import "@fontsource-variable/geist-mono";
-import "@/styles/globals.css";
-import { APP_DESCRIPTION, APP_NAME } from "@/config";
+import '@fontsource-variable/source-sans-3'
+import '@fontsource-variable/noto-sans-jp'
+import '@fontsource-variable/geist-mono'
+import '@/styles/globals.css'
+import { APP_DESCRIPTION, APP_NAME } from '@/config/app'
 
-export interface Props {
+interface Props {
   /** ページ固有のタイトル。省略時はサイト名のみ */
-  title?: string;
+  title?: string
   /** ページ固有の説明 */
-  description?: string;
+  description?: string
 }
 
-const { title, description = APP_DESCRIPTION } = Astro.props;
-const pageTitle = title ? `${title} | ${APP_NAME}` : APP_NAME;
+const { title, description = APP_DESCRIPTION } = Astro.props
+const pageTitle = title ? `${title} | ${APP_NAME}` : APP_NAME
 ---
 
 <!doctype html>

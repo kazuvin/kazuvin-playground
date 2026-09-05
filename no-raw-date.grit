@@ -1,0 +1,23 @@
+// 日付を組み立てる入口を src/lib/date.ts の 1 つに閉じるための Biome プラグイン。
+//
+// Date は `new Date('2026-03-09')` が UTC 0 時と解釈されるなど扱いを誤りやすく、
+// 各コンポーネントで直に触られると同じ間違いが何度でも入る。ノートの日付は
+// frontmatter の YYYY-MM-DD が出典で、表示に落とすのは date.ts の役目に限る。
+//
+// 対象から外すファイルは biome.jsonc の plugins.includes 側で指定する。
+// 例外を書きたい行には `// biome-ignore lint/plugin: 理由` を置く。
+language js
+
+or {
+  `new Date($args)` as $call where {
+    register_diagnostic(span=$call, message="生の new Date() は使わず @/lib/date のユーティリティを使ってください。")
+  },
+  `Date.$method($args)` as $call where {
+    $method <: or {
+      `now`,
+      `parse`,
+      `UTC`
+    },
+    register_diagnostic(span=$call, message="Date の静的メソッドは使わず @/lib/date のユーティリティを使ってください。")
+  }
+}

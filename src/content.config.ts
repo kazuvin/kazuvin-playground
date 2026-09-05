@@ -1,6 +1,6 @@
-import { defineCollection } from "astro:content";
-import { z } from "zod";
-import { glob } from "astro/loaders";
+import { defineCollection } from 'astro:content'
+import { glob } from 'astro/loaders'
+import { z } from 'zod'
 
 /**
  * notes コレクション
@@ -8,7 +8,7 @@ import { glob } from "astro/loaders";
  * frontmatter の唯一の出典。ページ・検索インデックス・型定義はすべてここから導出する。
  */
 const notes = defineCollection({
-  loader: glob({ pattern: "**/*.mdx", base: "./content/notes" }),
+  loader: glob({ pattern: '**/*.mdx', base: './content/notes' }),
   schema: z.object({
     /** ノートのタイトル */
     title: z.string(),
@@ -21,6 +21,6 @@ const notes = defineCollection({
     /** 下書きフラグ。true のものはビルド出力に含めない */
     draft: z.boolean().default(false),
   }),
-});
+})
 
-export const collections = { notes };
+export const collections = { notes }

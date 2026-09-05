@@ -21,12 +21,9 @@
       Fontsource registers a variable face under a "… Variable" family name,
       so the family names below are not interchangeable with the static ones. */
   --font-sans:
-    "Source Sans 3 Variable", "Noto Sans JP Variable", system-ui, -apple-system,
-    sans-serif;
-  --font-cjk:
-    "Noto Sans JP Variable", "Source Sans 3 Variable", system-ui, sans-serif;
-  --font-mono:
-    "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+    "Source Sans 3 Variable", "Noto Sans JP Variable", system-ui, -apple-system, sans-serif;
+  --font-cjk: "Noto Sans JP Variable", "Source Sans 3 Variable", system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /** ---- neutral ramp — the entire non-accent palette, including the
       primary action fill. Tailwind's default gray is cleared first so no

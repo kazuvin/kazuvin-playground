@@ -1,13 +1,13 @@
 ---
-import { NoteCard } from "@/components/notes";
-import { PageHeader } from "@/components/shared";
-import { Text } from "@/components/ui";
-import { getPublishedNotes, toNoteSummary } from "@/features/notes";
-import CommonLayout from "@/layouts/common-layout.astro";
+import { NoteCard } from '@/features/notes/note-card'
+import { PageHeader } from '@/components/ui/page-header'
+import { Text } from '@/components/ui/text'
+import { getPublishedNotes, toNoteSummary } from '@/features/notes/notes'
+import CommonLayout from '@/layouts/common-layout.astro'
 
-const title = "Notes";
-const description = "A collection of notes and thoughts";
-const notes = (await getPublishedNotes()).map(toNoteSummary);
+const title = 'Notes'
+const description = 'A collection of notes and thoughts'
+const notes = (await getPublishedNotes()).map(toNoteSummary)
 ---
 
 <CommonLayout title={title} description={description}>

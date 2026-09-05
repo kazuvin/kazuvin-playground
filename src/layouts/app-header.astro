@@ -1,0 +1,25 @@
+---
+import { CommandSearch } from '@/features/notes/command-search'
+import { APP_NAME } from '@/config/app'
+import { cn } from '@/lib/cn'
+
+interface Props {
+  class?: string
+}
+
+const { class: className } = Astro.props
+---
+
+<header
+  class={cn('bg-background/50 flex h-12 items-center justify-between backdrop-blur-2xl', className)}
+>
+  <a href="/" class="font-bold">{APP_NAME}</a>
+  <div class="flex items-center gap-5">
+    <nav class="flex items-center gap-5 text-sm">
+      <a href="/notes">Notes</a>
+      <a href="/playgrounds">Playgrounds</a>
+    </nav>
+    {/* コマンドパレットだけが island。ヘッダーの他は静的 HTML のまま配信される */}
+    <CommandSearch client:idle />
+  </div>
+</header>

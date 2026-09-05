@@ -1,5 +1,5 @@
-import type { APIRoute } from "astro";
-import { getPublishedNotes, toSearchableItem } from "@/features/notes";
+import type { APIRoute } from 'astro'
+import { getPublishedNotes, toSearchableItem } from '@/features/notes/notes'
 
 /**
  * コマンドパレット用の検索インデックス
@@ -8,9 +8,9 @@ import { getPublishedNotes, toSearchableItem } from "@/features/notes";
  * command-search.tsx がダイアログを開いたときに fetch する。
  */
 export const GET: APIRoute = async () => {
-  const items = (await getPublishedNotes()).map(toSearchableItem);
+  const items = (await getPublishedNotes()).map(toSearchableItem)
 
   return new Response(JSON.stringify(items, null, 2), {
-    headers: { "Content-Type": "application/json" },
-  });
-};
+    headers: { 'Content-Type': 'application/json' },
+  })
+}

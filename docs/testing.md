@@ -16,7 +16,7 @@
 
 **対象**:
 
-- `utils.ts`: ビジネスロジック、ヘルパー関数
+- `features/<domain>/*.ts`: ドメインのロジック、純粋関数
 - `hooks/use-*.ts`: カスタムフック
 - `lib/*.ts`: 汎用ユーティリティ
 
@@ -64,7 +64,7 @@ src/features/notes/
 pnpm test
 
 # テストを1回だけ実行 (CI用)
-pnpm test:run
+pnpm run test
 
 # UI モードでテストを実行
 pnpm test:ui
@@ -554,7 +554,7 @@ describe("functions", () => {
 
 ```bash
 # カバレッジレポートを生成
-pnpm test:run --coverage
+pnpm run test:coverage
 ```
 
 ### カバレッジの目標
@@ -602,7 +602,7 @@ jobs:
         run: pnpm install
 
       - name: Run tests
-        run: pnpm test:run
+        run: pnpm run test
 
       - name: Upload coverage
         uses: codecov/codecov-action@v3
