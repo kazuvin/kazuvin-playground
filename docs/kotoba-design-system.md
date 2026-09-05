@@ -7,7 +7,7 @@ claude.ai/design のプロジェクト **"Kotoba Design System"** からこの�
 - _Kotoba_ (ことば) は**プレースホルダ名**。ブランド・ロゴ・Figma ファイルは未提供で、
   すべて 1 通のブリーフから導出されている。実名が決まったらリネームする。
 
-トークン層は `app/globals.css`、コンポーネントは `app/components/ui/{button,text,screen}` にある。
+トークン層は `src/styles/globals.css`、コンポーネントは `src/components/ui/{button,text,screen}` にある。
 
 ---
 
@@ -64,7 +64,10 @@ Tailwind 標準の `gray` は `--color-gray-*: initial` で消してあるので
 
 ### typography
 
-Latin は `Source Sans 3`、CJK は `Noto Sans JP`。`app/layout.tsx` で `next/font` により self-host。
+Latin は `Source Sans 3`、CJK は `Noto Sans JP`。`src/layouts/base-layout.astro` で
+`@fontsource-variable/*` により self-host。Fontsource は可変フォントを
+`"Source Sans 3 Variable"` のような別名で登録するため、トークンの family 名は静的版と
+互換ではない。
 7 つの role が**コンテンツ / クローム**の 2 群に分かれる。
 
 | role         | size | line | tracking | weight | 群         | 既定タグ |
@@ -232,14 +235,14 @@ tier-1 の画面端スペーシング (24 / 32 / 24) を供給するシェル。
 
 ## このリポジトリに取り込むにあたっての判断
 
-元プロジェクトは React Native 前提の JSX + 素の CSS。ここでは Next.js + Tailwind v4 + TSX
-に移植し、既存の `app/components/ui/` に統合した。以下は 1:1 ではない箇所。
+元プロジェクトは React Native 前提の JSX + 素の CSS。ここでは Astro + React + Tailwind v4 + TSX
+に移植し、既存の `src/components/ui/` に統合した。以下は 1:1 ではない箇所。
 
 ### 意図的な差分
 
 | 項目                    | 元                            | ここ                                                         | 理由                                                                               |
 | ----------------------- | ----------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
-| フォント配信            | Google Fonts CDN の `@import` | `next/font/google` で self-host                              | レイアウトシフトとサードパーティ接続を避ける                                       |
+| フォント配信            | Google Fonts CDN の `@import` | `@fontsource-variable/*` で self-host                        | レイアウトシフトとサードパーティ接続を避ける                                       |
 | `accent` の意味         | 唯一の色相                    | 同左                                                         | shadcn 系の `bg-accent` (ホバー面) とは非互換。既存 5 箇所は `bg-muted` に移行済み |
 | `destructive`           | 存在しない                    | `primary` と同じ黒にマップ                                   | 既存の `bg-destructive` を壊さず、かつ色でステータスを伝えない                     |
 | `chart-1`〜`chart-5`    | 存在しない                    | 削除                                                         | 未使用で、チャートパレットはこのシステムに無い                                     |

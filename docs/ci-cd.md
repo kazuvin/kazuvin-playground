@@ -25,6 +25,7 @@ CI ワークフローは以下の 3 つのジョブで構成されています�
 ```
 
 **実行内容**:
+
 - ESLint によるコードスタイルチェック
 - TypeScript の型チェック
 
@@ -38,6 +39,7 @@ CI ワークフローは以下の 3 つのジョブで構成されています�
 ```
 
 **実行内容**:
+
 - Unit テスト（Vitest）
 - Storybook テスト（Playwright）
 
@@ -51,7 +53,8 @@ CI ワークフローは以下の 3 つのジョブで構成されています�
 ```
 
 **実行内容**:
-- Next.js のプロダクションビルド
+
+- Astro のプロダクションビルド (静的サイトを `dist/` に出力)
 - ビルド成果物を 7 日間保存
 
 ## ローカルで CI を実行する
@@ -135,6 +138,7 @@ act -v
 ```
 
 **設定の説明**:
+
 - `-P`: より互換性の高い Docker イメージを使用
 - `--reuse`: Docker コンテナを再利用して実行速度を向上
 - `--bind`: ワークスペースをバインドしてパーミッションエラーを回避
@@ -178,8 +182,8 @@ GitHub Actions では pnpm のキャッシュを活用しています：
 - name: Setup Node.js
   uses: actions/setup-node@v4
   with:
-    node-version: '20'
-    cache: 'pnpm'
+    node-version: "20"
+    cache: "pnpm"
 ```
 
 これにより、2 回目以降の実行で依存関係のインストールが高速になります。
@@ -296,7 +300,7 @@ pnpm run build
 
 # エラーを修正
 # ビルドキャッシュをクリアする場合：
-rm -rf .next
+rm -rf dist .astro node_modules/.vite
 pnpm run build
 ```
 
@@ -359,8 +363,8 @@ jobs:
 on:
   push:
     paths:
-      - 'app/**'
-      - 'lib/**'
+      - "src/**"
+      - "content/**"
 ```
 
 ### マトリックスビルド

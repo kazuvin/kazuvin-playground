@@ -1,0 +1,36 @@
+---
+/* Kotoba loads three families, self-hosted: Source Sans 3 for Latin,
+   Noto Sans JP for CJK, Geist Mono for code. The token layer names the
+   "… Variable" families these packages register — see src/styles/globals.css. */
+import "@fontsource-variable/source-sans-3";
+import "@fontsource-variable/noto-sans-jp";
+import "@fontsource-variable/geist-mono";
+import "@/styles/globals.css";
+import { APP_DESCRIPTION, APP_NAME } from "@/config";
+
+export interface Props {
+  /** ページ固有のタイトル。省略時はサイト名のみ */
+  title?: string;
+  /** ページ固有の説明 */
+  description?: string;
+}
+
+const { title, description = APP_DESCRIPTION } = Astro.props;
+const pageTitle = title ? `${title} | ${APP_NAME}` : APP_NAME;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

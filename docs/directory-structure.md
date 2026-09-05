@@ -2,248 +2,154 @@
 
 ## 概要
 
-このプロジェクトは Next.js App Router を採用しており、以下の原則に基づいてディレクトリを構成しています。
+このプロジェクトは Astro (静的サイト生成) を採用しており、以下の原則に基づいてディレクトリを構成しています。
 
-- **コロケーション**: ページ固有のロジック(store, actions, types など)はページと同階層で管理
-- **プレゼンテーションとロジックの分離**: コンポーネントは UI に専念し、ビジネスロジックは hooks/stores/services で管理
+- **コロケーション**: ドメイン固有のロジック (store, utils, types など) は使用する場所の近くで管理
+- **プレゼンテーションとロジックの分離**: コンポーネントは UI に専念し、ロジックは features/hooks/stores で管理
 - **ドメイン駆動設計**: コンポーネントをドメイン非依存/依存で分類
+- **islands**: 対話が必要なコンポーネントだけを React として hydrate し、それ以外は静的 HTML として配信
 
 ## ルートディレクトリ構成
 
 ```
 kazuvin-playground/
-├── app/                    # Next.js App Router のルート
-├── content/                # MDX やマークダウンなどのコンテンツファイル
-├── lib/                    # ユーティリティ関数・ヘルパー
-├── public/                 # 静的アセット
-├── scripts/                # ビルド・デプロイスクリプト
-├── config/                 # 設定ファイル
-└── docs/                   # プロジェクトドキュメント
+├── src/                    # アプリケーションのソース
+├── content/                # MDX などのコンテンツファイル (Content Collections の実体)
+├── public/                 # 静的アセット (そのまま dist/ にコピーされる)
+├── docs/                   # プロジェクトドキュメント
+├── astro.config.mjs        # Astro の設定
+└── wrangler.jsonc          # Cloudflare 配信の設定 (静的アセットのみ)
 ```
 
-## app/ ディレクトリ構成
-
-### トップレベル構成
+## src/ ディレクトリ構成
 
 ```
-app/
-├── (commonLayout)/         # Route Group: 共通レイアウトを適用するページ群
-│   ├── layout.tsx          # 共通レイアウト定義
-│   ├── page.tsx            # ホームページ
-│   ├── notes/              # ノートページ
-│   └── playgrounds/        # プレイグラウンドページ
+src/
+├── pages/                  # ルーティング (このディレクトリの構造がそのまま URL になる)
+├── layouts/                # ページを包むレイアウト (.astro)
 ├── components/             # すべてのコンポーネント (プレゼンテーションのみ)
+├── features/               # ドメイン固有のロジック (データ取得・変換・純粋関数)
 ├── hooks/                  # グローバルに使用するカスタムフック
 ├── stores/                 # アプリケーション全体で共有するグローバルステート
-├── layout.tsx              # ルートレイアウト
-├── globals.css             # グローバルスタイル
-├── not-found.tsx           # 404 ページ
-└── favicon.ico             # ファビコン
+├── lib/                    # ドメイン非依存のユーティリティ・共通型
+├── config/                 # アプリケーション設定
+├── styles/globals.css      # デザイントークンとグローバルスタイル
+└── content.config.ts       # Content Collections のスキーマ定義
 ```
 
-### ページ構成 (Route Group 配下)
-
-各ページは以下の構成で管理します。ページ固有のロジックはページと同階層に配置します（**コロケーション**）。
+### pages/ ディレクトリ
 
 ```
-app/(commonLayout)/notes/
-├── page.tsx                # ページコンポーネント (UI のみ)
-├── actions.ts              # Server Actions (データ取得・更新)
-├── store.ts                # ページ固有のクライアントステート
-├── store.test.ts           # ストアのテスト
-├── use-notes-filter.ts     # ページ固有のカスタムフック
-├── utils.ts                # ページ固有のユーティリティ関数
-├── types.ts                # ページ固有の型定義
-├── [slug]/                 # 動的ルート
-│   ├── page.tsx
-│   ├── actions.ts
-│   ├── use-note-editor.ts  # このページ専用のフック
-│   ├── utils.ts            # このページ専用のユーティリティ
-│   └── types.ts
-└── lib/                    # notes ドメイン内で共通使用するロジック
-    ├── note-formatter.ts
-    └── note-validator.ts
+src/pages/
+├── index.astro             # /
+├── 404.astro               # 404 ページ
+├── notes/
+│   ├── index.astro         # /notes
+│   └── [slug].astro        # /notes/:slug (getStaticPaths で全件を静的生成)
+├── playgrounds/
+│   └── index.astro         # /playgrounds
+└── notes-index.json.ts     # /notes-index.json (静的エンドポイント)
 ```
+
+**重要**: `src/pages/` 配下は**ルーティング専用**です。ここに置いた `.ts` は
+API ルートとして扱われ URL を持ってしまうため、ページ固有の utils / types / hooks を
+ページと同階層にコロケーションすることはできません。**ページ固有のロジックは
+`src/features/<domain>/` に置きます。**
 
 #### ページファイルの役割
 
-- `page.tsx`: UI の描画のみを担当。Server Component として実装
-- `actions.ts`: Server Actions を定義。データ取得・更新・削除など
-- `store.ts`: ページ固有のクライアントステート (UI 状態、フォーム状態など)
-- `use-*.ts`: ページ固有のカスタムフック
-- `utils.ts`: ページ固有のユーティリティ関数・ヘルパー関数
-- `types.ts`: ページで使用する型定義
-- `lib/`: ドメイン内の複数ページで共通使用するロジック
-- `*.test.ts`: 対応するファイルのテスト
+- `*.astro`: URL に対応するページ。frontmatter (`---` で囲まれた部分) はビルド時にのみ実行される
+- `*.json.ts` などのエンドポイント: ビルド時に JSON などの静的ファイルを出力する
+- ページの frontmatter ではデータ取得と整形の**呼び出し**のみを行い、実装は `features/` に置く
 
-#### Server と Client の責務分離
+```astro
+---
+// src/pages/notes/index.astro
+import { getPublishedNotes, toNoteSummary } from "@/features/notes";
+import CommonLayout from "@/layouts/common-layout.astro";
 
-Next.js App Router では、Server と Client で実行環境が異なるため、適切に責務を分離します。
+const notes = (await getPublishedNotes()).map(toNoteSummary);
+---
 
-**実行環境の違い**:
-
-| ファイル | 実行環境 | ディレクティブ | 責務 |
-|---------|---------|--------------|------|
-| `actions.ts` | Server | `"use server"` | データの取得・永続化、Server 処理 |
-| `store.ts` | Client | `"use client"` | UI 状態、Client ロジック、actions の呼び出し |
-| `utils.ts` | Both | なし | 純粋関数、ヘルパー（状態を持たない） |
-
-**actions.ts (Server Actions)**:
-
-```typescript
-// app/(commonLayout)/notes/actions.ts
-"use server"
-
-import { db } from "@/lib/db"
-
-/**
- * Server でのみ実行可能な処理
- * - データベースアクセス
- * - 外部 API 呼び出し
- * - サーバー側の環境変数使用
- */
-export async function getNotes() {
-  return await db.notes.findMany()
-}
-
-export async function createNote(data: NoteInput) {
-  return await db.notes.create({ data })
-}
-
-export async function deleteNote(id: string) {
-  return await db.notes.delete({ where: { id } })
-}
+<CommonLayout title="Notes">
+  {notes.map((note) => <NoteCard note={note} />)}
+</CommonLayout>
 ```
 
-**store.ts (Client State)**:
+### layouts/ ディレクトリ
 
-```typescript
-// app/(commonLayout)/notes/store.ts
-"use client"
-
-import { proxy } from "valtio"
-import { getNotes, createNote } from "./actions"
-
-/**
- * Client で完結するロジックは store 内部に定義
- * - UI 状態管理
- * - フィルタリング・ソート
- * - クライアント側の計算
- * - Server Actions の呼び出し
- */
-export const notesStore = proxy({
-  notes: [],
-  filterText: "",
-  sortOrder: "desc" as "asc" | "desc",
-  isLoading: false,
-
-  // Client ロジック（純粋関数として computed）
-  get filteredNotes() {
-    return this.notes.filter(note =>
-      note.title.toLowerCase().includes(this.filterText.toLowerCase())
-    )
-  },
-
-  get sortedNotes() {
-    return [...this.filteredNotes].sort((a, b) =>
-      this.sortOrder === "desc"
-        ? b.date.localeCompare(a.date)
-        : a.date.localeCompare(b.date)
-    )
-  },
-
-  // Client ロジック（状態更新）
-  setFilterText(text: string) {
-    this.filterText = text
-  },
-
-  toggleSortOrder() {
-    this.sortOrder = this.sortOrder === "desc" ? "asc" : "desc"
-  },
-
-  // Server Actions の呼び出し
-  async load() {
-    this.isLoading = true
-    try {
-      this.notes = await getNotes()
-    } finally {
-      this.isLoading = false
-    }
-  },
-
-  async create(data: NoteInput) {
-    const note = await createNote(data)
-    this.notes.push(note)
-  }
-})
+```
+src/layouts/
+├── base-layout.astro       # <html>/<head>/<body>・フォント・globals.css・メタタグ
+└── common-layout.astro     # base-layout + ヘッダー + main (通常のページはこちらを使う)
 ```
 
-**utils.ts (Pure Functions)**:
+複数ページで共有する外枠 (ヘッダー・`<main>` の幅・メタタグ) は、
+すべてこのディレクトリのレイアウトコンポーネントで表現します。
 
-```typescript
-// app/(commonLayout)/notes/utils.ts
+### features/ ディレクトリ
 
-import type { Note } from "./types"
+ドメイン固有のロジックを置きます。`src/pages/` にコロケーションできないものの受け皿であり、
+コンテンツの取得・変換・純粋関数・ドメイン固有のフックが対象です。
 
-/**
- * 純粋関数 - Server/Client どちらでも使用可能
- * - 状態を持たない
- * - 副作用がない
- * - 同じ入力には常に同じ出力
- */
-export function groupNotesByMonth(notes: Note[]) {
-  return notes.reduce((acc, note) => {
-    const monthKey = formatMonthKey(note.date)
-    if (!acc[monthKey]) {
-      acc[monthKey] = { label: formatMonthLabel(note.date), notes: [] }
-    }
-    acc[monthKey].notes.push(note)
-    return acc
-  }, {} as Record<string, { label: string; notes: Note[] }>)
-}
-
-export function formatMonthKey(date: string): string {
-  const d = new Date(date)
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
-}
-
-export function formatMonthLabel(date: string): string {
-  const d = new Date(date)
-  return `${d.getFullYear()}年${d.getMonth() + 1}月`
-}
+```
+src/features/
+└── notes/
+    ├── notes.ts                 # コレクションの取得と変換 (getPublishedNotes など)
+    ├── group-by-month.ts        # 純粋関数
+    ├── group-by-month.test.ts    # 対応するテスト
+    └── index.ts                 # エクスポートをまとめる
 ```
 
-**重要なポイント**:
+#### ビルド時と クライアント の責務分離
 
-1. **actions.ts と store.ts は分離する**
-   - Server と Client で実行環境が異なる
-   - それぞれ異なるディレクティブ (`"use server"`, `"use client"`) を使用
-   - 密接に関連していても、別ファイルで管理
+Astro ではページの frontmatter と `features/` の関数は**ビルド時にのみ**実行され、
+クライアントには一切送られません。ブラウザで動くのは island として明示的に hydrate した
+React コンポーネントだけです。
 
-2. **Client ロジックは store 内部に定義**
-   - フィルタリング、ソート、UI 状態更新など
-   - Client で完結する処理は外部に切り出さない
-   - Computed values (getter) を活用
+| ファイル                       | 実行環境     | 責務                           |
+| ------------------------------ | ------------ | ------------------------------ |
+| `*.astro` の frontmatter       | ビルド時     | データ取得・整形の呼び出し     |
+| `features/*.ts`                | ビルド時     | コンテンツ取得、変換、純粋関数 |
+| `components/**/*.tsx` (island) | クライアント | UI 状態、イベント処理          |
+| `stores/*.ts`                  | クライアント | island 間で共有するステート    |
+| `lib/*.ts`                     | 両方         | 純粋関数、共通型               |
 
-3. **純粋関数は utils.ts に分離**
-   - Server/Client どちらでも使える
-   - テストしやすい
-   - 再利用可能
+#### island の作り方
 
-4. **まとめるべきケース**
-   - 状態管理関連のファイルが 3 つ以上ある場合は `state/` ディレクトリでまとめることを検討
-   - ただし、基本は Server (actions) と Client (store) の分離を維持
+対話が必要なコンポーネントだけを `client:*` ディレクティブ付きで読み込みます。
+ディレクティブを付けない React コンポーネントは、ビルド時に HTML へ描画されて JS を送りません。
+
+```astro
+---
+// src/components/shared/app-header/app-header.astro
+import { CommandSearch } from "@/components/shared/command-search";
+---
+
+<header>
+  <a href="/">Kazuvin Playground</a>
+  {/* このコンポーネントだけが JS として配信される */}
+  <CommandSearch client:idle />
+</header>
+```
+
+| ディレクティブ   | 使いどころ                                       |
+| ---------------- | ------------------------------------------------ |
+| なし             | 静的な表示のみ (既定。まずここを検討する)        |
+| `client:idle`    | すぐには不要だが操作される可能性があるもの       |
+| `client:load`    | 初期表示直後から操作されるもの                   |
+| `client:visible` | ページ下部にあり、スクロールされて初めて使うもの |
 
 ### components/ ディレクトリ構成
 
-`app/components/` 配下のコンポーネントは**必ずプレゼンテーションコンポーネント**として実装します。
+`src/components/` 配下のコンポーネントは**必ずプレゼンテーションコンポーネント**として実装します。
 ビジネスロジックは含まず、props を受け取って UI を描画することに専念します。
 
-**重要**: この制約は `app/components/` 配下のコンポーネントに適用されます。
-`app/(commonLayout)/[page]/page.tsx` などのページコンポーネントには適用されません。
+**重要**: この制約は `src/components/` 配下のコンポーネントに適用されます。
+`src/pages/**/*.astro` などのページコンポーネントには適用されません。
 
 ```
-app/components/
+src/components/
 ├── ui/                     # ドメイン非依存の UI 要素
 │   ├── button/
 │   │   ├── button.tsx
@@ -253,17 +159,18 @@ app/components/
 │   │   └── button.test.tsx (optional)
 │   ├── card/
 │   ├── dialog/
-│   ├── typography/
 │   ├── command/
+│   ├── screen/
+│   ├── text/
 │   ├── timeline/
 │   └── index.ts            # エクスポートをまとめる
 │
 ├── shared/                 # ドメイン依存の共通 UI 要素
 │   ├── app-header/
-│   │   ├── app-header.tsx
-│   │   ├── index.ts
-│   │   └── app-header.test.tsx (optional)
+│   │   └── app-header.astro
 │   ├── page-header/
+│   │   ├── page-header.tsx
+│   │   └── index.ts
 │   ├── command-search/
 │   │   ├── command-search.tsx
 │   │   ├── use-command-search.ts  # コンポーネント固有のロジック
@@ -276,11 +183,18 @@ app/components/
 │   │   └── index.ts
 │   └── index.ts
 │
-├── home/                   # home ドメイン固有の UI 要素
-│   └── index.ts
-│
-└── index.ts                # すべてのコンポーネントのエクスポート
+└── home/                   # home ドメイン固有の UI 要素
+    └── index.ts
 ```
+
+#### .astro と .tsx の使い分け
+
+- **`.astro`**: 対話を持たないコンポーネント。JS を一切送らない
+- **`.tsx`**: island になりうるもの、Storybook で単体確認したいもの、
+  `ui/` のようにどこからでも再利用する部品
+
+`.astro` コンポーネントは `.ts` の barrel (`index.ts`) から re-export すると型が解決できないため、
+利用側からパスを直接 import します (例: `@/components/shared/app-header/app-header.astro`)。
 
 #### コンポーネントの分類基準
 
@@ -292,20 +206,16 @@ app/components/
 2. **shared/**: ドメイン依存の共通コンポーネント
    - AppHeader, PageHeader など複数ページで使用
    - プロジェクト固有だが特定ドメインには依存しない
-   - アプリケーション全体で共通する UI パターン
 
 3. **[domain]/**: 特定ドメイン固有
-   - notes/, user/, products/ など
-   - 特定のビジネスドメインに関連する UI
+   - notes/, home/ など
    - そのドメインのページでのみ使用
 
 #### コンポーネントディレクトリ構成
 
-各コンポーネントは以下のファイル構成を推奨します。
-
 ```
 component-name/
-├── component-name.tsx          # コンポーネント本体
+├── component-name.tsx          # コンポーネント本体 (静的なら .astro)
 ├── component-name.stories.tsx  # Storybook ストーリー
 ├── component-name.test.tsx     # テスト (optional)
 ├── store.ts                    # コンポーネント専用ストア (optional)
@@ -313,166 +223,95 @@ component-name/
 ├── utils.ts                    # コンポーネント専用ユーティリティ (optional)
 ├── variants.ts                 # variant 定義 (optional)
 ├── types.ts                    # 型定義 (optional、複雑な場合のみ)
-└── index.ts                    # エクスポート
+└── index.ts                    # エクスポート (.astro のみの場合は不要)
 ```
 
 ### hooks/ ディレクトリ構成
 
-カスタムフックは使用範囲に応じて配置場所を決定します。**コロケーション**を優先し、使用する場所の近くに配置します。
+カスタムフックは使用範囲に応じて配置場所を決定します。**コロケーション**を優先します。
 
-#### フックの配置基準
-
-1. **app/hooks/**: グローバルに使用する汎用的なフック
-   - 複数のページ・コンポーネントで使用される汎用フック
-   - ドメイン非依存のユーティリティフック
+1. **src/hooks/**: 複数の island で使う汎用フック
 
    ```
-   app/hooks/
-   ├── use-media-query.ts      # メディアクエリフック
-   ├── use-local-storage.ts    # ローカルストレージフック
-   ├── __tests__/              # フックのテスト
-   │   ├── use-media-query.test.ts
-   │   └── use-local-storage.test.ts
-   └── index.ts                # エクスポートをまとめる
+   src/hooks/
+   ├── use-keyboard-shortcut.ts
+   ├── use-window-scroll.ts
+   ├── use-window-scroll.test.ts
+   └── index.ts
    ```
 
-2. **app/components/[component]/use-*.ts**: 特定コンポーネント専用のフック
-   - 特定のコンポーネント内でのみ使用されるフック
-   - コンポーネントと同じディレクトリに配置
+2. **src/components/[component]/use-\*.ts**: 特定コンポーネント専用のフック
 
    ```
-   app/components/shared/command-search/
+   src/components/shared/command-search/
    ├── command-search.tsx
    ├── use-command-search.ts   # このコンポーネント専用
    └── index.ts
    ```
 
-3. **app/(commonLayout)/[page]/use-*.ts**: 特定ページ専用のフック
-   - 特定のページ内でのみ使用されるフック
-   - ページと同じディレクトリに配置
-
-   ```
-   app/(commonLayout)/notes/
-   ├── page.tsx
-   ├── use-notes-filter.ts     # このページ専用
-   └── store.ts
-   ```
+3. **src/features/[domain]/use-\*.ts**: 特定ドメイン専用のフック
 
 ### stores/ ディレクトリ構成
 
-ステート管理は使用範囲に応じて配置場所を決定します。**コロケーション**を優先し、使用する場所の近くに配置します。
+ページ単位のサーバーステートは存在しない (ビルド時に解決される) ため、
+ストアが扱うのは **island 間で共有するクライアントステート**だけです。
 
-#### ストアの配置基準
-
-1. **app/stores/**: アプリケーション全体で共有するグローバルステート
-   - 複数のページ・コンポーネントで使用されるグローバルな状態
-   - アプリケーション全体で共通する状態管理
+1. **src/stores/**: 複数の island で共有するグローバルステート
 
    ```
-   app/stores/
-   ├── theme-store.ts          # テーマの状態管理
-   ├── user-store.ts           # ユーザー情報の状態管理
-   ├── theme-store.test.ts     # ストアのテスト
-   └── index.ts                # エクスポートをまとめる
+   src/stores/
+   ├── theme-store.ts
+   ├── theme-store.test.ts
+   └── index.ts
    ```
 
-2. **app/components/[component]/store.ts**: 特定コンポーネント専用のストア
-   - 特定のコンポーネント内でのみ使用される状態管理
-   - コンポーネントと同じディレクトリに配置
-   - UI 状態など、コンポーネントに閉じたステート
+2. **src/components/[component]/store.ts**: 特定コンポーネント専用のストア
 
    ```
-   app/components/shared/command-search/
+   src/components/shared/command-search/
    ├── command-search.tsx
    ├── store.ts                # このコンポーネント専用
    ├── use-command-search.ts
    └── index.ts
    ```
 
-3. **app/(commonLayout)/[page]/store.ts**: 特定ページ専用のストア
-   - 特定のページ内でのみ使用されるクライアントステート
-   - ページと同じディレクトリに配置
-   - フォーム状態、フィルター状態など、ページに閉じたステート
-
-   ```
-   app/(commonLayout)/notes/
-   ├── page.tsx
-   ├── store.ts                # このページ専用
-   ├── store.test.ts
-   ├── use-notes-filter.ts
-   └── actions.ts
-   ```
-
 ## その他のディレクトリ
 
 ### lib/ と utils の配置
 
-ユーティリティ関数やヘルパー関数も**コロケーション**を優先します。使用する場所の近くに配置し、複数箇所で使用される汎用的なもののみグローバルに配置します。
-
-#### lib/utils の配置基準
-
-1. **lib/**: プロジェクト全体で使用される汎用的なロジック
-   - 複数のページ・コンポーネントで使用される共通ロジック
-   - ドメイン非依存のユーティリティ関数
-   - ビジネスロジックのコア部分
+1. **src/lib/**: プロジェクト全体で使用される汎用ロジックと共通型
 
    ```
-   lib/
-   ├── utils.ts                # 汎用ユーティリティ (cn, formatDate など)
-   ├── notes.ts                # ノート関連の共通ロジック
-   └── validators/             # 汎用バリデーション関数
-       └── schema-validator.ts
+   src/lib/
+   ├── cn/                     # className 結合ユーティリティ
+   ├── utils.ts                # 汎用ユーティリティ (formatDate など)
+   └── types.ts                # 複数レイヤーで共有する型 (SearchableItem など)
    ```
 
-2. **app/components/[component]/utils.ts**: コンポーネント専用のユーティリティ
-   - 特定のコンポーネント内でのみ使用されるヘルパー関数
-   - コンポーネントと同じディレクトリに配置
+2. **src/features/[domain]/**: ドメイン固有のロジック
+
+3. **src/components/[component]/utils.ts**: コンポーネント専用のユーティリティ
 
    ```
-   app/components/notes/note-card/
+   src/components/notes/note-card/
    ├── note-card.tsx
    ├── utils.ts                # このコンポーネント専用
    └── index.ts
    ```
 
-3. **app/(commonLayout)/[page]/utils.ts**: ページ専用のユーティリティ
-   - 特定のページ内でのみ使用されるヘルパー関数
-   - ページと同じディレクトリに配置
-
-   ```
-   app/(commonLayout)/notes/
-   ├── page.tsx
-   ├── utils.ts                # このページ専用
-   ├── validators.ts           # このページ専用のバリデーション
-   ├── store.ts
-   └── actions.ts
-   ```
-
-4. **app/(commonLayout)/[domain]/lib/**: ドメイン固有の共通ロジック
-   - 特定ドメイン配下の複数ページで使用されるロジック
-   - そのドメイン内でのみ使用される場合
-
-   ```
-   app/(commonLayout)/notes/
-   ├── page.tsx
-   ├── [slug]/
-   │   └── page.tsx
-   └── lib/
-       ├── note-formatter.ts   # notes ドメイン内で共通使用
-       └── note-validator.ts
-   ```
-
 ### content/ ディレクトリ
 
-MDX やマークダウンなどのコンテンツファイルを配置します。
+MDX などのコンテンツファイルを配置します。スキーマは `src/content.config.ts` で定義し、
+frontmatter はビルド時に検証されます。**frontmatter の型はここが唯一の出典**です。
 
 ```
 content/
-├── notes/                  # ノートの MDX ファイル
-│   ├── note-1.mdx
-│   └── note-2.mdx
-└── docs/                   # ドキュメントの MDX ファイル
+└── notes/                  # ノートの MDX ファイル
+    ├── note-1.mdx
+    └── note-2.mdx
 ```
+
+`draft: true` のノートは `getPublishedNotes()` が除外するため、ビルド出力にも含まれません。
 
 ## テストファイルの配置
 
@@ -480,129 +319,83 @@ content/
 
 ### パターン 1: 単一ファイルの場合
 
-単一の汎用ユーティリティファイルには、同階層に `*.test.ts` を配置します。
-
 ```
-app/(commonLayout)/notes/
-├── page.tsx
-├── utils.ts
-├── utils.test.ts           # ✅ シンプルで見つけやすい
-├── store.ts
-└── store.test.ts
+src/features/notes/
+├── group-by-month.ts
+├── group-by-month.test.ts  # ✅ シンプルで見つけやすい
+└── index.ts
 ```
-
-**メリット**:
-- ファイルとテストの対応関係が明確
-- ファイル数が少ない場合はディレクトリ構造がフラットで見やすい
-- インポートパスがシンプル
 
 ### パターン 2: 複数の関連ファイルがある場合
 
-関連する複数のユーティリティ（3つ以上）がある場合は、ディレクトリでまとめてコロケーションします。
+関連する複数のユーティリティ (3 つ以上) がある場合は、ディレクトリでまとめます。
 
 ```
-app/(commonLayout)/notes/
-├── page.tsx
+src/features/notes/
 ├── utils/
 │   ├── formatters.ts
 │   ├── formatters.test.ts
 │   ├── validators.ts
 │   ├── validators.test.ts
-│   ├── helpers.ts
-│   ├── helpers.test.ts
-│   └── index.ts            # エクスポートをまとめる
-├── store.ts
-└── store.test.ts
+│   └── index.ts
+└── index.ts
 ```
 
-**メリット**:
-- 関連する複数のユーティリティを論理的にグループ化
-- ファイル数が多い場合に整理しやすい
-- 責務ごとに分割できる
-
-### パターン 3: ドメイン共通ロジックの場合
-
-ドメイン配下で共通使用するロジックは、`lib/` ディレクトリ内でファイルごとにテストを配置します。
+### パターン 3: 複数のフックがある場合
 
 ```
-app/(commonLayout)/notes/
-├── page.tsx
-├── [slug]/
-│   └── page.tsx
-└── lib/
-    ├── note-formatter.ts
-    ├── note-formatter.test.ts
-    ├── note-validator.ts
-    ├── note-validator.test.ts
-    └── index.ts
-```
-
-### パターン 4: 複数のフックがある場合
-
-ページやコンポーネントに複数のカスタムフックがある場合も、同様にディレクトリでまとめます。
-
-```
-app/(commonLayout)/notes/
-├── page.tsx
+src/features/notes/
 ├── hooks/
 │   ├── use-notes-filter.ts
 │   ├── use-notes-filter.test.ts
 │   ├── use-notes-sort.ts
 │   ├── use-notes-sort.test.ts
-│   ├── use-notes-pagination.ts
-│   ├── use-notes-pagination.test.ts
-│   └── index.ts            # エクスポートをまとめる
-├── store.ts
-└── actions.ts
-```
-
-または、単一フックの場合:
-
-```
-app/(commonLayout)/notes/
-├── page.tsx
-├── use-notes-filter.ts
-├── use-notes-filter.test.ts
-├── store.ts
-└── actions.ts
+│   └── index.ts
+└── index.ts
 ```
 
 ### 判断基準
 
-| 状況 | 推奨パターン | 例 |
-|------|------------|-----|
-| 単一のユーティリティ/フック | `utils.ts` + `utils.test.ts` または `use-*.ts` + `use-*.test.ts` | ページ固有のヘルパー関数、単一フック |
-| 複数の関連ユーティリティ (3つ以上) | `utils/` ディレクトリでまとめる | formatters, validators, helpers など |
-| 複数の関連フック (3つ以上) | `hooks/` ディレクトリでまとめる | filter, sort, pagination などのフック群 |
-| ドメイン固有の複雑なロジック | `lib/` ディレクトリ内でファイルごとにテスト | ドメインロジック、バリデーター |
-| グローバルフック | `app/hooks/__tests__/` | 汎用的なカスタムフック |
+| 状況                                | 推奨パターン                        | 例                                     |
+| ----------------------------------- | ----------------------------------- | -------------------------------------- |
+| 単一のユーティリティ/フック         | `*.ts` + `*.test.ts` を同階層       | ドメイン固有のヘルパー関数、単一フック |
+| 複数の関連ユーティリティ (3 つ以上) | `utils/` ディレクトリでまとめる     | formatters, validators, helpers など   |
+| 複数の関連フック (3 つ以上)         | `hooks/` ディレクトリでまとめる     | filter, sort, pagination など          |
+| グローバルフック                    | `src/hooks/` に配置し同階層にテスト | 汎用的なカスタムフック                 |
+
+なお、`src/pages/` 配下にはテストを置けません (ルートとして扱われるため)。
+ページから呼ばれるロジックを `features/` に置くのは、テスト可能にするためでもあります。
 
 ## 命名規則
 
 ### ファイル名
 
-- **コンポーネント**: `kebab-case.tsx` (例: `note-card.tsx`, `app-header.tsx`)
+- **コンポーネント**: `kebab-case.tsx` / `kebab-case.astro` (例: `note-card.tsx`, `app-header.astro`)
+- **レイアウト**: `kebab-case.astro` (例: `base-layout.astro`)
 - **フック**: `use-kebab-case.ts` (例: `use-media-query.ts`)
 - **ストア**: `kebab-case-store.ts` (例: `theme-store.ts`)
-- **ユーティリティ**: `kebab-case.ts` (例: `utils.ts`)
+- **ユーティリティ**: `kebab-case.ts` (例: `group-by-month.ts`)
 - **テスト**: `*.test.ts` または `*.test.tsx`
 - **Storybook**: `*.stories.tsx`
+
+`.astro` も例外ではありません。`HeroSection.astro` ではなく `hero-section.astro` とします。
+フレームワークが名前を固定しているもの (`astro.config.mjs`, `src/content.config.ts`,
+`404.astro`, `[slug].astro`) のみが例外です。
 
 ### ディレクトリ名
 
 - **kebab-case** を使用 (例: `note-card/`, `app-header/`)
-- **Route Group**: `(camelCase)` を使用 (例: `(commonLayout)/`)
-- **動的ルート**: `[param]` を使用 (例: `[slug]/`)
+- **動的ルート**: `[param]` を使用 (例: `[slug].astro`)
 
 ## ベストプラクティス
 
 ### 1. components/ 配下のコンポーネントはプレゼンテーションに専念
 
-`app/components/` 配下のコンポーネントはプレゼンテーションに専念し、ビジネスロジックを含めません。
+`src/components/` 配下のコンポーネントはプレゼンテーションに専念し、ビジネスロジックを含めません。
 
 ```tsx
-// ❌ Bad: app/components/ 配下でデータ取得
-// app/components/notes/note-card/note-card.tsx
+// ❌ Bad: src/components/ 配下でデータ取得
+// src/components/notes/note-card/note-card.tsx
 export function NoteCard() {
   const [note, setNote] = useState(null);
   useEffect(() => {
@@ -612,83 +405,23 @@ export function NoteCard() {
 }
 
 // ✅ Good: props でデータを受け取る
-// app/components/notes/note-card/note-card.tsx
-export function NoteCard({ note }: { note: Note }) {
-  return <div>{note.title}</div>;
+// src/components/notes/note-card/note-card.tsx
+export function NoteCard({ note }: { note: NoteSummary }) {
+  return <div>{note.metadata.title}</div>;
 }
 ```
 
-**注**: `app/(commonLayout)/[page]/page.tsx` などのページコンポーネントはこの制約の対象外です。
-ページコンポーネントでは Server Component としてデータ取得を行うことができます。
+### 2. 既定は静的、島は最小限に
 
-### 2. ページ固有のロジックはページと同階層に配置（コロケーション）
+`client:*` を付けるのは、そのコンポーネントが**本当にブラウザで動く必要がある**ときだけです。
+ヘッダー全体を island にするのではなく、コマンドパレットだけを island にします。
 
-```
-app/(commonLayout)/login/
-├── page.tsx                # UI
-├── actions.ts              # Server Actions
-├── store.ts                # クライアントステート
-├── use-login-form.ts       # ページ固有のフック
-├── utils.ts                # ページ固有のユーティリティ
-└── store.test.ts           # テスト
-```
+### 3. データ取得はページの frontmatter か features/ で行う
 
-### 3. Server/Client Components の使い分け
+island の中で `fetch` してデータを取りに行くのは、ビルド時に解決できない場合
+(コマンドパレットの検索インデックスなど) に限ります。
 
-- **Server Component** (デフォルト): データ取得、静的コンテンツ
-- **Client Component** (`"use client"`): インタラクティブな UI、状態管理
+### 4. 型の出典を一箇所にする
 
-### 4. index.ts では export * を使用
-
-`index.ts` でエクスポートをまとめる際は、`export *` を使用することで、型のエクスポート漏れを防ぎ、メンテナンスを楽にします。
-
-```tsx
-// ❌ Bad: 個別に列挙（型の漏れが発生しやすい）
-// app/components/ui/button/index.ts
-export { Button } from "./button";
-export type { ButtonProps } from "./button";
-export type { ButtonVariant } from "./button";  // 追加し忘れる可能性
-
-// ✅ Good: export * で自動エクスポート
-// app/components/ui/button/index.ts
-export * from "./button";
-
-// 使用側
-import { Button, type ButtonProps } from "@/app/components/ui/button";
-```
-
-**export * の利点**:
-- 型のエクスポート漏れを防ぐ
-- 新しいエクスポートを追加してもバレルファイルの修正が不要
-- すべてのコンポーネントディレクトリで一貫性を保てる
-
-**複数ファイルがある場合**:
-
-```tsx
-// app/components/ui/index.ts
-export * from "./button";
-export * from "./card";
-export * from "./dialog";
-export * from "./timeline";
-export * from "./typography";
-```
-
-### 5. 絶対パスインポートを使用
-
-```tsx
-// ❌ Bad
-import { Button } from "../../../components/ui/button";
-
-// ✅ Good
-import { Button } from "@/app/components/ui/button";
-```
-
-## まとめ
-
-- **ページ固有のロジック**: ページと同階層に `store.ts`, `actions.ts`, `use-*.ts`, `utils.ts` を配置（コロケーション）
-- **components/ 配下のコンポーネント**: プレゼンテーションのみ、`app/components/` 配下にドメイン別に分類
-- **コンポーネント固有のロジック**: コンポーネントと同じディレクトリに `store.ts`, `use-*.ts`, `utils.ts` を配置（コロケーション）
-- **ドメイン固有の共通ロジック**: ドメイン配下の複数ページで使用する場合は `app/(commonLayout)/[domain]/lib/` に配置
-- **ページコンポーネント**: `app/(commonLayout)/[page]/page.tsx` はデータ取得などのロジックを含めることができる
-- **グローバルロジック**: 複数箇所で使用される汎用的なものは `hooks/`, `stores/`, `lib/` に配置
-- **コロケーション原則**: 関連するファイルは近くに配置して保守性を向上。グローバルディレクトリは汎用的なもののみ
+コンテンツの型は `src/content.config.ts` のスキーマから導出します。
+同じ形の interface を複数箇所に書き写さないでください。

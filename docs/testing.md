@@ -15,6 +15,7 @@
 ユーティリティ関数、ビジネスロジック、フックなどの単体テスト。
 
 **対象**:
+
 - `utils.ts`: ビジネスロジック、ヘルパー関数
 - `hooks/use-*.ts`: カスタムフック
 - `lib/*.ts`: 汎用ユーティリティ
@@ -26,6 +27,7 @@
 コンポーネントのビジュアルリグレッションテストとインタラクションテスト。
 
 **対象**:
+
 - `*.stories.tsx`: Storybook ストーリー
 
 **環境**: Chromium (ブラウザ環境)
@@ -37,15 +39,17 @@
 ### 基本パターン
 
 **単一ファイル**:
+
 ```
-app/(commonLayout)/
-├── utils.ts
-└── utils.test.ts           # 同階層に配置
+src/features/notes/
+├── group-by-month.ts
+└── group-by-month.test.ts  # 同階層に配置
 ```
 
 **複数ファイル**:
+
 ```
-app/(commonLayout)/
+src/features/notes/
 └── utils/
     ├── formatters.ts
     ├── formatters.test.ts
@@ -93,14 +97,14 @@ describe("functionToTest", () => {
 #### 例: グルーピング関数のテスト
 
 ```typescript
-// app/(commonLayout)/utils.test.ts
+// src/features/notes/group-by-month.test.ts
 import { describe, it, expect } from "vitest";
-import { groupNotesByMonth } from "./utils";
-import type { NoteItem } from "./types";
+import { groupNotesByMonth } from "./group-by-month";
+import type { SearchableItem } from "@/lib/types";
 
 describe("groupNotesByMonth", () => {
   it("should group notes by month correctly", () => {
-    const notes: NoteItem[] = [
+    const notes: SearchableItem[] = [
       {
         type: "note",
         url: "/notes/note1",
@@ -132,7 +136,7 @@ describe("groupNotesByMonth", () => {
   });
 
   it("should handle empty array", () => {
-    const notes: NoteItem[] = [];
+    const notes: SearchableItem[] = [];
     const result = groupNotesByMonth(notes);
 
     expect(Object.keys(result)).toHaveLength(0);
@@ -152,7 +156,7 @@ describe("groupNotesByMonth", () => {
 #### 例: シンプルなフックのテスト
 
 ```typescript
-// app/hooks/use-window-scroll.test.ts
+// src/hooks/use-window-scroll.test.ts
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useWindowScroll } from "./use-window-scroll";
@@ -203,10 +207,10 @@ describe("useWindowScroll", () => {
 ### ソート関数のテスト
 
 ```typescript
-// app/(commonLayout)/utils.test.ts
+// src/features/notes/group-by-month.test.ts
 import { describe, it, expect } from "vitest";
-import { sortMonthsDescending } from "./utils";
-import type { NotesByMonth } from "./types";
+import { sortMonthsDescending } from "./group-by-month";
+import type { NotesByMonth } from "@/lib/types";
 
 describe("sortMonthsDescending", () => {
   it("should sort months in descending order", () => {
@@ -298,9 +302,9 @@ describe("formatCurrency", () => {
 
 ```typescript
 // 等価性
-expect(value).toBe(expected);           // 厳密等価 (===)
-expect(value).toEqual(expected);        // 深い等価性
-expect(value).toStrictEqual(expected);  // より厳密な等価性
+expect(value).toBe(expected); // 厳密等価 (===)
+expect(value).toEqual(expected); // 深い等価性
+expect(value).toStrictEqual(expected); // より厳密な等価性
 
 // 真偽値
 expect(value).toBeTruthy();
@@ -591,8 +595,8 @@ jobs:
       - uses: pnpm/action-setup@v2
       - uses: actions/setup-node@v3
         with:
-          node-version: '20'
-          cache: 'pnpm'
+          node-version: "20"
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install
@@ -614,12 +618,13 @@ jobs:
 **原因**: happy-dom 環境で window オブジェクトが正しく初期化されていない
 
 **解決策**:
+
 ```typescript
 beforeEach(() => {
-  Object.defineProperty(window, 'property', {
+  Object.defineProperty(window, "property", {
     writable: true,
     configurable: true,
-    value: 'value',
+    value: "value",
   });
 });
 ```
@@ -629,6 +634,7 @@ beforeEach(() => {
 **原因**: テストが完了する前にタイムアウト
 
 **解決策**:
+
 ```typescript
 it("should wait for long operation", async () => {
   // タイムアウトを延長
@@ -644,9 +650,10 @@ it("should wait for long operation", async () => {
 **原因**: テスト間でモックが共有されている
 
 **解決策**:
+
 ```typescript
 afterEach(() => {
-  vi.clearAllMocks();  // すべてのモックをクリア
+  vi.clearAllMocks(); // すべてのモックをクリア
   vi.restoreAllMocks(); // すべてのモックを復元
 });
 ```

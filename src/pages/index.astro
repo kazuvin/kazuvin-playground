@@ -1,0 +1,20 @@
+---
+import { Hero, NotesTimeline } from "@/components/home";
+import {
+  getPublishedNotes,
+  groupNotesByMonth,
+  sortMonthsDescending,
+  toSearchableItem,
+} from "@/features/notes";
+import CommonLayout from "@/layouts/common-layout.astro";
+
+const notes = (await getPublishedNotes()).map(toSearchableItem);
+const sortedMonths = sortMonthsDescending(groupNotesByMonth(notes));
+---
+
+<CommonLayout>
+  <div class="space-y-12">
+    <Hero />
+    <NotesTimeline sortedMonths={sortedMonths} />
+  </div>
+</CommonLayout>

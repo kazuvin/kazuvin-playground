@@ -1,0 +1,29 @@
+---
+import { NoteCard } from "@/components/notes";
+import { PageHeader } from "@/components/shared";
+import { Text } from "@/components/ui";
+import { getPublishedNotes, toNoteSummary } from "@/features/notes";
+import CommonLayout from "@/layouts/common-layout.astro";
+
+const title = "Notes";
+const description = "A collection of notes and thoughts";
+const notes = (await getPublishedNotes()).map(toNoteSummary);
+---
+
+<CommonLayout title={title} description={description}>
+  <div>
+    <PageHeader title={title} description={description} />
+
+    {
+      notes.length === 0 ? (
+        <Text role="support">No notes yet. Check back later!</Text>
+      ) : (
+        <div class="grid gap-6">
+          {notes.map((note) => (
+            <NoteCard note={note} />
+          ))}
+        </div>
+      )
+    }
+  </div>
+</CommonLayout>
