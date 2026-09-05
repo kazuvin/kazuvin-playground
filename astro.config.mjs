@@ -59,7 +59,21 @@ export default defineConfig({
       },
     },
   ],
-  integrations: [react(), mdx(), sitemap()],
+  /* React Compiler を通す。再レンダーの抑制はコンパイラに任せる方針なので
+     （biome.jsonc の noRestrictedImports のメッセージと対）、useMemo /
+     useCallback / memo を手で置かない。
+
+     Biome の nursery/useReactCompiler は入れていない。2.5.12 時点では
+     日本語コメントを含むファイルで panic する（バイト境界の扱いのバグ）。
+
+     @astrojs/react の babel オプションは中の @vitejs/plugin-react にそのまま
+     渡る。ランタイムは react/compiler-runtime として React 19 に同梱されて
+     いるので、追加の依存は babel プラグインだけ。
+
+     効くのは client:* の island だけで、.astro が出す静的 HTML は対象外。
+     Storybook は @storybook/react-vite が別に react プラグインを持つため
+     コンパイラを通らない。意味論は変えない前提なので揃えていない。 */
+  integrations: [react({ babel: { plugins: ['babel-plugin-react-compiler'] } }), mdx(), sitemap()],
   markdown: {
     /* Kotoba は白地・単一色相の系なので、ハイライトも明色テーマで揃える */
     shikiConfig: { theme: 'github-light' },
