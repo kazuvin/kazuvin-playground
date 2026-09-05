@@ -1,10 +1,10 @@
 ---
-/* Kotoba loads three families, self-hosted. The two Latin ones go through
-   Astro の Fonts API (<Font> = @font-face + preload + メトリクス補正済みの
-   代替 face)、CJK の Noto Sans JP だけは @font-face が 124 本あって head に
-   インライン展開すると HTML が 100KB 増えるので、従来どおり CSS を import
-   して外部スタイルシートに残す。宣言は astro.config.mjs、family 名と
-   トークンの対応は src/styles/globals.css。 */
+/* Kotoba は 2 書体を self-host する。欧文の Noto Sans Mono は Astro の
+   Fonts API (<Font> = @font-face + preload + メトリクス補正済みの代替 face)、
+   CJK の Noto Sans JP だけは @font-face が 124 本あって head にインライン
+   展開すると HTML が 100KB 増えるので、CSS を import して外部スタイルシート
+   に残す。宣言は astro.config.mjs、family 名とトークンの対応は
+   src/styles/globals.css。 */
 import { Font } from 'astro:assets'
 import '@fontsource-variable/noto-sans-jp'
 import '@/styles/globals.css'
@@ -31,8 +31,7 @@ const pageTitle = title ? `${title} | ${APP_NAME}` : APP_NAME
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
-    <Font cssVariable="--font-source-sans-3" preload />
-    <Font cssVariable="--font-geist-mono" />
+    <Font cssVariable="--font-noto-sans-mono" preload />
   </head>
   <body>
     <slot />

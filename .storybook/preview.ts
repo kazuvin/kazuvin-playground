@@ -2,9 +2,8 @@ import type { Preview } from '@storybook/react-vite'
 
 /* Storybook はアプリのレイアウトを描画しないので、フォントはここで読み込む。
    src/layouts/base-layout.astro と同じ @fontsource-variable/* を使う。 */
-import '@fontsource-variable/source-sans-3'
+import '@fontsource-variable/noto-sans-mono'
 import '@fontsource-variable/noto-sans-jp'
-import '@fontsource-variable/geist-mono'
 import './fonts.css'
 import '../src/styles/globals.css'
 

@@ -16,19 +16,26 @@
   /** Spacing base unit — every shipped spacing value is 4 × n */
   --spacing: 4px;
 
-  /** Font — faces are self-hosted. Latin の 2 書体は astro.config.mjs の
-      fonts で宣言し、Astro が family 名をハッシュ付きに書き換えるので、
-      ここでは名前ではなく Astro が出す CSS 変数を参照する。変数の中身は
-      実書体 → メトリクス補正済みの代替 → 設定した fallback の順に並んでいて、
-      補正済みの代替が入っているぶん、書体が届いた瞬間のレイアウトシフトが
-      起きない。CJK の "Noto Sans JP Variable" だけは Fontsource の CSS を
-      そのまま読むので、名前で書く (Fontsource の可変フォントは "… Variable"
-      という別名で登録されるため、静的版の名前とは互換ではない)。
-      Storybook は Astro を通らないので、.storybook/preview.ts が
-      @fontsource-variable/* を直接 import してこの 3 書体を用意する。 */
-  --font-sans: var(--font-source-sans-3, system-ui), sans-serif;
-  --font-cjk: "Noto Sans JP Variable", var(--font-source-sans-3, system-ui), sans-serif;
-  --font-mono: var(--font-geist-mono, ui-monospace), monospace;
+  /** Font — 本文も見出しもコードも等幅で通す。欧文は Noto Sans Mono、和文は
+      Noto Sans JP。同じ Noto なので骨格とウェイトの刻みが揃う。faces は
+      self-host し、配信経路は 2 通りに分かれる。
+
+      欧文は astro.config.mjs の fonts で宣言し、Astro が family 名をハッシュ
+      付きに書き換えるので、ここでは名前ではなく Astro が出す CSS 変数を参照
+      する。変数の中身は 実書体 → メトリクス補正済みの代替 → 和文 → system mono
+      の順に並んでいて、補正済みの代替が入っているぶん、書体が届いた瞬間の
+      レイアウトシフトが起きない。
+
+      CJK の "Noto Sans JP Variable" だけは Fontsource の CSS をそのまま読むので
+      名前で書く (Fontsource の可変フォントは "… Variable" という別名で登録
+      されるため、静的版の名前とは互換ではない)。Storybook は Astro を通らない
+      ので、.storybook/preview.ts が @fontsource-variable/* を直接 import して
+      この 2 書体を用意する。
+
+      sans と mono が同じ値を指すのは意図的。役割としての 2 つは残しつつ、
+      実体を 1 つの等幅書体に寄せている。 */
+  --font-sans: var(--font-noto-sans-mono, ui-monospace), monospace;
+  --font-mono: var(--font-noto-sans-mono, ui-monospace), monospace;
 
   /** ---- neutral ramp — the entire non-accent palette, including the
       primary action fill. Tailwind's default gray is cleared first so no

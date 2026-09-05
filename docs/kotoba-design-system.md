@@ -65,33 +65,37 @@ Tailwind 標準の `gray` は `--color-gray-*: initial` で消してあるので
 
 ### typography
 
-Latin は `Source Sans 3`、CJK は `Noto Sans JP`、コードは `Geist Mono`。実体は
-`@fontsource-variable/*` で self-host する。配信経路は 2 通りに分かれていて、
+**本文も見出しもコードも等幅で組む。** 欧文は `Noto Sans Mono`、和文は `Noto Sans JP`。
+同じ Noto なので骨格もウェイトの刻みも揃っていて、和欧が混ざる行でも濃度が破綻しない。
+`--font-sans` と `--font-mono` は同じ値を指す。役割としての 2 つは残してあるが、
+実体は 1 つの等幅書体に寄せてある。
+
+実体は `@fontsource-variable/*` で self-host する。配信経路は 2 通りに分かれていて、
 分けている理由がそのままレイアウトシフト対策になっている。
 
-- **Latin の 2 書体 (`Source Sans 3` / `Geist Mono`)** は `astro.config.mjs` の
-  `fonts` で宣言し、`src/layouts/base-layout.astro` の `<Font>` が描画する。
+- **欧文 (`Noto Sans Mono`)** は `astro.config.mjs` の `fonts` で宣言し、
+  `src/layouts/base-layout.astro` の `<Font>` が描画する。
   Astro が `<link rel="preload">` と、**実ファイルのメトリクスから算出した代替
   `@font-face`** (`size-adjust` / `ascent-override` / `descent-override`) を出す。
   代替書体で描かれている間も行の高さと字幅が本番の書体と一致するので、
-  差し替わった瞬間にレイアウトが動かない。トークンは family 名ではなく
-  Astro が発行する `--font-source-sans-3` / `--font-geist-mono` を参照する
-  (Astro が family 名をハッシュ付きに書き換えるため)。
-  載せるサブセットは `latin` だけ。`preload` は宣言した全 variant に効くので、
-  英日サイトでまず出番のない `latin-ext` (60KB) まで毎回落ちてしまう。
-  漏れた文字は `Noto Sans JP` → `system-ui` にグリフ単位で落ちる。
+  差し替わった瞬間にレイアウトが動かない (代替は `Courier New` で `size-adjust` は
+  99.98%、つまりほぼ等倍)。トークンは family 名ではなく Astro が発行する
+  `--font-noto-sans-mono` を参照する (Astro が family 名をハッシュ付きに書き換えるため)。
+  載せるサブセットは `latin` だけ (20KB 台)。`preload` は宣言した全 variant に効くので、
+  英日サイトでまず出番のない `latin-ext` や `cyrillic` まで毎回落ちてしまう。
+  漏れた文字は `Noto Sans JP` → system mono にグリフ単位で落ちる。
 - **`Noto Sans JP`** だけは Fontsource の CSS をそのまま import し、外部の
   スタイルシートに残す。`@font-face` が 124 本 (CJK を字種で分割したもの) あり、
   `<Font>` に載せると head に全部インライン展開されて HTML が 1 ページあたり
   100KB 増える。分割配信のまま外部 CSS に置けばキャッシュも効く。
-  なお CJK には上記のメトリクス補正が効かない (Astro が使う代替は Arial /
-  Courier New で、CJK グリフを持たない)。ここは font-size と line-height を
-  px で固定していることで実害を抑えている。
+  なお CJK には上記のメトリクス補正が効かない (Astro が使う代替は `Courier New` で、
+  CJK グリフを持たない)。ここは font-size と line-height を px で固定していることで
+  実害を抑えている。
 
-Fontsource は可変フォントを `"Source Sans 3 Variable"` のような別名で登録するため、
+Fontsource は可変フォントを `"Noto Sans Mono Variable"` のような別名で登録するため、
 family 名は静的版と互換ではない。Storybook は Astro を通らないので、
 `.storybook/preview.ts` が `@fontsource-variable/*` を直接 import し、
-`.storybook/fonts.css` が上記 2 つの CSS 変数を Fontsource の family 名に解決する。
+`.storybook/fonts.css` が上記の CSS 変数を Fontsource の family 名に解決する。
 
 7 つの role が**コンテンツ / クローム**の 2 群に分かれる。
 
