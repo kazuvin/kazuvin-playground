@@ -1,10 +1,12 @@
 ---
-/* Kotoba loads three families, self-hosted: Source Sans 3 for Latin,
-   Noto Sans JP for CJK, Geist Mono for code. The token layer names the
-   "… Variable" families these packages register — see src/styles/globals.css. */
-import '@fontsource-variable/source-sans-3'
+/* Kotoba loads three families, self-hosted. The two Latin ones go through
+   Astro の Fonts API (<Font> = @font-face + preload + メトリクス補正済みの
+   代替 face)、CJK の Noto Sans JP だけは @font-face が 124 本あって head に
+   インライン展開すると HTML が 100KB 増えるので、従来どおり CSS を import
+   して外部スタイルシートに残す。宣言は astro.config.mjs、family 名と
+   トークンの対応は src/styles/globals.css。 */
+import { Font } from 'astro:assets'
 import '@fontsource-variable/noto-sans-jp'
-import '@fontsource-variable/geist-mono'
 import '@/styles/globals.css'
 import { APP_DESCRIPTION, APP_NAME } from '@/config/app'
 
@@ -29,6 +31,8 @@ const pageTitle = title ? `${title} | ${APP_NAME}` : APP_NAME
     <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
+    <Font cssVariable="--font-source-sans-3" preload />
+    <Font cssVariable="--font-geist-mono" />
   </head>
   <body>
     <slot />

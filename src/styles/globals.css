@@ -16,14 +16,19 @@
   /** Spacing base unit — every shipped spacing value is 4 × n */
   --spacing: 4px;
 
-  /** Font — faces are self-hosted with @fontsource-variable/*, imported from
-      src/layouts/base-layout.astro (and .storybook/preview.ts for Storybook).
-      Fontsource registers a variable face under a "… Variable" family name,
-      so the family names below are not interchangeable with the static ones. */
-  --font-sans:
-    "Source Sans 3 Variable", "Noto Sans JP Variable", system-ui, -apple-system, sans-serif;
-  --font-cjk: "Noto Sans JP Variable", "Source Sans 3 Variable", system-ui, sans-serif;
-  --font-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo, monospace;
+  /** Font — faces are self-hosted. Latin の 2 書体は astro.config.mjs の
+      fonts で宣言し、Astro が family 名をハッシュ付きに書き換えるので、
+      ここでは名前ではなく Astro が出す CSS 変数を参照する。変数の中身は
+      実書体 → メトリクス補正済みの代替 → 設定した fallback の順に並んでいて、
+      補正済みの代替が入っているぶん、書体が届いた瞬間のレイアウトシフトが
+      起きない。CJK の "Noto Sans JP Variable" だけは Fontsource の CSS を
+      そのまま読むので、名前で書く (Fontsource の可変フォントは "… Variable"
+      という別名で登録されるため、静的版の名前とは互換ではない)。
+      Storybook は Astro を通らないので、.storybook/preview.ts が
+      @fontsource-variable/* を直接 import してこの 3 書体を用意する。 */
+  --font-sans: var(--font-source-sans-3, system-ui), sans-serif;
+  --font-cjk: "Noto Sans JP Variable", var(--font-source-sans-3, system-ui), sans-serif;
+  --font-mono: var(--font-geist-mono, ui-monospace), monospace;
 
   /** ---- neutral ramp — the entire non-accent palette, including the
       primary action fill. Tailwind's default gray is cleared first so no

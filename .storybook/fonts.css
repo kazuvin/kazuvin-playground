@@ -1,0 +1,11 @@
+/* Storybook は Astro を通らないので、astro.config.mjs の fonts が出す
+   --font-source-sans-3 / --font-geist-mono が存在しない。src/styles/globals.css
+   のトークンはこの 2 変数を参照しているため、ここで Fontsource が登録する
+   family 名に解決してやる (preview.ts が @fontsource-variable/* を import 済み)。
+
+   Astro 側と違ってメトリクス補正済みの代替 face は入らない。Storybook は
+   実測用ではなく見た目の確認用なので、そこは合わせない。 */
+:root {
+  --font-source-sans-3: "Source Sans 3 Variable", "Noto Sans JP Variable", system-ui, -apple-system;
+  --font-geist-mono: "Geist Mono Variable", ui-monospace, SFMono-Regular, Menlo;
+}

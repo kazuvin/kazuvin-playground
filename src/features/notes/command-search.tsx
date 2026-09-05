@@ -15,6 +15,32 @@ import type { SearchableItem } from '@/lib/types'
 import { fetchSearchIndex, filterSearchableItems, groupSearchableItemsByType } from './search-index'
 
 /*
+ * ⌘ (U+2318) を文字として置くと、この 1 文字のために Noto Sans JP の CJK チャンク
+ * (25KB) を落とすことになる。ヘッダーは静的 HTML として即座に出るのに、記号だけが
+ * 遅れて別の書体から差し替わっていた。書体に依存しない図形として持つ。
+ *
+ * 形は looped square そのもの: 一辺 6 の正方形の各辺を両端に 3 ずつ伸ばして交差させ、
+ * 4 隅に半径 3 の輪を付ける。12px 角に置くと図形の実効高さが 10px になり、
+ * 隣の "K" の cap height (14px × 約 0.68) とほぼ揃う。
+ */
+function CommandGlyph() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="size-3"
+    >
+      <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
+    </svg>
+  )
+}
+
+/*
  * コマンドパレット。ヘッダーで唯一 island になる部品。
  *
  * 検索インデックスの URL と絞り込みの規則は ./search-index が持つ。ここに残すのは
@@ -68,9 +94,10 @@ export function CommandSearch() {
       <button
         type="button"
         onClick={toggle}
-        className="cursor-pointer rounded-xl bg-primary px-3 py-1 font-semibold text-primary-foreground text-sm"
+        aria-label="検索"
+        className="inline-flex cursor-pointer items-center gap-0.5 rounded-xl bg-primary px-3 py-1 font-semibold text-primary-foreground text-sm"
       >
-        ⌘K
+        <CommandGlyph />K
       </button>
       <Dialog open={open} onOpenChange={close}>
         <DialogContent className="max-w-lg p-0">

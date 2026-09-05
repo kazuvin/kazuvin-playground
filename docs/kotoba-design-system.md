@@ -65,10 +65,34 @@ Tailwind 標準の `gray` は `--color-gray-*: initial` で消してあるので
 
 ### typography
 
-Latin は `Source Sans 3`、CJK は `Noto Sans JP`。`src/layouts/base-layout.astro` で
-`@fontsource-variable/*` により self-host。Fontsource は可変フォントを
-`"Source Sans 3 Variable"` のような別名で登録するため、トークンの family 名は静的版と
-互換ではない。
+Latin は `Source Sans 3`、CJK は `Noto Sans JP`、コードは `Geist Mono`。実体は
+`@fontsource-variable/*` で self-host する。配信経路は 2 通りに分かれていて、
+分けている理由がそのままレイアウトシフト対策になっている。
+
+- **Latin の 2 書体 (`Source Sans 3` / `Geist Mono`)** は `astro.config.mjs` の
+  `fonts` で宣言し、`src/layouts/base-layout.astro` の `<Font>` が描画する。
+  Astro が `<link rel="preload">` と、**実ファイルのメトリクスから算出した代替
+  `@font-face`** (`size-adjust` / `ascent-override` / `descent-override`) を出す。
+  代替書体で描かれている間も行の高さと字幅が本番の書体と一致するので、
+  差し替わった瞬間にレイアウトが動かない。トークンは family 名ではなく
+  Astro が発行する `--font-source-sans-3` / `--font-geist-mono` を参照する
+  (Astro が family 名をハッシュ付きに書き換えるため)。
+  載せるサブセットは `latin` だけ。`preload` は宣言した全 variant に効くので、
+  英日サイトでまず出番のない `latin-ext` (60KB) まで毎回落ちてしまう。
+  漏れた文字は `Noto Sans JP` → `system-ui` にグリフ単位で落ちる。
+- **`Noto Sans JP`** だけは Fontsource の CSS をそのまま import し、外部の
+  スタイルシートに残す。`@font-face` が 124 本 (CJK を字種で分割したもの) あり、
+  `<Font>` に載せると head に全部インライン展開されて HTML が 1 ページあたり
+  100KB 増える。分割配信のまま外部 CSS に置けばキャッシュも効く。
+  なお CJK には上記のメトリクス補正が効かない (Astro が使う代替は Arial /
+  Courier New で、CJK グリフを持たない)。ここは font-size と line-height を
+  px で固定していることで実害を抑えている。
+
+Fontsource は可変フォントを `"Source Sans 3 Variable"` のような別名で登録するため、
+family 名は静的版と互換ではない。Storybook は Astro を通らないので、
+`.storybook/preview.ts` が `@fontsource-variable/*` を直接 import し、
+`.storybook/fonts.css` が上記 2 つの CSS 変数を Fontsource の family 名に解決する。
+
 7 つの role が**コンテンツ / クローム**の 2 群に分かれる。
 
 | role         | size | line | tracking | weight | 群         | 既定タグ |
@@ -243,7 +267,7 @@ tier-1 の画面端スペーシング (24 / 32 / 24) を供給するシェル。
 
 | 項目                    | 元                            | ここ                                                         | 理由                                                                               |
 | ----------------------- | ----------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
-| フォント配信            | Google Fonts CDN の `@import` | `@fontsource-variable/*` で self-host                        | レイアウトシフトとサードパーティ接続を避ける                                       |
+| フォント配信            | Google Fonts CDN の `@import` | `@fontsource-variable/*` で self-host + Astro Fonts API      | サードパーティ接続を避ける。preload とメトリクス補正済み代替でレイアウトシフトも消す |
 | `accent` の意味         | 唯一の色相                    | 同左                                                         | shadcn 系の `bg-accent` (ホバー面) とは非互換。既存 5 箇所は `bg-muted` に移行済み |
 | `destructive`           | 存在しない                    | `primary` と同じ黒にマップ                                   | 既存の `bg-destructive` を壊さず、かつ色でステータスを伝えない                     |
 | `chart-1`〜`chart-5`    | 存在しない                    | 削除                                                         | 未使用で、チャートパレットはこのシステムに無い                                     |

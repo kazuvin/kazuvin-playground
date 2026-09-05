@@ -5,6 +5,7 @@ import type { Preview } from '@storybook/react-vite'
 import '@fontsource-variable/source-sans-3'
 import '@fontsource-variable/noto-sans-jp'
 import '@fontsource-variable/geist-mono'
+import './fonts.css'
 import '../src/styles/globals.css'
 
 const preview: Preview = {
