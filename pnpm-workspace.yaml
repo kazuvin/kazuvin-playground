@@ -1,11 +1,9 @@
 packages:
   - "."
 
-onlyBuiltDependencies:
-  - core-js-pure
-  - esbuild
-  - lefthook
-  - rclone.js
-  - sharp
-  - unrs-resolver
-  - workerd
+# pnpm 11 で onlyBuiltDependencies から allowBuilds に移行
+allowBuilds:
+  esbuild: true
+  lefthook: true
+  sharp: true
+  workerd: true

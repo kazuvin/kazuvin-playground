@@ -1,6 +1,6 @@
 [tools]
-node = "24.14.0"
-"npm:pnpm" = "10.32.1"
+node = "24.20.0"
+"npm:pnpm" = "11.25.0"
 
 [settings]
 # .nvmrc / .node-version などの自動読み込みを無効化し、mise.toml を単一の情報源にする
