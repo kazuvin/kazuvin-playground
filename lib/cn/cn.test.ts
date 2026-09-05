@@ -161,4 +161,37 @@ describe("cn", () => {
     const result = cn(["px-2", "py-1"], ["px-4"]);
     expect(result).toBe("py-1 px-4");
   });
+
+  describe("Kotoba typography roles", () => {
+    const roles = [
+      "expression",
+      "reading",
+      "gloss",
+      "body",
+      "label",
+      "support",
+      "overline",
+    ];
+
+    it.each(roles)("should keep text-%s when a text colour follows", (role) => {
+      const result = cn(`text-${role}`, "text-foreground");
+      expect(result).toContain(`text-${role}`);
+      expect(result).toContain("text-foreground");
+    });
+
+    it("should still treat one role as replacing another", () => {
+      const result = cn("text-body", "text-expression");
+      expect(result).toBe("text-expression");
+    });
+
+    it("should still treat built-in sizes as conflicting with roles", () => {
+      expect(cn("text-body", "text-sm")).toBe("text-sm");
+    });
+
+    it("should still collapse conflicting text colours", () => {
+      expect(cn("text-foreground", "text-muted-foreground")).toBe(
+        "text-muted-foreground"
+      );
+    });
+  });
 });

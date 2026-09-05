@@ -29,7 +29,7 @@ export interface NoteTimelineItemProps {
 export function NoteTimelineItem({ note }: NoteTimelineItemProps) {
   return (
     <Link href={note.url}>
-      <Card className="hover:bg-accent transition-colors">
+      <Card className="hover:bg-muted transition-colors">
         <CardHeader>
           <CardTitle className="text-sm">{note.metadata.title}</CardTitle>
           <CardDescription className="text-xs">

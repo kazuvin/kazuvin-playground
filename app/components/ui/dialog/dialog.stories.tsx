@@ -116,7 +116,7 @@ export const Controlled: Story = {
           <DialogFooter>
             <button
               onClick={() => setOpen(false)}
-              className="border-border hover:bg-accent rounded-md border px-4 py-2 transition-colors"
+              className="border-border hover:bg-muted rounded-md border px-4 py-2 transition-colors"
             >
               Cancel
             </button>
@@ -265,7 +265,7 @@ export const AlertDialog: Story = {
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
-          <button className="border-border hover:bg-accent rounded-md border px-4 py-2 transition-colors">
+          <button className="border-border hover:bg-muted rounded-md border px-4 py-2 transition-colors">
             Cancel
           </button>
           <button className="bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-md px-4 py-2 transition-colors">

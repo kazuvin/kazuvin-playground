@@ -1,33 +1,78 @@
-export type ButtonVariant = keyof typeof variantClasses;
-export type ButtonSize = keyof typeof sizeClasses;
+export type ButtonVariant = "primary" | "secondary";
+export type ButtonSize = "default" | "large";
 
 interface ButtonVariants {
   variant: ButtonVariant;
   size: ButtonSize;
+  disabled: boolean;
+  selected: boolean;
+  fullWidth: boolean;
 }
 
-export const baseClasses =
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0";
+/* Visual height and tap height are separate concerns. The visual box renders
+   at 40 (default) or 52 (large); the default size pads its touchable out to
+   the 44px minimum with a transparent slop ring, which is the web analogue of
+   React Native's hitSlop. Changing the label size never moves the box. */
 
-export const variantClasses = {
-  default: "bg-primary text-primary-foreground shadow hover:bg-primary/90",
-  destructive:
-    "bg-destructive text-destructive-foreground shadow-sm hover:bg-destructive/90",
-  outline:
-    "border border-input bg-background shadow-sm hover:bg-accent hover:text-accent-foreground",
+export const touchBaseClasses =
+  "group m-0 cursor-pointer border-0 bg-transparent p-0 [-webkit-tap-highlight-color:transparent] disabled:cursor-default";
+
+export const touchSlopClasses = {
+  default: "py-hitslop",
+  large: "",
+};
+
+export const boxBaseClasses =
+  "box-border inline-flex items-center justify-center rounded-control border border-solid px-inset-x text-label transition-[background-color,border-color,opacity] duration-[120ms] ease-standard";
+
+export const boxSizeClasses = {
+  default: "h-control",
+  large: "h-control-lg",
+};
+
+/* Primary is black, not chromatic. Press swaps to a darker fill — never a
+   scale-down, never an opacity fade. Selected is secondary-only and pairs the
+   accent border with a tint and a check glyph, so the state survives greyscale
+   and colour-blind rendering. */
+export const boxStateClasses = {
+  disabled: "border-disabled bg-disabled text-disabled-foreground",
+  primary:
+    "border-primary bg-primary text-primary-foreground group-active:border-primary-pressed group-active:bg-primary-pressed",
+  selected: "border-2 border-selected-border bg-selected text-foreground",
   secondary:
-    "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80",
-  ghost: "hover:bg-accent hover:text-accent-foreground",
-  link: "text-primary underline-offset-4 hover:underline",
+    "border-border-strong bg-background text-foreground group-active:bg-muted",
 };
 
-export const sizeClasses = {
-  default: "h-9 px-4 py-2",
-  sm: "h-8 rounded-md px-3 text-xs",
-  lg: "h-10 rounded-md px-8",
-  icon: "h-9 w-9",
-};
+export function getButtonTouchClasses({
+  size,
+  fullWidth,
+}: Pick<ButtonVariants, "size" | "fullWidth">): string {
+  return [
+    touchBaseClasses,
+    touchSlopClasses[size],
+    fullWidth ? "block w-full" : "inline-block w-auto",
+  ].join(" ");
+}
 
-export function getButtonClasses({ variant, size }: ButtonVariants): string {
-  return `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]}`;
+export function getButtonBoxClasses({
+  variant,
+  size,
+  disabled,
+  selected,
+  fullWidth,
+}: ButtonVariants): string {
+  const state = disabled
+    ? boxStateClasses.disabled
+    : variant === "primary"
+      ? boxStateClasses.primary
+      : selected
+        ? boxStateClasses.selected
+        : boxStateClasses.secondary;
+
+  return [
+    boxBaseClasses,
+    boxSizeClasses[size],
+    fullWidth ? "w-full" : "w-auto",
+    state,
+  ].join(" ");
 }

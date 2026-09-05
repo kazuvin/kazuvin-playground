@@ -11,11 +11,11 @@ const meta = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["default", "destructive", "outline", "secondary", "ghost", "link"],
+      options: ["primary", "secondary"],
     },
     size: {
       control: "select",
-      options: ["default", "sm", "lg", "icon"],
+      options: ["default", "large"],
     },
   },
 } satisfies Meta<typeof Button>;
@@ -23,161 +23,93 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {
+export const Primary: Story = {
   args: {
-    children: "Button",
-    variant: "default",
+    children: "Show meaning",
+    variant: "primary",
     size: "default",
-  },
-};
-
-export const Destructive: Story = {
-  args: {
-    children: "Delete",
-    variant: "destructive",
-  },
-};
-
-export const Outline: Story = {
-  args: {
-    children: "Outline",
-    variant: "outline",
   },
 };
 
 export const Secondary: Story = {
   args: {
-    children: "Secondary",
+    children: "Skip for now",
     variant: "secondary",
-  },
-};
-
-export const Ghost: Story = {
-  args: {
-    children: "Ghost",
-    variant: "ghost",
-  },
-};
-
-export const Link: Story = {
-  args: {
-    children: "Link",
-    variant: "link",
-  },
-};
-
-export const Small: Story = {
-  args: {
-    children: "Small Button",
-    size: "sm",
   },
 };
 
 export const Large: Story = {
   args: {
-    children: "Large Button",
-    size: "lg",
+    children: "Got it",
+    variant: "primary",
+    size: "large",
   },
 };
 
-export const Icon: Story = {
+export const Selected: Story = {
   args: {
-    children: "🔍",
-    size: "icon",
+    children: "Formal register",
+    variant: "secondary",
+    selected: true,
   },
 };
 
 export const Disabled: Story = {
   args: {
-    children: "Disabled",
+    children: "Show meaning",
     disabled: true,
   },
 };
 
+export const FullWidth: Story = {
+  args: {
+    children: "Show meaning",
+    size: "large",
+    fullWidth: true,
+  },
+  parameters: { layout: "padded" },
+};
+
+/** One primary per screen; everything else is secondary. There is no third
+ *  variant — anything quieter than secondary is body text with a link. */
 export const AllVariants: Story = {
+  args: { children: "Show meaning" },
   render: () => (
-    <div className="flex flex-col gap-4">
-      <div className="flex gap-2">
-        <Button variant="default">Default</Button>
-        <Button variant="destructive">Destructive</Button>
-        <Button variant="outline">Outline</Button>
-        <Button variant="secondary">Secondary</Button>
-        <Button variant="ghost">Ghost</Button>
-        <Button variant="link">Link</Button>
-      </div>
+    <div className="gap-gap flex">
+      <Button variant="primary">Show meaning</Button>
+      <Button variant="secondary">Skip for now</Button>
+      <Button variant="secondary" selected>
+        Formal register
+      </Button>
+      <Button disabled>Show meaning</Button>
     </div>
   ),
 };
 
+/** The box is 40 or 52. The 40 box pads its touchable out to the 44pt
+ *  minimum, so both sizes clear the tap target with the same label size. */
 export const AllSizes: Story = {
+  args: { children: "Show meaning" },
   render: () => (
-    <div className="flex items-center gap-2">
-      <Button size="sm">Small</Button>
-      <Button size="default">Default</Button>
-      <Button size="lg">Large</Button>
-      <Button size="icon">🔍</Button>
+    <div className="gap-gap flex items-center">
+      <Button size="default">Default 40</Button>
+      <Button size="large">Large 52</Button>
     </div>
   ),
 };
 
-export const WithIcon: Story = {
+/** The action group: full-width, stacked, primary always above secondary. */
+export const ActionGroup: Story = {
+  args: { children: "Got it" },
+  parameters: { layout: "padded" },
   render: () => (
-    <div className="flex gap-2">
-      <Button>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M5 12h14" />
-          <path d="m12 5 7 7-7 7" />
-        </svg>
-        Next
+    <div className="gap-gap flex w-[342px] flex-col">
+      <Button variant="primary" size="large" fullWidth>
+        Got it
       </Button>
-      <Button variant="outline">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M15 18l-6-6 6-6" />
-        </svg>
-        Previous
+      <Button variant="secondary" size="large" fullWidth>
+        Practice again
       </Button>
     </div>
-  ),
-};
-
-export const Loading: Story = {
-  render: () => (
-    <Button disabled>
-      <svg
-        className="animate-spin"
-        xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M21 12a9 9 0 1 1-6.219-8.56" />
-      </svg>
-      Loading...
-    </Button>
   ),
 };

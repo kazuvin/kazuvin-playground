@@ -1,5 +1,5 @@
 import { NoteCard } from "@/app/components/notes";
-import { Typography } from "@/app/components/ui";
+import { Text } from "@/app/components/ui";
 import { PageHeader } from "@/app/components/shared";
 import type { Metadata } from "next";
 import { getNotes } from "./actions";
@@ -22,9 +22,7 @@ export default async function NotesPage() {
       />
 
       {notes.length === 0 ? (
-        <Typography variant="small">
-          No notes yet. Check back later!
-        </Typography>
+        <Text role="support">No notes yet. Check back later!</Text>
       ) : (
         <div className="grid gap-6">
           {notes.map((note) => (

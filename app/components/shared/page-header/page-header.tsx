@@ -1,6 +1,6 @@
 import * as React from "react";
 import { cn } from "@/lib/cn";
-import { Typography } from "@/app/components/ui";
+import { Text } from "@/app/components/ui";
 
 export interface PageHeaderProps extends React.HTMLAttributes<HTMLElement> {
   title: string;
@@ -14,9 +14,13 @@ function PageHeader({
   ...props
 }: PageHeaderProps) {
   return (
-    <header className={cn("mb-12", className)} {...props}>
-      <Typography variant="h1">{title}</Typography>
-      {description && <Typography variant="p">{description}</Typography>}
+    <header className={cn("mb-block", className)} {...props}>
+      <Text role="expression">{title}</Text>
+      {description && (
+        <Text role="body" className="mt-gap">
+          {description}
+        </Text>
+      )}
     </header>
   );
 }

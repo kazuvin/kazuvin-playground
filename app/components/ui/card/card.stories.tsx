@@ -46,18 +46,22 @@ export const WithFooter: Story = {
         <form>
           <div className="grid w-full items-center gap-4">
             <div className="flex flex-col space-y-1.5">
-              <label htmlFor="name" className="text-sm font-medium">Name</label>
+              <label htmlFor="name" className="text-sm font-medium">
+                Name
+              </label>
               <input
                 id="name"
                 placeholder="Name of your project"
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                className="border-input placeholder:text-muted-foreground focus-visible:ring-ring flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:ring-1 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               />
             </div>
             <div className="flex flex-col space-y-1.5">
-              <label htmlFor="framework" className="text-sm font-medium">Framework</label>
+              <label htmlFor="framework" className="text-sm font-medium">
+                Framework
+              </label>
               <select
                 id="framework"
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                className="border-input focus-visible:ring-ring flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:ring-1 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <option value="">Select</option>
                 <option value="next">Next.js</option>
@@ -70,7 +74,7 @@ export const WithFooter: Story = {
         </form>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <Button variant="outline">Cancel</Button>
+        <Button variant="secondary">Cancel</Button>
         <Button>Deploy</Button>
       </CardFooter>
     </Card>
@@ -87,10 +91,10 @@ export const Notification: Story = {
       <CardContent className="grid gap-4">
         <div className="flex items-center space-x-4 rounded-md border p-4">
           <div className="flex-1 space-y-1">
-            <p className="text-sm font-medium leading-none">
+            <p className="text-sm leading-none font-medium">
               Push Notifications
             </p>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               Send notifications to device.
             </p>
           </div>
@@ -116,10 +120,10 @@ export const Notification: Story = {
             >
               <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
               <div className="space-y-1">
-                <p className="text-sm font-medium leading-none">
+                <p className="text-sm leading-none font-medium">
                   {notification.title}
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   {notification.description}
                 </p>
               </div>
@@ -128,7 +132,7 @@ export const Notification: Story = {
         </div>
       </CardContent>
       <CardFooter>
-        <Button className="w-full">Mark all as read</Button>
+        <Button fullWidth>Mark all as read</Button>
       </CardFooter>
     </Card>
   ),
@@ -141,7 +145,7 @@ export const Simple: Story = {
         <CardTitle>Simple Card</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-sm text-muted-foreground">
+        <p className="text-muted-foreground text-sm">
           This is a simple card with just a title and content.
         </p>
       </CardContent>
@@ -165,7 +169,7 @@ export const AllComponents: Story = {
           </p>
         </CardContent>
         <CardFooter>
-          <p className="text-sm text-muted-foreground">Card Footer</p>
+          <p className="text-muted-foreground text-sm">Card Footer</p>
         </CardFooter>
       </Card>
     </div>
