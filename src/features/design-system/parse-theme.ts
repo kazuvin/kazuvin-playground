@@ -1,16 +1,7 @@
 /*
- * src/styles/globals.css の @theme をそのまま読み下して、トークンの一覧に落とす。
- *
- * カタログ (/design-system) が値を書き写さないための層。ここが CSS を唯一の出典に
- * している限り、globals.css にトークンを 1 つ足せばカタログの行も 1 つ増える。
- * 「値のコピーを TS 側に持たない」が設計方針のすべてで、プレビューの色もサイズも
- * ここで解決した実値をそのまま inline style に流す。Tailwind は使われていない
- * @theme 変数を出力から落とすので、`var(--color-gray-25)` のような未使用トークンを
- * カタログ側で参照すると値が無い。実値まで解決しておくのはそのため。
- *
- * 拾うのは @theme 直下の `--*` 宣言だけで、@keyframes のような入れ子は深さで弾く。
- * 宣言の直前のコメントはトークン群の設計意図そのものなので、見出し (`---- x ----`)
- * と本文に分けて一緒に持ち上げる。
+ * globals.css の @theme を読み下してトークンの一覧にする。カタログが値を書き写さない
+ * ための層。var() を実値まで解決するのは、Tailwind が未使用の @theme 変数を出力から
+ * 落とすため (カタログ側で参照しても値が無い)。
  */
 
 interface TokenModifier {
@@ -135,7 +126,7 @@ function scanDeclarations(block: string): RawDeclaration[] {
   return declarations
 }
 
-/** var() を @theme の中だけで辿る。辿れない参照 (Astro が出す font 変数など) は
+/** var() を @theme の中だけで辿る。辿れない参照 (next/font が出す font 変数など) は
     そのまま残す。循環は seen で止める。 */
 function resolveValue(value: string, values: Map<string, string>, seen: Set<string>): string {
   return value.replace(VAR_REFERENCE, (reference, name: string) => {
@@ -197,12 +188,7 @@ function describeComment(comment: string | null): Pick<ThemeToken, 'label' | 'no
   }
 }
 
-/**
- * globals.css の文字列から @theme のトークン一覧を作る。
- *
- * 並びは宣言順のまま。CSS 側で意味のまとまりごとに並べてあるので、
- * カタログはそれをそのまま表に写せばよい。
- */
+/** 並びは宣言順のまま。 */
 export function parseThemeTokens(css: string): ThemeToken[] {
   const declarations = scanDeclarations(extractThemeBlock(css))
   const values = new Map(declarations.map((declaration) => [declaration.name, declaration.value]))

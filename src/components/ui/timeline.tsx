@@ -9,11 +9,8 @@ function TimelineItem({ ref, className, ...props }: ComponentProps<'li'>) {
   return <li ref={ref} className={cn('relative', className)} {...props} />
 }
 
-/* レールの上下端はセパレーターの組み方で変わる。
-   ドットが TimelineHeader 側にいる構成 (月ごとのノート一覧) では、セパレーターは
-   ドットより下から始まるので上下いっぱいに貫く。ドットが同じセパレーターに同居
-   する構成では、そのドットの中心から次の項目のドットの中心 (= セパレーター下端の
-   16px 下) までを結ぶ。上に飛び出す端も、項目のあいだの切れ目も出さないため。 */
+/* 端の処理はドットの居場所で変わる。TimelineHeader 側にいるなら上下いっぱい、
+   同じセパレーターに同居するならドットの中心から次のドットの中心まで。 */
 function TimelineConnector({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div

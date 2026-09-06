@@ -17,13 +17,9 @@ export interface NotesTimelineProps {
   sortedMonths: [string, NotesByMonth][]
 }
 
-/**
- * ノートのタイムライン表示
- * プレゼンテーションコンポーネント - props を受け取って UI を描画
- */
 export function NotesTimeline({ sortedMonths }: NotesTimelineProps) {
   return (
-    <section className="animation-delay-600 animation-forwards animate-fade-slide-up opacity-0">
+    <section>
       <Timeline>
         {sortedMonths.map(([monthKey, { label, notes }], index) => (
           <TimelineItem key={monthKey}>

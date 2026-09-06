@@ -5,59 +5,41 @@
 
 ## リンター / フォーマッター
 
-**Biome が唯一のリンター兼フォーマッター**で、ESLint と Prettier（の大半）を置き換えている。
+**Biome が唯一のリンター兼フォーマッター**で、ESLint と Prettier を置き換えている。
 設定は `biome.jsonc` の 1 ファイルに集約し、層の境界も `overrides` でここに書く。
 
 | 対象 | lint | format |
 | --- | --- | --- |
-| `.ts` / `.tsx` / `.mts` / `.mjs` / `.json` / `.jsonc` / `.css` | Biome | Biome |
-| `.astro` | (なし) | Prettier + `prettier-plugin-astro` |
-| すべて | `astro check`（型） | — |
+| `.ts` / `.tsx` / `.mts` / `.mjs` / `.json` / `.jsonc` / `.css` / `.md` | Biome | Biome |
+| すべて | `tsc --noEmit`（型） | — |
 
-### なぜ .astro だけ Prettier なのか
+テンプレートも含めてすべてが `.tsx` なので、**Biome の対象外になるファイルが無い**。
+かつては `.astro` のテンプレートを Biome が扱えず（フロントマターしか見ない、しかも
+テンプレートでしか使わない変数を未使用と誤検知する）、整形を Prettier に、型を
+`astro check` に渡していた。層の境界チェックもそこだけ効かず、レビューで担保する
+必要があった。その穴はもう無い。
 
-Biome の `.astro` 対応は**フロントマター（`---` で囲んだスクリプト）に限られる**。
-テンプレートは整形されず、さらに**テンプレートでしか使わない変数や import を
-`noUnusedVariables` / `noUnusedImports` が未使用と誤検知する**。
-
-```astro
----
-const title = "Notes"   // ← Biome はここだけを見て「未使用」と判定する
----
-<h1>{title}</h1>        <!-- ← この参照が見えていない -->
-```
-
-そのため `biome.jsonc` の `files.includes` で `.astro` を対象から外し、整形は Prettier に、
-型は `astro check` に渡している。**`.astro` には Biome のガードレールが効かない**ので、
-ロジックは `.astro` に書かず `features/` に置く。テスト可能にするためであると同時に、
-lint を効かせるためでもある。
-
-Prettier が `.astro` 以外に手を出さないよう、`.prettierignore` で全ファイルを除外してから
-`.astro` だけを戻している。gitignore 記法では**除外したディレクトリの中身は再包含できない**
-ため、`!*/` でディレクトリの探索を残す 3 行の順序が必要になる。ここを崩すと Prettier は
-黙って何も整形しなくなる。
+生成物 (`out/` `.next/` `next-env.d.ts`) と `public/` だけを `files.includes` で外している。
 
 ### 整形スタイル
 
 シングルクォート・セミコロンなし・行幅 100。JSX の属性だけダブルクォート。
-Biome と Prettier の両方に同じ値を書いてあるので、`.astro` とそれ以外で見た目は揃う。
 
 ## 命名規則
 
 bulletproof-react に倣い、**ファイル名は React コンポーネントも含めてすべて kebab-case** に
-統一する（`note-card.tsx`、`app-sidebar.astro`）。Biome の `useFilenamingConvention` で
+統一する（`note-card.tsx`、`app-sidebar.tsx`）。Biome の `useFilenamingConvention` で
 `kebab-case` のみを許可し、違反は lint で落ちる。
 
 - **ディレクトリ名も kebab-case**。ただし Biome が検査するのはファイル名だけなので、
   ディレクトリ名はレビューで担保する。
-- **`.astro` も Biome の対象外**なので同じくレビューで担保する。`HeroSection.astro` ではなく
-  `hero-section.astro`。
-- フレームワークが名前を固定しているものだけが例外（`astro.config.mjs`、
-  `src/content.config.ts`、`404.astro`、`[slug].astro`）。
+- フレームワークが名前を固定しているものだけが例外（`next.config.ts`、
+  `postcss.config.mjs`、`src/app/**` の規約ファイル）。`src/app/` は名前を決めるのが
+  Next.js と URL なので、`biome.jsonc` でこのルール自体を外している。
 
 | 種類 | 形 | 例 |
 | --- | --- | --- |
-| コンポーネント | `kebab-case.tsx` / `.astro` | `note-card.tsx` |
+| コンポーネント | `kebab-case.tsx` | `note-card.tsx` |
 | フック | `use-kebab-case.ts` | `use-window-scroll.ts` |
 | ストア | `kebab-case-store.ts` | `theme-store.ts` |
 | テスト | `*.test.ts` / `*.test.tsx` | `cn.test.ts` |
@@ -81,13 +63,14 @@ knip が判定できない。実際、`DialogClose` / `TimelineIcon` / `CONTENT_
 未使用として見つかったのは barrel が無かったからで、これらは削除済み。
 再エクスポートの連鎖が循環参照の温床になりやすいのも避けたい点。
 
-**バンドルサイズは理由にならない。** このリポジトリで実測したところ、`ui/` の 7 部品を
-再エクスポートする barrel を挟んでも island のチャンクは 76,482 B → 76,499 B の
-**17 バイト増**に留まった。使っていない部品は Rollup が完全に落とす。
-「barrel はツリーシェイキングを壊す」は、少なくともこの構成では成り立たない。
+**バンドルサイズは主な理由ではない。** かつてこのリポジトリで実測したところ、`ui/` の
+7 部品を再エクスポートする barrel を挟んでもチャンクは **17 バイト増**に留まった。
+使っていない部品はバンドラが落とす。「barrel はツリーシェイキングを壊す」は、
+少なくともこの構成では成り立たない。barrel を置かない理由は knip と循環参照のほうにある。
 
-`.astro` コンポーネントはそもそも `.ts` から re-export すると型が解決できないので、
-利用側からパスを直接 import する（`./app-sidebar.astro`）。
+Server / Client の境界でも barrel は面倒を増やす。`'use client'` を付けたファイルを
+barrel 越しに読むと、同じ barrel から取った Server 用の部品まで境界の向こう側に
+引き込まれることがある。実ファイルを直接指していれば起きない。
 
 ### 自前モジュールは flat named import で参照する
 
@@ -120,7 +103,7 @@ src/components/ui/card.stories.tsx
 
 ## React の書き方
 
-React 19 + Astro の island。`biome.jsonc` が機械的に落とすのは次のとおり。
+React 19 + Next.js の App Router。`biome.jsonc` が機械的に落とすのは次のとおり。
 
 - **`import * as React` / `import React` は禁止**。必要な API は named import で取り込む
   （`import type { ComponentProps, ReactNode } from 'react'`）。JSX の変換に React の
@@ -132,6 +115,25 @@ React 19 + Astro の island。`biome.jsonc` が機械的に落とすのは次の
 - **`<></>` に統一する**。`React.Fragment` を書くのは `key` を渡すときだけ。
 - **`Children` / `cloneElement` は使わない**。children の構造に依存するので、
   context か render prop に置き換える。
+
+## コメント
+
+**設計の説明は `docs/` に置き、コードにはコピーしない。** 同じ内容が 2 箇所にあると
+必ず片方が腐ります。`layouts/` を `components/layouts/` へ移したとき、同じ説明を
+ファイル冒頭と `docs/directory-structure.md` の両方で直す必要がありました。
+
+コードに残してよいのは、**そのファイルを開いた人がコードだけでは復元できないもの**に
+限ります。目安は 1〜3 行です。
+
+| 残す | 消す |
+| --- | --- |
+| 数字の導出 (`624 = 576 + 24 × 2`) | 構造・層・命名の説明 (docs にある) |
+| 選ばなかった選択肢と、その理由 | コードを日本語で言い直しただけの行 |
+| 外すと壊れる制約 (`Fragment を <div> にすると grid が潰れる`) | 型から読める JSDoc (`/** タイトル */ title: string`) |
+| `biome-ignore` の理由 (lint が要求する) | 変更の経緯・実測ログ |
+
+ファイル冒頭に長い解説を置かないでください。書きたくなったら、それは docs に
+足りていない節がある合図です。docs 側に書いて、コードからは 1 行で参照します。
 
 ## 日付の扱い
 

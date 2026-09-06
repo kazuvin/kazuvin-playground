@@ -1,7 +1,6 @@
 import type { ComponentProps, ReactNode } from 'react'
 import { cn } from '@/lib/cn'
 
-// 公開 API ではないので export しない（型は props の形からしか使わない）
 type ButtonVariant = 'primary' | 'secondary'
 type ButtonSize = 'default' | 'large'
 
@@ -13,10 +12,8 @@ interface ButtonVariants {
   fullWidth: boolean
 }
 
-/* Visual height and tap height are separate concerns. The visual box renders
-   at 40 (default) or 52 (large); the default size pads its touchable out to
-   the 44px minimum with a transparent slop ring, which is the web analogue of
-   React Native's hitSlop. Changing the label size never moves the box. */
+/* 面の高さ (40 / 52) とタップ領域 (最低 44) は別。default は透明な slop で
+   44 まで広げる。ラベルのサイズを変えても面は動かない。 */
 const touchBaseClasses =
   'group m-0 cursor-pointer border-0 bg-transparent p-0 [-webkit-tap-highlight-color:transparent] disabled:cursor-default'
 
@@ -33,10 +30,7 @@ const boxSizeClasses = {
   large: 'h-control-lg',
 }
 
-/* Primary is black, not chromatic. Press swaps to a darker fill — never a
-   scale-down, never an opacity fade. Selected is secondary-only and pairs the
-   accent border with a tint and a check glyph, so the state survives greyscale
-   and colour-blind rendering. */
+/* 押下は塗りの差し替えだけ。縮小も不透明度も使わない。 */
 const boxStateClasses = {
   disabled: 'border-disabled bg-disabled text-disabled-foreground',
   primary:

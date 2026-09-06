@@ -1,20 +1,13 @@
-import type { MarkdownHeading } from 'astro'
-import globalsCss from '@/styles/globals.css?raw'
+import { readFileSync } from 'node:fs'
+import path from 'node:path'
+import type { MarkdownHeading } from '@/lib/types'
 import { parseThemeTokens } from './parse-theme'
 import type { TokenGroup } from './token-groups'
 import { groupThemeTokens } from './token-groups'
 
 /*
- * カタログの目次と中身の出典。
- *
- * トークンの節は globals.css を読んで組み立てるので、@theme に接頭辞の違うトークンが
- * 増えれば節も目次も自動で増える。`?raw` で読むのは、Tailwind が未使用の @theme 変数を
- * 出力から落とすため (詳しくは parse-theme.ts の冒頭)。dev では globals.css が
- * このモジュールの依存になるので、保存するとページごと作り直される。
- *
- * 手で書いているのはコンポーネントとパターンの節だけで、それも「id と文言」に限る。
- * ページ側は findCatalogSection(id) 経由でしか見出しを描けず、ここに無い id を書くと
- * ビルドが落ちる。目次とページの食い違いはそこで止まる。
+ * カタログの目次の出典。トークンの節は globals.css から自動で増える。手で書くのは
+ * コンポーネントとパターンの節の「id と文言」だけ。
  */
 
 interface CatalogSection {
@@ -25,7 +18,12 @@ interface CatalogSection {
   depth: 2 | 3
 }
 
-export const TOKEN_GROUPS: TokenGroup[] = groupThemeTokens(parseThemeTokens(globalsCss))
+/** トークンの出典。CSS のテキストそのものを読み下す (Tailwind が組み立てた後ではない) */
+const GLOBALS_CSS_PATH = path.join(process.cwd(), 'src', 'styles', 'globals.css')
+
+export const TOKEN_GROUPS: TokenGroup[] = groupThemeTokens(
+  parseThemeTokens(readFileSync(GLOBALS_CSS_PATH, 'utf8')),
+)
 
 const CATALOG_SECTIONS: CatalogSection[] = [
   { id: 'principles', title: '原則', depth: 2 },
@@ -52,7 +50,7 @@ const CATALOG_SECTIONS: CatalogSection[] = [
   { id: 'pattern-utilities', title: 'ユーティリティ', depth: 3 },
 ]
 
-/** 右レールに渡す目次。記事の render() が返す headings と同じ形にしてある。 */
+/** 右レールに渡す目次。MDX から拾う見出し (features/notes/mdx.ts) と同じ形にしてある。 */
 export const CATALOG_HEADINGS: MarkdownHeading[] = CATALOG_SECTIONS.map((section) => ({
   depth: section.depth,
   slug: section.id,

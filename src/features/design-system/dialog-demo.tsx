@@ -1,3 +1,5 @@
+'use client'
+
 import { Button } from '@/components/ui/button'
 import {
   Dialog,
@@ -9,10 +11,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog'
 
-/*
- * Dialog は compound で、開閉の state を Radix の Root が持つ。Astro の slot 越しに
- * 子を渡すと島の境界で分断されるので、ひとまとまりの島としてここに置く。
- */
+/* 開閉の state を Radix の Root が持つので、境界を割らずひとまとまりの Client にする。 */
 function DialogDemo() {
   return (
     <Dialog>

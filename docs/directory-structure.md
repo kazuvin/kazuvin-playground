@@ -2,13 +2,14 @@
 
 ## 概要
 
-このプロジェクトは Astro (静的サイト生成) を採用しており、以下の原則に基づいてディレクトリを構成しています。
+このプロジェクトは Next.js の App Router を Static Export (`output: "export"`) で使っており、
+以下の原則に基づいてディレクトリを構成しています。
 
 - **コロケーション**: ドメイン固有のロジック (store, utils, types など) は使用する場所の近くで管理
 - **プレゼンテーションとロジックの分離**: コンポーネントは UI に専念し、ロジックは features/hooks/stores で管理
 - **ドメイン駆動設計**: コンポーネントをドメイン非依存/依存で分類
-- **islands**: 対話が必要なコンポーネントだけを React として hydrate し、それ以外は静的 HTML として配信
-- **一方向の依存**: 共有層 → features → pages / layouts。向きは Biome が lint で強制する
+- **既定は Server Component**: ブラウザで動く必要があるものだけ `'use client'` を付け、境界は葉に寄せる
+- **一方向の依存**: 共有層 → features → app / layouts。向きは Biome が lint で強制する
 
 命名と import の書き方は [コーディング規約](coding-standards.md) にあります。
 
@@ -17,12 +18,13 @@
 ```
 kazuvin-playground/
 ├── src/                    # アプリケーションのソース
-├── content/                # MDX などのコンテンツファイル (Content Collections の実体)
-├── public/                 # 静的アセット (そのまま dist/ にコピーされる)
+├── content/                # MDX などのコンテンツファイル (記事の実体)
+├── public/                 # URL を固定したいものだけ (favicon / _headers。そのまま out/ にコピーされる)
 ├── docs/                   # プロジェクトドキュメント
 ├── .claude/rules/          # Claude Code 用のルール (frontmatter の paths で対象を絞る)
 ├── .mcp.json               # Claude Code が起動する MCP サーバー (Agentation)
-├── astro.config.mjs        # Astro の設定
+├── next.config.ts          # Next.js の設定 (Static Export の宣言もここ)
+├── postcss.config.mjs      # Tailwind v4 を Next のビルドに載せる口
 ├── biome.jsonc             # lint / format と層の境界の設定 (ガードレールの本体)
 ├── no-raw-date.grit        # Biome の GritQL プラグイン (生の Date を禁じる)
 ├── knip.jsonc              # 未使用ファイル・export・依存の検出
@@ -35,108 +37,165 @@ kazuvin-playground/
 
 ```
 src/
-├── pages/                  # ルーティング (このディレクトリの構造がそのまま URL になる)
-├── layouts/                # ページを包むレイアウト (.astro)
-├── components/             # すべてのコンポーネント (プレゼンテーションのみ)
+├── app/                    # ルーティング (このディレクトリの構造がそのまま URL になる)
+├── components/             # すべてのコンポーネント
+│   ├── layouts/            # ページを包む外枠 (レール・grid・dev ツール)
+│   ├── ui/                 # ドメインを知らない UI プリミティブ
+│   └── dev/                # 開発時だけ動くもの
 ├── features/               # ドメイン固有のロジック (データ取得・変換・純粋関数)
 ├── hooks/                  # グローバルに使用するカスタムフック
 ├── stores/                 # アプリケーション全体で共有するグローバルステート
 ├── lib/                    # ドメイン非依存のユーティリティ・共通型
 ├── config/                 # アプリケーション設定
-├── styles/globals.css      # デザイントークンとグローバルスタイル
-└── content.config.ts       # Content Collections のスキーマ定義
+├── assets/                 # import して使う画像 (ハッシュ付きで out/_next/static/media/ に出る)
+└── styles/
+    ├── globals.css         # デザイントークンとグローバルスタイル
+    └── fonts.ts            # next/font の宣言 (欧文の self-host)
 ```
+
+`components/layouts/` は Next.js の規約ではなく、このプロジェクトの層の名前です。
+`app/layout.tsx` は `<html>` と外枠の**呼び出し**だけを持ち、中身 (3 カラムの grid・
+左右のレール) は `src/components/layouts/` にあります。ディレクトリは `components/` の
+下にありますが、features を呼んでページの骨格を組み立てるので、層としては app と同じ
+高さに立ちます ([レイヤー境界](#レイヤー境界))。
+
+### assets/ と public/ の使い分け
+
+**画像はまず `src/assets/` に置いて import します。** `public/` に置くと URL は
+`/logo.png` のまま固定されますが、ファイル名にハッシュが付かないぶん長いキャッシュを
+当てられません。`public/_headers` の `immutable` は `/_next/static/*` にしか掛かっておらず、
+それ以外は Cloudflare の既定 (`max-age=0, must-revalidate`) になるため、**初回表示のたびに
+304 の往復が入り、その間その画像の箱は空で描かれます**。
+
+```tsx
+import logo from '@/assets/logo.png'
+
+;<img src={logo.src} alt="…" width={logo.width} height={logo.height} className="h-8 w-auto" />
+```
+
+import すると `out/_next/static/media/logo.<hash>.png` として書き出され、`immutable` が
+効くので 2 回目以降はネットワークに出ません。`width` / `height` も原画の実寸が
+メタデータで返るので、手で書き写さずに箱を確保できます。Next はさらに、その画像を使う
+ページの `<head>` に `<link rel="preload">` を入れます。
+
+**`next/image` は使いません。** Static Export には変換を行うサーバーが無く
+(`next.config.ts` の `images.unoptimized`)、素の `<img>` から得られないものがありません。
+
+`public/` に残すのは、URL が固定されている必要があるもの (`favicon.png`) と、
+Cloudflare が読む `_headers` だけです。
 
 ## レイヤー境界
 
-依存は **`共有層 → features → pages / layouts`** の一方向に限ります。
+依存は **`共有層 → features → app / layouts`** の一方向に限ります。
 Biome の `noRestrictedImports` を `overrides` で層ごとに設定しており、違反は lint で落ちます。
 
 | 層 | ディレクトリ | 参照してよい先 |
 | --- | --- | --- |
-| app | `pages/` `layouts/` | すべて |
+| app | `app/` `components/layouts/` | すべて |
 | features | `features/<domain>/` | 共有層と、自分自身の feature のみ |
-| 共有層 | `hooks/` `stores/` `lib/` `config/` | 共有層のみ |
+| 共有層 | `hooks/` `stores/` `lib/` `config/` `components/dev/` | 共有層のみ |
 | ui | `components/ui/` | `lib/cn` などドメインを知らないものだけ |
 
-トップレベルのディレクトリ名がそのまま層の名前になっています。
-`app-sidebar.astro` が `components/` ではなく `layouts/` にあるのも、
+ディレクトリ名がそのまま層の名前になっています。唯一またいでいるのが `components/` で、
+この下の `layouts/` だけが app 層、残り (`ui/` `dev/`) は共有層です。置き場所ではなく
+**何を参照してよいか**が層を決めるので、`biome.jsonc` では共有層の override
+(`components/**` を含む) の後に `components/layouts/**` の override を置いて上書きしています。
+`app-sidebar.tsx` が `components/ui/` ではなく `components/layouts/` にあるのも、
 features (コマンドパレット) を参照する必要があるためです。
 
 - **feature 間の直接 import は禁止**。共有したくなったら `lib/` へ引き上げるか、
-  ページの frontmatter で両方を呼んで合成する。
+  ページで両方を呼んで合成する。
 - **自 feature 内は相対 import で書く**（`@/features/**` は自分自身を含めて全面禁止のため）。
   feature ごとに例外を書かず、1 つの override で境界を表現するための割り切り。
 - **`components/ui/` はドメインを知らない**。`@/lib/types` の `NoteSummary` のような型を
   import した時点で、その画面でしか使えない部品になる。表示に必要な値は素の props
   (string / number) で受け取り、ドメインの型からの変換は `features/<domain>/` の UI で行う。
-- **親を遡る相対 import (`../`) は共有層・features・ui で禁止**。この記法を許すと
+- **親を遡る相対 import (`../`) は共有層・features・ui・layouts で禁止**。この記法を許すと
   `@/` エイリアスに対する境界チェックを表記の違いだけですり抜けられるため。
 - `overrides` の options はグローバル設定を**マージではなく上書き**する。そのため各 override で
   React まるごと取り込み禁止の `paths` を再掲している。消すとその配下だけ素通りになる。
 
-**`.astro` にはこの lint が効きません** (Biome の対象外。理由は
-[コーディング規約](coding-standards.md#なぜ-astro-だけ-prettier-なのか))。
-ロジックを `.astro` に書かず `features/` に置くのは、テスト可能にするためであると同時に、
-境界チェックを効かせるためでもあります。
+テンプレートも含めてすべてが `.tsx` なので、この lint はサイトの全ファイルに効きます
+(`.astro` を Biome の対象外にしていた頃の抜け穴はもうありません)。
 
-### pages/ ディレクトリ
+### app/ ディレクトリ
 
 ```
-src/pages/
-├── index.astro             # /
-├── 404.astro               # 404 ページ
+src/app/
+├── layout.tsx              # 全ページの外枠 (<html>・書体・メタデータの既定)
+├── page.tsx                # /
+├── not-found.tsx           # 404 (out/404.html として書き出される)
+├── sitemap.ts              # /sitemap.xml
 ├── notes/
-│   ├── index.astro         # /notes
-│   └── [slug].astro        # /notes/:slug (getStaticPaths で全件を静的生成)
-├── playgrounds/
-│   └── index.astro         # /playgrounds
-├── products/
-│   └── index.astro         # /products
-├── design-system/
-│   └── index.astro         # /design-system
-└── notes-index.json.ts     # /notes-index.json (静的エンドポイント)
+│   ├── page.tsx            # /notes
+│   └── [slug]/page.tsx     # /notes/:slug (generateStaticParams で全件を静的生成)
+├── notes-index.json/
+│   └── route.ts            # /notes-index.json (Route Handler。force-static)
+├── playgrounds/page.tsx    # /playgrounds
+├── products/page.tsx       # /products
+└── design-system/
+    ├── page.tsx            # /design-system
+    └── page.module.css     # そのページでしか使わないスタイル
 ```
 
-**重要**: `src/pages/` 配下は**ルーティング専用**です。ここに置いた `.ts` は
-API ルートとして扱われ URL を持ってしまうため、ページ固有の utils / types / hooks を
-ページと同階層にコロケーションすることはできません。**ページ固有のロジックは
-`src/features/<domain>/` に置きます。**
+**重要**: `src/app/` 配下は**ルーティング専用**です。規約の名前 (`page` / `layout` /
+`route` / `sitemap` など) だけがルートとして扱われるので、ページ固有の utils / types /
+hooks を同階層にコロケーションすることは技術的には可能ですが、**この構成では行いません**。
+ページ固有のロジックは `src/features/<domain>/` に置きます (層の向きが読めなくなるため)。
 
 #### ページファイルの役割
 
-- `*.astro`: URL に対応するページ。frontmatter (`---` で囲まれた部分) はビルド時にのみ実行される
-- `*.json.ts` などのエンドポイント: ビルド時に JSON などの静的ファイルを出力する
-- ページの frontmatter ではデータ取得と整形の**呼び出し**のみを行い、実装は `features/` に置く
+- `page.tsx`: URL に対応するページ。既定で Server Component なので、本体はビルド時にしか動かない
+- `route.ts`: ビルド時に JSON などの静的ファイルを出力する。`export const dynamic = 'force-static'` が要る
+- ページではデータ取得と整形の**呼び出し**のみを行い、実装は `features/` に置く
+- タイトルや canonical は `export const metadata` (動的なら `generateMetadata`) で宣言する
 
-```astro
----
-// src/pages/notes/index.astro
+```tsx
+// src/app/notes/page.tsx
 import { getPublishedNotes, toNoteSummary } from '@/features/notes/notes'
-import CommonLayout from '@/layouts/common-layout.astro'
+import { PageShell } from '@/components/layouts/page-shell'
 
-const notes = (await getPublishedNotes()).map(toNoteSummary)
----
+export const metadata = { title: 'Notes', alternates: { canonical: '/notes' } }
 
-<CommonLayout title="Notes">
-  {notes.map((note) => <NoteCard note={note} />)}
-</CommonLayout>
+export default async function NotesPage() {
+  const notes = (await getPublishedNotes()).map(toNoteSummary)
+
+  return (
+    <PageShell>
+      {notes.map((note) => (
+        <NoteCard key={note.slug} note={note} />
+      ))}
+    </PageShell>
+  )
+}
 ```
 
-### layouts/ ディレクトリ
+`PageShell` が返すのは Fragment で、`<main>` と右レールの 2 つが並びます。どちらも
+`app/layout.tsx` が敷いた grid の**直接の子**である必要があるためで、`<div>` で包むと
+3 トラックが 2 つに潰れます。
+
+### components/layouts/ ディレクトリ
 
 ```
-src/layouts/
-├── base-layout.astro       # <html>/<head>/<body>・フォント・globals.css・メタタグ
-├── app-sidebar.astro       # 左レール: グローバルナビ (コマンドパレットの island を置く)
-├── toc-sidebar.astro       # 右レール: ページ専用ナビ (記事の目次)
-└── common-layout.astro     # base-layout + 左右のレール + main (通常のページはこちら)
+src/components/layouts/
+├── app-shell.tsx               # 3 カラムの grid + 左レール。app/layout.tsx が使う
+├── app-sidebar.tsx             # 左レール: ロゴ・検索・ナビ (Server Component)
+├── site-nav.tsx                # 　└ 行き先 (Client。usePathname で現在地を出す)
+├── command-search-trigger.tsx  # 　└ ⌘K のボタン (Client。押されて初めて本体を読む)
+├── page-shell.tsx              # <main> + 右レール。各ページが使う
+├── toc-sidebar.tsx             # 右レール: ページ専用ナビ (記事の目次)
+└── dev-tools.tsx               # 開発時だけ Agentation を載せる
 ```
+
+**外枠は 2 つに割れています。** `app-shell` は `app/layout.tsx` に置かれてページの外に
+居るので、遷移しても作り直されません。`page-shell` はページと同じ枝なので、遷移のたびに
+中身ごと差し替わります。左レールが残り、`<main>` と目次だけが入れ替わるのはこの分け方に
+よるものです。
 
 サイトの外枠は**ヘッダーを持たない 3 カラム**です。サイト名・検索・行き先は左レールが
 すべて引き取り、右レールにはそのページ専用のナビ (今は記事の目次) が入ります。
 
-3 つは `common-layout.astro` の 1 本の grid に並んでいて、**レールは画面の端ではなく
+3 つは `app-shell.tsx` の 1 本の grid に並んでいて、**レールは画面の端ではなく
 本文の両脇に付きます**。トラックは `auto` (左) / `minmax(0, 39rem)` (中央) / `15rem` (右) で、
 どれも画面幅では伸びません。余った幅は `justify-center` が grid ごと中央に寄せて左右の外へ
 落とすので、読み幅もレールとの間隔も画面幅で動きません。中央のトラックは読み幅
@@ -162,22 +221,28 @@ src/layouts/
 - **目次の有無で本文は動きません。** 右のトラックは `grid-template-columns` が常に
   確保していて、埋まるかどうかとは無関係だからです。
 
-`app-sidebar.astro` が `components/` ではなく `layouts/` にあるのは、コマンドパレットの
-island (`@/features/notes/command-search`) を描画するためです。features を参照できるのは
-app 層だけなので、features を使うコンポーネントは `layouts/` か `pages/` に置きます。
+`app-sidebar.tsx` が `components/ui/` ではなく `components/layouts/` にあるのは、
+`@/config/app` の `NAV_ITEMS` でサイト全体の行き先を並べ、コマンドパレット (features) を
+起動する、ページの外枠そのものだからです。features を参照できるのは app 層だけなので、
+features を使うコンポーネントは `components/layouts/` か `app/` に置きます。
+
+レール自体は Server Component のままで、`'use client'` が付いているのは中の 2 つだけです
+(現在地を知る必要があるナビと、⌘K を待ち受けるボタン)。境界を葉に寄せる例としてそのまま
+読めます。
 
 複数ページで共有する外枠 (レール・`<main>` の幅・メタタグ) は、
 すべてこのディレクトリのレイアウトコンポーネントで表現します。
 
 ### features/ ディレクトリ
 
-ドメイン固有のロジックを置きます。`src/pages/` にコロケーションできないものの受け皿であり、
+ドメイン固有のロジックを置きます。`src/app/` に置かないものの受け皿であり、
 コンテンツの取得・変換・純粋関数・ドメイン固有のフックが対象です。
 
 ```
 src/features/
 ├── notes/
-│   ├── notes.ts                 # コレクションの取得と変換 (getPublishedNotes など)
+│   ├── notes.ts                 # content/notes の読み取り・検証・変換 (frontmatter の出典)
+│   ├── mdx.ts                   # MDX 本文をコンポーネントと目次に変える
 │   ├── group-by-month.ts        # 純粋関数
 │   ├── group-by-month.test.ts   # 対応するテスト
 │   ├── search-index.ts          # 検索インデックスの取得・絞り込み・グループ化
@@ -185,16 +250,17 @@ src/features/
 │   ├── note-card.tsx            # ドメインの型を受け取る UI
 │   ├── notes-timeline.tsx
 │   ├── note-timeline-item.tsx
-│   └── command-search.tsx       # コマンドパレット (island)
+│   └── command-search.tsx       # コマンドパレット (開かれた時に初めて読まれる)
 └── design-system/
     ├── parse-theme.ts           # globals.css の @theme をトークン一覧に落とす
     ├── parse-theme.test.ts
     ├── token-groups.ts          # トークンをカタログの節に振り分ける
     ├── token-groups.test.ts
-    ├── catalog.ts               # ?raw で globals.css を読み、目次と節を組む
-    ├── token-table.tsx          # 1 節ぶんの表 (静的。島にしない)
-    ├── section-heading.astro    # 見出し。id から catalog.ts を引く
-    ├── dialog-demo.tsx          # compound をひとまとまりで動かす island
+    ├── catalog.ts               # globals.css をファイルとして読み、目次と節を組む
+    ├── token-table.tsx          # 1 節ぶんの表 (Server Component)
+    ├── motion-button.tsx        # 　└ 再生ボタンだけが Client
+    ├── section-heading.tsx      # 見出し。id から catalog.ts を引く
+    ├── dialog-demo.tsx          # compound をひとまとまりで動かす Client Component
     └── command-demo.tsx
 ```
 
@@ -203,62 +269,96 @@ src/features/
 右の目次も増え、接頭辞を知らないトークンは Uncategorised の節に出ます。プレビューの色や
 サイズが Tailwind のクラスではなく inline style なのは、Tailwind が**使われていない
 `@theme` 変数を出力から落とす**ためで、解決済みの実値を流す以外に一致させる方法が
-ありません (経緯は `parse-theme.ts` 冒頭)。
+ありません (経緯は `parse-theme.ts` 冒頭)。CSS をバンドラ経由ではなく `node:fs` で
+読むのも同じ理由です。
 
-**features には UI を置けます。** ドメインを知っている island は、`components/` ではなく
-ここが居場所です (`components/` は features を import できないため)。
+**features には UI を置けます。** ドメインを知っているコンポーネントは、`components/` では
+なくここが居場所です (`components/` は features を import できないため)。
 
 `index.ts` は置きません。利用側は `@/features/notes/notes` のように実ファイルを直接指します。
 
 #### ビルド時とクライアントの責務分離
 
-Astro ではページの frontmatter と `features/` の関数は**ビルド時にのみ**実行され、
-クライアントには一切送られません。ブラウザで動くのは island として明示的に hydrate した
-React コンポーネントだけです。
+`page.tsx` と `features/` の関数は Server Component として**ビルド時にのみ**実行され、
+その中身はクライアントに送られません。ブラウザに降りるのは `'use client'` を付けた
+ファイルとその依存だけです。
 
-| ファイル                       | 実行環境     | 責務                           |
-| ------------------------------ | ------------ | ------------------------------ |
-| `*.astro` の frontmatter       | ビルド時     | データ取得・整形の呼び出し     |
-| `features/*.ts`                | ビルド時     | コンテンツ取得、変換、純粋関数 |
-| `components/**/*.tsx` (island) | クライアント | UI 状態、イベント処理          |
-| `stores/*.ts`                  | クライアント | island 間で共有するステート    |
-| `lib/*.ts`                     | 両方         | 純粋関数、共通型               |
+| ファイル                            | 実行環境     | 責務                             |
+| ----------------------------------- | ------------ | -------------------------------- |
+| `app/**/page.tsx` (Server)          | ビルド時     | データ取得・整形の呼び出し       |
+| `app/**/route.ts`                   | ビルド時     | 静的ファイル (JSON など) の出力  |
+| `features/*.ts` (Server)            | ビルド時     | コンテンツ取得、変換、純粋関数   |
+| `'use client'` を付けた `*.tsx`     | 両方         | ビルド時に HTML を出し、そこから先はブラウザ |
+| `stores/*.ts`                       | クライアント | Client Component 間で共有するステート |
+| `lib/*.ts`                          | 両方         | 純粋関数、共通型                 |
+
+`'use client'` は「クライアントでしか動かない」ではなく「**クライアントでも動く**」の印です。
+ビルド時に一度描かれて HTML に載り、そのうえで hydrate されます。左レールも右の目次も、
+JS が来る前から HTML に入っているのはこのためです。
 
 `src/**` には `noNodejsModules` を掛けており、ブラウザに届きうるコードに Node の
-ビルトインを持ち込めません。
+ビルトインを持ち込めません。例外は `biome.jsonc` で**名指ししたファイルだけ**
+(`src/app/**` と、content / CSS を読む 2 つ) で、これは「ビルド時にしか動かない」という
+宣言でもあります。`'use client'` のファイルをここに足してはいけません。
 
-#### island の作り方
+#### Client Component の作り方
 
-対話が必要なコンポーネントだけを `client:*` ディレクティブ付きで読み込みます。
-ディレクティブを付けない React コンポーネントは、ビルド時に HTML へ描画されて JS を送りません。
+対話が必要なコンポーネントのファイル先頭に `'use client'` を書きます。付けない
+コンポーネントはビルド時に HTML へ描画されて JS を送りません。
 
-```astro
----
-// src/layouts/app-sidebar.astro
-import { CommandSearch } from '@/features/notes/command-search'
----
+```tsx
+// src/features/design-system/dialog-demo.tsx
+'use client'
 
-<aside>
-  <a href="/">Kazuvin Playground</a>
-  {/* このコンポーネントだけが JS として配信される */}
-  <CommandSearch client:idle />
-</aside>
+export function DialogDemo() { … }
 ```
 
-| ディレクティブ   | 使いどころ                                       |
-| ---------------- | ------------------------------------------------ |
-| なし             | 静的な表示のみ (既定。まずここを検討する)        |
-| `client:idle`    | すぐには不要だが操作される可能性があるもの       |
-| `client:load`    | 初期表示直後から操作されるもの                   |
-| `client:visible` | ページ下部にあり、スクロールされて初めて使うもの |
+**境界はできるだけ葉に寄せます。** 左レール全体ではなくナビとボタンだけ、トークンの表
+全体ではなく再生ボタンだけが Client です。Server Component は Client Component を
+子として描けるので、対話する部分だけを切り出せば残りは HTML のまま配信されます。
+
+#### 操作されるまで読まない (遅延読み込み)
+
+`'use client'` を付けたコンポーネントは、そのページのチャンクに入って初期ロードで
+落ちてきます。**押されるまで何もしない UI** なら、`next/dynamic` で描画そのものを
+遅らせたほうが安くなります。コマンドパレットがこの形です。
+
+```tsx
+// src/components/layouts/command-search-trigger.tsx
+const CommandSearch = dynamic(
+  async () => (await import('@/features/notes/command-search')).CommandSearch,
+  { ssr: false },
+)
+
+export function CommandSearchTrigger() {
+  const [isMounted, setIsMounted] = useState(false)
+  …
+  return (
+    <>
+      <button onClick={toggle}>⌘K</button>
+      {isMounted && <CommandSearch open={isOpen} onClose={close} />}
+    </>
+  )
+}
+```
+
+要点は `isMounted` です。木に無いあいだはチャンクの要求すら発生しないので、
+**React + Radix + cmdk (gzip 約 17KB)** は初めて押されるまで落ちてきません。
+同じ形を `dev-tools.tsx` が Agentation ツールバーに使っています (あちらはさらに
+`NODE_ENV` の枝に入れてあるので、本番ではチャンクごと生まれません)。
+
+判断の順序は **Server Component → `next/dynamic` → `'use client'` を直接**。
+状態を持つ UI が初期表示から画面に出ているならそのまま Client に、押されて初めて
+現れるなら `next/dynamic` に寄せます。
 
 ### components/ ディレクトリ構成
 
 `src/components/` 配下のコンポーネントは**必ずプレゼンテーションコンポーネント**として実装します。
-ビジネスロジックは含まず、props を受け取って UI を描画することに専念します。
+ビジネスロジックは含まず、props を受け取って UI を描画することに専念します
+(外枠を組み立てる `layouts/` だけは層が違います。前の節を参照)。
 
 **重要**: この制約は `src/components/` 配下のコンポーネントに適用されます。
-`src/pages/**/*.astro` などのページコンポーネントには適用されません。
+`src/app/**/page.tsx` などのページコンポーネントには適用されません。
 
 **1 コンポーネント = 1 ファイル**にし、ディレクトリと `index.ts` は作りません。
 Compound Components のパーツも 1 ファイルにまとめて flat named export します
@@ -266,6 +366,7 @@ Compound Components のパーツも 1 ファイルにまとめて flat named exp
 
 ```
 src/components/
+├── layouts/                # ページの外枠 (層は app。前の節を参照)
 ├── ui/                     # UI プリミティブ
 │   ├── button.tsx          # variant のクラス定義も private でこの中
 │   ├── button.stories.tsx
@@ -281,8 +382,9 @@ src/components/
     └── agentation-toolbar.tsx
 ```
 
-**`src/components/` はドメインを知らない部品だけの置き場です。** ドメインを知っている UI
-(`NoteSummary` のような型を受け取るもの) は `features/<domain>/` に置きます。bulletproof-react
+**`src/components/` は、`layouts/` を除けばドメインを知らない部品だけの置き場です。**
+ドメインを知っている UI (`NoteSummary` のような型を受け取るもの) は
+`features/<domain>/` に置きます。bulletproof-react
 と同じ切り方で、1 つのドメインを理解するのに 2 つのツリーを行き来せずに済みます。
 
 `shared` のような広い名前のディレクトリは作りません。何でも入ってしまうためです。
@@ -292,19 +394,11 @@ src/components/
 ([Agentation](agentation.md) のツールバー)。本番に出ないものが `ui/` に混ざると、
 どれが配信されるのか読めなくなるため分けています。
 
-#### .astro と .tsx の使い分け
-
-- **`.astro`**: 対話を持たないコンポーネント。JS を一切送らない
-- **`.tsx`**: island になりうるもの、Storybook で単体確認したいもの、
-  `ui/` のようにどこからでも再利用する部品
-
-`.astro` コンポーネントは `.ts` から re-export すると型が解決できないため、
-利用側からパスを直接 import します (例: `./app-sidebar.astro`)。
-
 #### コンポーネントの置き場所を決める
 
 | 問い | 置き場所 |
 | --- | --- |
+| ページを包む外枠 (レール・grid) か、features を呼ぶ? | `src/components/layouts/` |
 | ドメインの型 (`NoteSummary` など) を受け取る? | `src/features/<domain>/` |
 | 1 ページでしか使わない静的なマークアップ? | そのページに直接書く |
 | どちらでもない (ドメインを知らない部品) | `src/components/ui/` |
@@ -314,7 +408,7 @@ src/components/
 ui プリミティブを組み合わせただけの部品も、ドメインを知らない限りここに置きます。
 逆にドメインの型を受け取るようになったら、それが features へ移す合図です。
 
-ホームの挨拶文が `src/pages/index.astro` に直接書かれているのは 2 番目の例です。
+ホームの挨拶文が `src/app/page.tsx` に直接書かれているのは 2 番目の例です。
 1 箇所でしか使わず、状態も持たないマークアップに、ファイルを与える理由はありません。
 
 #### ロジックを切り出す基準
@@ -342,8 +436,8 @@ variant のクラス定義も同じで、コンポーネント本体に private 
 (型の export は許されますが、外から使わないものは export しません)。
 
 この基準は主要な OSS の実態とも一致します。shadcn/ui (505 コンポーネント)、
-bulletproof-react、vercel/commerce、withastro/docs には**コンポーネント同居のフックが
-1 つもありません**。cal.com と excalidraw を含めて数えても、約 1,850 のコンポーネント
+bulletproof-react、vercel/commerce、Next.js の公式サンプルには**コンポーネント同居の
+フックが 1 つもありません**。cal.com と excalidraw を含めて数えても、約 1,850 のコンポーネント
 ファイルに対して同居フックは 13 件 (0.7%) で、いずれも大きな機能群の中にあります。
 再利用されるフックは中央の `hooks/` へ、ドメインのロジックは feature へ集まり、
 残りはコンポーネント本体に留まる、という配分になっています。
@@ -351,10 +445,10 @@ bulletproof-react、vercel/commerce、withastro/docs には**コンポーネン�
 ### hooks/ ディレクトリ構成
 
 **フックを置くのは「2 つ目の利用者が現れてから」です**
-([ロジックを切り出す基準](#ロジックを切り出す基準))。1 つの island でしか使わない状態は、
+([ロジックを切り出す基準](#ロジックを切り出す基準))。1 つのコンポーネントでしか使わない状態は、
 そのコンポーネントの中に書きます。
 
-1. **src/hooks/**: 複数の island で使う汎用フック
+1. **src/hooks/**: 複数の Client Component で使う汎用フック
 
    ```
    src/hooks/
@@ -371,12 +465,12 @@ bulletproof-react、vercel/commerce、withastro/docs には**コンポーネン�
 ### stores/ ディレクトリ構成
 
 ページ単位のサーバーステートは存在しない (ビルド時に解決される) ため、
-ストアが扱うのは **island 間で共有するクライアントステート**だけです。
+ストアが扱うのは **Client Component 間で共有するクライアントステート**だけです。
 
-置き場所はフックと同じ基準です。**1 つの island に閉じた状態は `useState` のまま
+置き場所はフックと同じ基準です。**1 つのコンポーネントに閉じた状態は `useState` のまま
 コンポーネントに置き**、島をまたいで共有する必要が出てからストアにします。
 
-1. **src/stores/**: 複数の island で共有するグローバルステート
+1. **src/stores/**: 複数の Client Component で共有するグローバルステート
 
    ```
    src/stores/
@@ -420,8 +514,9 @@ src/config/
 
 ### content/ ディレクトリ
 
-MDX などのコンテンツファイルを配置します。スキーマは `src/content.config.ts` で定義し、
-frontmatter はビルド時に検証されます。**frontmatter の型はここが唯一の出典**です。
+MDX などのコンテンツファイルを配置します。スキーマは `src/features/notes/notes.ts` の
+zod で定義し、frontmatter はビルド時に検証されます。**frontmatter の型はここが唯一の出典**です
+(`z.infer` で TypeScript の型が導出されます)。
 
 ```
 content/
@@ -445,24 +540,28 @@ src/features/notes/
 関連するユーティリティやフックが 3 つ以上に増えたら、`utils/` や `hooks/` の
 サブディレクトリでまとめ、その中でも同じくテストを同階層に置きます。
 
-なお、`src/pages/` 配下にはテストを置けません (ルートとして扱われるため)。
-ページから呼ばれるロジックを `features/` に置くのは、テスト可能にするためでもあります。
+なお、`src/app/` 配下にはテストを置きません。ページから呼ばれるロジックを `features/` に
+置くのは、テスト可能にするためでもあります。
 
 詳細は [テスト](testing.md) を参照してください。
 
 ## 命名規則
 
-ファイル名・ディレクトリ名はすべて **kebab-case** です。`.astro` も例外ではありません
-(`HeroSection.astro` ではなく `hero-section.astro`)。
+ファイル名・ディレクトリ名はすべて **kebab-case** です。コンポーネントも例外ではありません
+(`HeroSection.tsx` ではなく `hero-section.tsx`)。
 一覧と、lint で担保される範囲は [コーディング規約](coding-standards.md#命名規則) にあります。
 
-動的ルートだけは Astro の記法に従い `[param]` を使います (`[slug].astro`)。
+`src/app/` だけは例外で、名前を決めるのは Next.js と URL です。規約ファイル
+(`page.tsx` / `layout.tsx` / `not-found.tsx` / `route.ts` / `sitemap.ts`)、動的ルートの
+`[param]`、そして `notes-index.json/` のように拡張子を含むディレクトリ名がそれにあたります。
+`biome.jsonc` はこのディレクトリだけ `useFilenamingConvention` を外しています。
 
 ## ベストプラクティス
 
 ### 1. components/ 配下のコンポーネントはプレゼンテーションに専念
 
-`src/components/` 配下のコンポーネントはプレゼンテーションに専念し、ビジネスロジックを含めません。
+`src/components/` 配下のコンポーネントはプレゼンテーションに専念し、ビジネスロジックを含めません
+(`components/layouts/` は features を呼びますが、呼ぶだけで実装は持ちません)。
 
 ```tsx
 // ❌ Bad: components/ 配下でデータ取得
@@ -482,20 +581,20 @@ export function NoteCard({ note }: { note: NoteSummary }) {
 }
 ```
 
-### 2. 既定は静的、島は最小限に
+### 2. 既定は Server Component、境界は葉に寄せる
 
-`client:*` を付けるのは、そのコンポーネントが**本当にブラウザで動く必要がある**ときだけです。
-ヘッダー全体を island にするのではなく、コマンドパレットだけを island にします。
+`'use client'` を付けるのは、そのコンポーネントが**本当にブラウザで動く必要がある**ときだけです。
+左レール全体を Client にするのではなく、現在地を知るナビと ⌘K のボタンだけを Client にします。
 
-### 3. データ取得はページの frontmatter か features/ で行う
+### 3. データ取得はページ (Server Component) か features/ で行う
 
-island の中で `fetch` してデータを取りに行くのは、ビルド時に解決できない場合
+Client Component の中で `fetch` してデータを取りに行くのは、ビルド時に解決できない場合
 (コマンドパレットの検索インデックスなど) に限ります。
 
 ### 4. 型の出典を一箇所にする
 
-コンテンツの型は `src/content.config.ts` のスキーマから導出します。
-同じ形の interface を複数箇所に書き写さないでください。
+コンテンツの型は `src/features/notes/notes.ts` の zod スキーマから導出します
+(`z.infer`)。同じ形の interface を複数箇所に書き写さないでください。
 
 ### 5. 未使用のファイル・export は溜めない
 

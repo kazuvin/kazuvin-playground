@@ -29,7 +29,6 @@ export function useWindowScroll(): [WindowScrollPosition, (options: ScrollToOpti
       })
     }
 
-    // 初期値を設定
     handleScroll()
 
     window.addEventListener('scroll', handleScroll, { passive: true })

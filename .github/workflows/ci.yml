@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Biome（ts/tsx/json/css）と Prettier（.astro）の両方を通す
+      # Biome が ts/tsx/json/css/その他すべてを見る
       - name: Run lint
         run: pnpm run lint
 
@@ -88,5 +88,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: build-output
-          path: dist/
+          path: out/
           retention-days: 7

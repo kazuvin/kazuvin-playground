@@ -1,13 +1,6 @@
 import type { SearchableItem, SearchableItemType } from '@/lib/types'
 
-/*
- * コマンドパレットが引く検索インデックス。
- *
- * 実体は src/pages/notes-index.json.ts がビルド時に出力する静的 JSON で、
- * この 2 ファイルだけが URL と中身の形を知っている。features/notes の他の関数と違い、
- * fetchSearchIndex だけはブラウザ（island）で実行される。ノートが増えるほど
- * インデックスも育つので、全ページの HTML に埋め込まず遅延取得している。
- */
+/* 実体は src/app/notes-index.json/route.ts がビルド時に出力する静的 JSON。 */
 const SEARCH_INDEX_URL = '/notes-index.json'
 
 /** 検索インデックスを取得する。ダイアログを開いた時点で初めて呼ばれる。 */
@@ -23,11 +16,7 @@ export async function fetchSearchIndex(): Promise<SearchableItem[]> {
   return (await response.json()) as SearchableItem[]
 }
 
-/**
- * 検索語で絞り込む。タイトル・説明・タグを横断して部分一致で見る。
- *
- * 大文字小文字は無視する。空の検索語は「絞り込まない」を意味し、全件を返す。
- */
+/** タイトル・説明・タグを横断した部分一致。空の検索語は全件を返す。 */
 export function filterSearchableItems(items: SearchableItem[], query: string): SearchableItem[] {
   const normalized = query.trim().toLowerCase()
 
@@ -49,12 +38,7 @@ export interface SearchableItemGroup {
   items: SearchableItem[]
 }
 
-/**
- * 種類ごとにまとめる。
- *
- * 並び順は元の配列で最初に現れた順を保つ。インデックスは公開日の降順で作られるので、
- * 新しいノートを持つ種類が上に来る。
- */
+/** 並びは元の配列で最初に現れた順のまま。 */
 export function groupSearchableItemsByType(items: SearchableItem[]): SearchableItemGroup[] {
   const groups: SearchableItemGroup[] = []
 

@@ -1,6 +1,6 @@
-import type { MarkdownHeading } from 'astro'
 import { describe, expect, it } from 'vitest'
 import { isActiveNavItem, selectTocHeadings } from './nav'
+import type { MarkdownHeading } from './types'
 
 describe('isActiveNavItem', () => {
   it('should match the exact path', () => {

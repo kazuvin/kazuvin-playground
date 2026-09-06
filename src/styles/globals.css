@@ -24,15 +24,15 @@
       Noto Sans JP。同じ Noto なので骨格とウェイトの刻みが揃う。faces は
       self-host し、配信経路は 2 通りに分かれる。
 
-      欧文は astro.config.mjs の fonts で宣言し、Astro が family 名をハッシュ
-      付きに書き換えるので、ここでは名前ではなく Astro が出す CSS 変数を参照
-      する。変数の中身は 実書体 → メトリクス補正済みの代替 → 和文 → system mono
-      の順に並んでいて、補正済みの代替が入っているぶん、書体が届いた瞬間の
-      レイアウトシフトが起きない。
+      欧文は src/styles/fonts.ts の next/font で宣言し、Next が family 名を
+      ハッシュ付きに書き換えるので、ここでは名前ではなく next/font が出す CSS
+      変数を参照する。変数の中身は 実書体 → 和文 → system mono の順で、書体が
+      届く前も等幅のまま落ちる (代替を等幅に寄せている理由は fonts.ts の
+      コメント)。変数を張るのは <html> なので、body 直下のポータルにも届く。
 
       CJK の "Noto Sans JP Variable" だけは Fontsource の CSS をそのまま読むので
       名前で書く (Fontsource の可変フォントは "… Variable" という別名で登録
-      されるため、静的版の名前とは互換ではない)。Storybook は Astro を通らない
+      されるため、静的版の名前とは互換ではない)。Storybook は Next を通らない
       ので、.storybook/preview.ts が @fontsource-variable/* を直接 import して
       この 2 書体を用意する。
 
@@ -58,7 +58,7 @@
   --color-gray-900: #16161a;
 
   /** ---- the one chromatic value — 4 stops, focus + selection only.
-      基準は public/logo.png のピンクそのもの (#f23182)。600 / 700 / tint は
+      基準は src/assets/logo.png のピンクそのもの (#f23182)。600 / 700 / tint は
       同じ色相のまま、明度と彩度だけを動かした段で、白地に対する 3:1 (非文字の
       コントラスト下限) は基準の 3.79 で満たしている。 ---- */
   --color-accent: rgb(242, 49, 130);
@@ -341,8 +341,17 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* 縦スクロールバーの溝を常に確保する。レイアウトシェル (src/components/layouts/app-shell.tsx の
+   grid) は justify-center で画面の中央に寄せているので、スクロールバーが出る長いページと
+   出ない短いページのあいだで clientWidth が変わると、中央そのものがずれて本文が
+   横に飛ぶ。overlay スクロールバーの macOS では元から起きないが、溝を実際に取る
+   Windows / Linux では遷移のたびにスクロールバーの幅ぶん動く。 */
+html {
+  scrollbar-gutter: stable;
+}
+
 /* 目次や共有された #anchor から飛ぶときは滑らかに送る。右レールの現在地追従
-   (src/layouts/toc-sidebar.astro) はこの動きに乗って印を移すだけで、スクロール
+   (src/components/layouts/toc-sidebar.tsx) はこの動きに乗って印を移すだけで、スクロール
    そのものには触らない。動きを減らす設定にしている人には効かせない。 */
 @media (prefers-reduced-motion: no-preference) {
   html {

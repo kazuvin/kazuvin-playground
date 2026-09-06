@@ -1,23 +1,13 @@
 import type { CSSProperties } from 'react'
 import { Text } from '@/components/ui/text'
+import { MotionButton } from './motion-button'
 import type { ThemeToken } from './parse-theme'
 import type { TokenGroup, TokenPreview } from './token-groups'
 
 /*
- * トークン 1 節ぶんの表。
- *
- * プレビューは Tailwind のクラスではなく inline style で描く。クラス名を
- * `text-${key}` のように組み立てても Tailwind は生成しないし、`var(--color-gray-25)`
- * のような未使用トークンは出力から落ちているため。parse-theme が解決した実値を
- * そのまま流すのが、globals.css と一致し続ける唯一の方法になる。
- *
- * 島にはしない。動きが要るのは motion 節の再生ボタンだけで、それはページ側の
- * <script> が data 属性を拾って賄う。
+ * プレビューは inline style で描く。`text-${key}` のように組み立てたクラス名は
+ * Tailwind が生成せず、未使用トークンは出力からも落ちているため。
  */
-
-/** ease のドットが走る距離。プレビュー列 (w-28 = 112px) からドットの 8px を引いた分。
-    ページ側の <script> は data 属性でこれを受け取るので、値はここだけにある。 */
-const EASE_TRAVEL_PX = 104
 
 interface TokenTableProps {
   group: TokenGroup
@@ -34,33 +24,6 @@ function modifierStyle(token: ThemeToken): CSSProperties {
     }
   }
   return style
-}
-
-function MotionButton({ token, kind }: { token: ThemeToken; kind: 'ease' | 'animation' }) {
-  return (
-    <button
-      type="button"
-      data-motion-play
-      data-motion-kind={kind}
-      data-motion-value={token.resolved}
-      data-motion-travel={EASE_TRAVEL_PX}
-      aria-label={`${token.name} を再生`}
-      className="relative block h-8 w-full cursor-pointer rounded-control border border-border-hairline bg-transparent p-0 transition-colors duration-120 ease-standard hover:bg-muted"
-    >
-      {/* ease は端から端まで走らせて曲線を見せ、animation は面そのものを動かす */}
-      {kind === 'ease' ? (
-        <span
-          data-motion-target
-          className="absolute top-1/2 left-1 block size-2 -translate-y-1/2 rounded-chip bg-foreground"
-        />
-      ) : (
-        <span
-          data-motion-target
-          className="absolute top-1/2 left-1/2 block size-5 -translate-x-1/2 -translate-y-1/2 rounded-sm bg-foreground"
-        />
-      )}
-    </button>
-  )
 }
 
 function TokenPreviewCell({ preview, token }: { preview: TokenPreview; token: ThemeToken }) {

@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import type { SearchableItem } from '@/lib/types'
 
@@ -5,13 +6,9 @@ export interface NoteTimelineItemProps {
   note: SearchableItem
 }
 
-/**
- * タイムライン内の個別のノートカード
- * プレゼンテーションコンポーネント - props を受け取って UI を描画
- */
 export function NoteTimelineItem({ note }: NoteTimelineItemProps) {
   return (
-    <a href={note.url}>
+    <Link href={note.url}>
       <Card className="transition-colors hover:bg-muted">
         <CardHeader>
           <CardTitle className="text-sm">{note.metadata.title}</CardTitle>
@@ -30,6 +27,6 @@ export function NoteTimelineItem({ note }: NoteTimelineItemProps) {
           </div>
         </CardContent>
       </Card>
-    </a>
+    </Link>
   )
 }

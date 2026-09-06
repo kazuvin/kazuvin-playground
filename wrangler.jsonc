@@ -2,8 +2,8 @@
  * For more details on how to configure Wrangler, refer to:
  * https://developers.cloudflare.com/workers/wrangler/configuration/
  *
- * Astro は完全な静的サイトを dist/ に出力するため、Worker スクリプトは持たず
- * 静的アセットのみを配信する構成にしている。
+ * Next.js の Static Export (next.config.ts の output: "export") は完全な静的サイトを
+ * out/ に出力するため、Worker スクリプトは持たず静的アセットのみを配信する構成にしている。
  * https://developers.cloudflare.com/workers/static-assets/
  */
 {
@@ -11,7 +11,7 @@
   "name": "kazuvin-playground",
   "compatibility_date": "2025-03-01",
   "assets": {
-    "directory": "./dist",
+    "directory": "./out",
     "not_found_handling": "404-page"
   }
 }

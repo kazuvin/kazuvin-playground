@@ -1,65 +1,47 @@
 /**
- * 検索可能なアイテムの種類
+ * 記事やカタログの見出し 1 つ。出所は MDX (features/notes/mdx.ts) と
+ * デザインシステムのカタログ (features/design-system/catalog.ts) の 2 つで、
+ * 目次側はこの形しか知らない。
  */
+export interface MarkdownHeading {
+  /** 見出しの段。h2 なら 2 */
+  depth: number
+  slug: string
+  text: string
+}
+
 export type SearchableItemType = 'note' | 'playground'
 
-/**
- * 検索可能なアイテムの基本メタデータ
- */
 interface SearchableMetadata {
-  /** タイトル */
   title: string
-  /** 公開日 (YYYY-MM-DD形式) */
+  /** YYYY-MM-DD */
   date: string
-  /** 説明 */
   description?: string
-  /** タグのリスト */
   tags?: string[]
 }
 
-/**
- * 検索可能なアイテム（コマンドパレット用）
- *
- * ビルド時に /notes-index.json として出力され、コマンドパレットが fetch する。
- * 生成元は src/pages/notes-index.json.ts。
- */
+/** コマンドパレットが fetch する /notes-index.json の 1 件。 */
 export interface SearchableItem {
-  /** アイテムの種類 */
   type: SearchableItemType
-  /** メタデータ */
   metadata: SearchableMetadata
-  /** 遷移先のURL */
   url: string
 }
 
-/**
- * 一覧表示用のノート情報
- *
- * notes コレクションのエントリを UI が扱いやすい形に落としたもの。
- * 変換は src/features/notes/notes.ts の toNoteSummary が担当する。
- */
+/** 一覧表示用。変換は features/notes/notes.ts の toNoteSummary。 */
 export interface NoteSummary {
-  /** ノートのスラッグ */
   slug: string
-  /** ノートのメタデータ */
   metadata: {
-    /** ノートのタイトル */
     title: string
-    /** 公開日 (YYYY-MM-DD形式) */
+    /** YYYY-MM-DD */
     date: string
-    /** ノートの説明 */
     description?: string
-    /** タグのリスト */
     tags: string[]
   }
 }
 
-/**
- * 月ごとにグループ化されたノート（ホームのタイムライン表示用）
- */
+/** ホームのタイムライン用に月でまとめたもの。 */
 export interface NotesByMonth {
   /** 表示用の月ラベル (例: "2025年11月") */
   label: string
-  /** その月に属するノート */
   notes: SearchableItem[]
 }

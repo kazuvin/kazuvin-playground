@@ -1,0 +1,10 @@
+/* トークン名やクラス名を地の文に混ぜるための小さな見た目。globals.css の
+   .note-content のインラインコードと同じ作りだが、あちらは記事本文にしか掛からない。
+   このページでしか使わないので CSS Module に閉じてある。 */
+.dsCode {
+  font-family: var(--font-mono);
+  background-color: var(--color-muted);
+  border: 1px solid var(--color-border-hairline);
+  border-radius: var(--radius-sm);
+  padding: 1px 4px;
+}

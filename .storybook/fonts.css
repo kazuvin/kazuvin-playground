@@ -1,10 +1,10 @@
-/* Storybook は Astro を通らないので、astro.config.mjs の fonts が出す
+/* Storybook は Next を通らないので、src/styles/fonts.ts の next/font が出す
    --font-noto-sans-mono が存在しない。src/styles/globals.css のトークンは
    この変数を参照しているため、ここで Fontsource が登録する family 名に
    解決してやる (preview.ts が @fontsource-variable/* を import 済み)。
 
-   Astro 側と違ってメトリクス補正済みの代替 face は入らない。Storybook は
-   実測用ではなく見た目の確認用なので、そこは合わせない。 */
+   アプリ側と違って preload も latin サブセットの絞り込みも掛からない。
+   Storybook は実測用ではなく見た目の確認用なので、そこは合わせない。 */
 :root {
   --font-noto-sans-mono: "Noto Sans Mono Variable", "Noto Sans JP Variable", ui-monospace, Menlo;
 }

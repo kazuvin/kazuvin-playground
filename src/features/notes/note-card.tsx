@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatDate } from '@/lib/date'
 import type { NoteSummary } from '@/lib/types'
@@ -10,7 +11,7 @@ export function NoteCard({ note }: NoteCardProps) {
   const formattedDate = formatDate(note.metadata.date, 'ja-JP')
 
   return (
-    <a href={`/notes/${note.slug}`} className="block">
+    <Link href={`/notes/${note.slug}`} className="block">
       <Card className="transition-colors hover:border-border-strong">
         <CardHeader>
           <CardTitle>{note.metadata.title}</CardTitle>
@@ -38,6 +39,6 @@ export function NoteCard({ note }: NoteCardProps) {
           </CardContent>
         )}
       </Card>
-    </a>
+    </Link>
   )
 }

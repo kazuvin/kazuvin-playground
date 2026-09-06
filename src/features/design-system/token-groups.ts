@@ -1,13 +1,8 @@
 import type { ThemeToken } from './parse-theme'
 
 /*
- * @theme のトークンを、カタログの節に振り分ける。
- *
- * 振り分けは名前の前方一致だけで決める。値の一覧をここに書き写さないのと同じ理由で、
- * 「どのトークンがあるか」も持たない。定義に無い名前は捨てずに最後の Uncategorised へ
- * 落ちるので、globals.css に新しい接頭辞のトークンが増えても、カタログから消える
- * ことはない (見出しが付かないだけ)。定義の順に先勝ちで見るため、--color-gray-* を
- * --color-* より前に置いてある。
+ * 振り分けは名前の前方一致だけ。先勝ちで見るので --color-gray-* を --color-* より前に
+ * 置く。定義に無い名前は捨てずに Uncategorised へ落ちる。
  */
 
 export type TokenPreview =

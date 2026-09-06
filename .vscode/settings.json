@@ -4,10 +4,6 @@
   "editor.codeActionsOnSave": {
     "source.fixAll.biome": "explicit"
   },
-  // Biome は .astro のフロントマターしか扱えないので、.astro だけ Prettier に渡す
-  "[astro]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
   "typescript.tsdk": "node_modules/typescript/lib",
   "files.associations": {
     "*.css": "tailwindcss"

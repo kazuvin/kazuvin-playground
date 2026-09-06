@@ -1,3 +1,8 @@
 # https://developers.cloudflare.com/workers/static-assets/headers
-/_astro/*
+#
+# Next.js がハッシュ付きで書き出すものだけをここに入れる。JS / CSS のチャンクも、
+# src/assets/ から import した画像 (out/_next/static/media/*) もこの下に来る。
+# public/ に直接置いたファイル (favicon.png など) はファイル名が変わらないので、
+# Cloudflare 既定の max-age=0, must-revalidate のままにしておく。
+/_next/static/*
   Cache-Control: public,max-age=31536000,immutable

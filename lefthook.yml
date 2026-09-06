@@ -5,12 +5,7 @@ pre-commit:
       glob: '*.{js,jsx,ts,tsx,mts,mjs,json,jsonc,css}'
       run: pnpm exec biome check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
       stage_fixed: true
-    # .astro は Biome がテンプレートを扱えないため Prettier が受け持つ
-    - name: prettier-astro
-      glob: '*.astro'
-      run: pnpm exec prettier --write {staged_files}
-      stage_fixed: true
-    # astro check はプロジェクト全体を見るのでファイル単位に絞れない
+    # tsc はプロジェクト全体を見るのでファイル単位に絞れない
     - name: typecheck
       run: pnpm run typecheck
 

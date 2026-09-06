@@ -26,9 +26,8 @@ CI ワークフローは以下の 3 つのジョブで構成されています�
 
 **実行内容**:
 
-- Biome による lint と整形チェック (`.ts` / `.tsx` / `.json` / `.css`)
-- Prettier による整形チェック (`.astro`)
-- `astro check` による型チェック (`.astro` を含む)
+- Biome による lint と整形チェック (リポジトリ全体。生成物と `public/` だけ除外)
+- `tsc --noEmit` による型チェック
 
 #### 2. Test
 
@@ -55,7 +54,7 @@ CI ワークフローは以下の 3 つのジョブで構成されています�
 
 **実行内容**:
 
-- Astro のプロダクションビルド (静的サイトを `dist/` に出力)
+- Next.js のプロダクションビルド (Static Export で静的サイトを `out/` に出力)
 - ビルド成果物を 7 日間保存
 
 ## ローカルで CI を実行する
@@ -300,7 +299,7 @@ pnpm run build
 
 # エラーを修正
 # ビルドキャッシュをクリアする場合：
-rm -rf dist .astro node_modules/.vite
+rm -rf out .next node_modules/.vite
 pnpm run build
 ```
 
@@ -308,8 +307,8 @@ pnpm run build
 
 ### 1. コミット前のチェックは自動で走る
 
-lefthook が pre-commit で Biome (staged なファイルのみ)、Prettier (`.astro`)、
-`astro check` を実行し、commit-msg で commitlint が Conventional Commits を検証します。
+lefthook が pre-commit で Biome (staged なファイルのみ) と `tsc --noEmit` を実行し、
+commit-msg で commitlint が Conventional Commits を検証します。
 `pnpm install` 時に `prepare` スクリプトからフックが同期されます。
 
 手動で通したい場合：
@@ -332,8 +331,7 @@ VS Code や WebStorm などのエディタで、保存時に自動整形や lint
 
 #### VS Code の設定例 (.vscode/settings.json)
 
-`.vscode/settings.json` に設定済みです。`.astro` だけ Prettier に渡している点に注意
-してください (Biome はテンプレートを扱えないため)。
+`.vscode/settings.json` に設定済みです。整形は全ファイル Biome に渡します。
 
 ```json
 {
@@ -341,9 +339,6 @@ VS Code や WebStorm などのエディタで、保存時に自動整形や lint
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.biome": "explicit"
-  },
-  "[astro]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "typescript.tsdk": "node_modules/typescript/lib"
 }

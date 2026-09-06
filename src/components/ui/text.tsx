@@ -1,18 +1,8 @@
 import type { HTMLAttributes } from 'react'
 import { cn } from '@/lib/cn'
 
-/* 8 つの role。src/styles/globals.css のスケール (text-2xs … text-base) の
-   上に乗っていて、独自のサイズは持たない。
-
-   上の 5 つ — title / heading / subheading / body / lead — は**すべて同じ
-   0.875rem (14px)**。階層はサイズではなく「太さ + 色」で作る。等幅 1 書体で
-   通しているので、大きさを変えるより太さを変えるほうが段として読みやすく、
-   行の濃度も揃う。サイズが下がるのは、本文ではないメタデータ
-   (caption / label / overline) に入ってからだけ。
-
-   密度もサイズを削って作らない。詰めたいときは余白のほうを詰める。
-
-   公開 API ではないので export しない（型は props の形からしか使わない）。 */
+/* globals.css のスケールの上に乗るだけで、独自のサイズは持たない。上の 5 つは
+   すべて 14px で、階層はサイズではなく太さと色で作る (docs/kotoba-design-system.md)。 */
 const textRoleClasses = {
   /** 14 / 700 — ページタイトル。1 画面に 1 つ。 */
   title: 'text-base font-bold text-balance text-foreground',

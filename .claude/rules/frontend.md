@@ -1,6 +1,6 @@
 ---
 paths:
-  - "src/**/*.{ts,tsx,astro,css}"
+  - "src/**/*.{ts,tsx,css}"
   - "biome.jsonc"
 ---
 
@@ -21,43 +21,49 @@ paths:
 
 ## 書く前に決まっていること
 
-- **依存は `共有層 → features → pages / layouts` の一方向**。feature 間の直接 import は禁止。
+- **依存は `共有層 → features → app / layouts` の一方向**。feature 間の直接 import は禁止。
   ファイルの置き場所はこの向きから決まる。
-- **ファイル名はディレクトリ名も含めてすべて kebab-case**。`.astro` も例外ではない。
+- **ファイル名はディレクトリ名も含めてすべて kebab-case**。例外は `src/app/` の規約ファイル
+  （`page.tsx` / `layout.tsx` / `[slug]` / `notes-index.json`）だけで、これは URL と
+  フレームワークが決めている。
 - **`index.ts` の barrel は置かない**。import は実ファイルを直接指す
-  （`@/components/ui/card`）。Astro は island 単位でバンドルを切るので、barrel を挟むと
-  使っていないコンポーネントまで island のチャンクに入る。
-- **既定は静的**。`client:*` を付けるのは、本当にブラウザで動く必要があるものだけ。
+  （`@/components/ui/card`）。Next はルート単位でチャンクを切るので、barrel を挟むと
+  使っていないコンポーネントまでそのページのチャンクに入る。
+- **既定は Server Component**。`'use client'` を付けるのは、本当にブラウザで動く必要が
+  あるものだけ。境界はできるだけ葉に寄せる（レール全体ではなくナビだけ、表全体ではなく
+  再生ボタンだけ）。
+- **Static Export なので実行時のサーバーは無い**。SSR / ISR / Middleware / 画像最適化 API /
+  動的な Route Handler は使えない。データはビルド時に読む。
 - **色は `src/styles/globals.css` の `@theme` にあるものだけ**。
 
 ## lint が落とさないもの
 
-古い React の書き方・依存の向き・ファイル名は Biome と `astro check` が落とし、
-理由はそのメッセージに出る。機械が判定できないのは次の 3 つで、これはレビューでしか止まらない。
+古い React の書き方・依存の向き・ファイル名・Node ビルトインの持ち込みは Biome と `tsc` が
+落とし、理由はそのメッセージに出る。機械が判定できないのは次の 4 つで、これはレビューでしか
+止まらない。
 
-- **`src/components/` にビジネスロジックを持ち込まない**。データ取得と整形はページの
-  frontmatter か `features/` で行い、コンポーネントは props で受け取る。
-- **island の中で `fetch` しない**。ビルド時に解決できない場合
+- **`src/components/` にビジネスロジックを持ち込まない**。データ取得と整形はページ
+  （Server Component）か `features/` で行い、コンポーネントは props で受け取る。
+- **Client Component の中で `fetch` しない**。ビルド時に解決できない場合
   （コマンドパレットの検索インデックスなど）だけの例外。
 - **`useMemo` / `useCallback` / `memo` を手で足さない**。まず本当に遅いのかを測る。
+- **コメントに設計の説明を書き写さない**。docs にあることはコードに複製せず、残すのは
+  コードだけでは復元できない「なぜ」に限る（1〜3 行）。基準は
+  `docs/coding-standards.md` の「コメント」。
+- **`biome.jsonc` の noNodejsModules 例外に `'use client'` のファイルを足さない**。
+  あの一覧は「ビルド時にしか動かない」という宣言で、ブラウザに降りるファイルを入れると
+  ガードそのものが無意味になる。
 
-## .astro の扱い
+## 内部リンクは next/link
 
-Biome は `.astro` の**フロントマターしか見ない**。テンプレートは整形されず、しかも
-テンプレートでしか使わない変数を未使用と誤検知する。そのため `biome.jsonc` の
-`files.includes` で `.astro` を対象外にし、整形は Prettier（`prettier-plugin-astro`）、
-型は `astro check` が受け持つ。
-
-- **`.astro` には Biome のガードレールが効かない。** 層をまたぐ import や命名は
-  レビューで担保する。ロジックを `.astro` に書かず `features/` に置くのは、
-  テスト可能にするためであると同時に、lint を効かせるためでもある。
-- `.astro` コンポーネントは `.ts` から re-export できない。利用側からパスを直接 import する
-  （`./app-sidebar.astro`）。
+サイト内の行き先は `<a href>` ではなく `next/link` の `<Link>` で書く。`<a>` に戻すと
+クリックのたびに文書ごと再読み込みになり、左レールまで組み直される（遷移中のちらつきは
+それが原因だった）。ページ内アンカー（`#heading`）と外部リンクは素の `<a>` のまま。
 
 ## 変更後に通すもの
 
 ```sh
-pnpm lint        # Biome + Prettier(.astro)。--write 相当は pnpm lint:fix
-pnpm typecheck   # astro check
+pnpm lint        # Biome。--write 相当は pnpm lint:fix
+pnpm typecheck   # tsc --noEmit
 pnpm test        # vitest run
 ```

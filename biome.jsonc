@@ -8,20 +8,18 @@
   },
   "files": {
     "ignoreUnknown": false,
-    // .astro は Biome が「フロントマターのスクリプトだけ」を見る作りで、
-    // テンプレートは整形されず、しかもテンプレートでしか使わない変数や import を
-    // noUnusedVariables / noUnusedImports が未使用と誤検知する。
-    // .astro の lint / format は Prettier（prettier-plugin-astro）に任せ、
-    // 型は astro check が見る。ここでは対象から完全に外す。
+    // テンプレートも含めてすべて Biome が見る。Prettier は使わない
+    // （.astro を受け持たせるために置いていたが、置き換えで対象が無くなった）。
     "includes": [
       "**",
-      "!**/*.astro",
-      "!**/.astro",
       "!**/public",
-      "!**/dist",
+      "!**/.next",
+      "!**/out",
       "!**/coverage",
       "!**/storybook-static",
-      "!**/.wrangler"
+      "!**/.wrangler",
+      // Next が毎ビルド生成する。手で書かないので lint も整形もしない
+      "!next-env.d.ts"
     ]
   },
   "formatter": {
@@ -163,7 +161,8 @@
           }
         },
         // bulletproof-react に倣い、コンポーネントも含めて kebab-case に統一する。
-        // .astro は Biome の対象外なので、ディレクトリ名ともども docs とレビューで担保する。
+        // ディレクトリ名はこのルールでは見られないので、docs とレビューで担保する。
+        // src/app/ だけは規約ファイル（page / layout / [slug]）が別なので下で外す。
         "useFilenamingConvention": {
           "level": "error",
           "options": {
@@ -203,6 +202,10 @@
                 // 自前モジュールは flat named import で統一する。`import * as X` は import 名 `*`
                 // として扱われるため importNamePattern で狙い撃ちできる。
                 // 外部ライブラリは group に含めないので対象外（cmdk の `import * as` などは通る）。
+                //
+                // 動的 import()（遅延読み込み）も名前空間の取り込みとして拾われる。
+                // 分けること自体が目的の 2 箇所（コマンドパレット / Agentation）だけ、
+                // 抑制コメントに理由を添えて残してある。
                 "group": ["./**", "../**", "@/**"],
                 "importNamePattern": "[*]",
                 "message": "自前モジュールを `import * as` で読み込むことはできません。`import { Foo } from '...'` の形で参照してください。外部ライブラリは対象外です。"
@@ -214,8 +217,8 @@
 
       "performance": {
         // 再エクスポート専用ファイル（index.ts の barrel）はバンドラの tree-shaking を妨げる。
-        // Astro は island 単位でバンドルを切るので、barrel 経由の import は
-        // 使っていないコンポーネントまで island のチャンクに引き込む。
+        // Next はルート単位でチャンクを切るので、barrel を挟むと使っていない
+        // コンポーネントまでそのページのチャンクに引き込む。
         "noBarrelFile": "error",
         "noReExportAll": "error",
         "noDelete": "error"
@@ -241,9 +244,6 @@
         "**",
         // 日付を組み立てる唯一の場所
         "!**/lib/date.ts",
-        // Content Collections が frontmatter を Date にパースするため、
-        // その受け取りと文字列化はここで行う
-        "!**/features/notes/notes.ts",
         // テストは時刻を固定するために Date を直接使うことがある
         "!**/*.test.ts",
         "!**/*.test.tsx"
@@ -292,8 +292,8 @@
       }
     },
     {
-      // ブラウザ（island）で動くコードに Node のビルトインを持ち込ませない。
-      // Astro のページ frontmatter はビルド時に動くが、.astro は Biome の対象外。
+      // ブラウザに降りるコードに Node のビルトインを持ち込ませない。
+      // 例外はこの下の override で名指しする（ビルド時にしか動かないファイル）。
       "includes": ["src/**"],
       "linter": {
         "rules": {
@@ -303,15 +303,54 @@
         }
       }
     },
+    {
+      // ビルド時にしか動かないファイル。Static Export では Server Component も
+      // Route Handler も「ビルド時に 1 度だけ走る」ものなので、content/ を読む
+      // ためのファイルシステムアクセスをここだけ許す。
+      //
+      // 名指しなのが要点で、features のうちブラウザにも降りうるファイル
+      // （command-search / search-index）はこの一覧に無い。
+      // 'use client' を付けたファイルをここに足してはいけない。
+      "includes": [
+        "src/app/**",
+        "src/features/notes/notes.ts",
+        "src/features/design-system/catalog.ts"
+      ],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noNodejsModules": "off"
+          }
+        }
+      }
+    },
+    {
+      // App Router の規約ファイル。page / layout / not-found / sitemap は
+      // default export であることがフレームワークの API なので、そこだけ外す。
+      // ルートの名前（[slug] や notes-index.json）もディレクトリ名が URL に
+      // なる規約で、kebab-case の命名規約では表せない。
+      "includes": ["src/app/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noDefaultExport": "off",
+            "useFilenamingConvention": "off"
+          }
+        }
+      }
+    },
     // ---------------------------------------------------------------
-    // レイヤー境界。依存は 共有層 -> features -> app（pages / layouts）の一方向に限る。
+    // レイヤー境界。依存は 共有層 -> features -> app（ページ / layouts）の一方向に限る。
+    //
+    // layouts は置き場所こそ components/layouts だが、features を組み立てる側なので
+    // 層としては app と同じ高さにある。共有層の override より後で上書きしている。
     //
     // overrides の options はグローバル設定を「マージではなく上書き」する。
     // そのため各 override で react / react-dom の paths を再掲している。
     // 消すとその配下だけ React まるごと取り込みが素通りになるので注意。
     // ---------------------------------------------------------------
     {
-      // 共有層は上位レイヤー（features / pages / layouts）を知らない。
+      // 共有層は上位レイヤー（features / app / layouts）を知らない。
       // 再エクスポートを経由した迂回もここで断つ。
       "includes": [
         "src/components/**",
@@ -345,8 +384,8 @@
                 },
                 "patterns": [
                   {
-                    "group": ["@/features/**", "@/pages/**", "@/layouts/**"],
-                    "message": "共有層から features / pages / layouts を import することはできません。依存の向きは 共有層 → features → pages の一方向です。共有したい実装は共有層に移すか、ページの frontmatter 側で合成してください。"
+                    "group": ["@/features/**", "@/app/**", "@/components/layouts/**"],
+                    "message": "共有層から features / app / layouts を import することはできません。依存の向きは 共有層 → features → app の一方向です。共有したい実装は共有層に移すか、ページ側で合成してください。"
                   },
                   {
                     // 親を遡る相対 import を塞がないと、@/ エイリアスに対する上の判定を
@@ -367,7 +406,66 @@
       }
     },
     {
-      // features は他 feature と pages / layouts を知らない。自 feature 内は相対 import で書く。
+      // ---------------------------------------------------------------
+      // layouts 層。ページを包む外枠（レール・grid・dev ツール）。
+      //
+      // ディレクトリは components 配下にあるが、共有層ではない。features を呼んで
+      // 画面の骨格を組み立てるのが仕事で、層としては app と同じ高さに立つ。
+      // そのため共有層で禁じている @/features/** への依存だけを開けてある。
+      // app（ページ）には依存しない。向きが逆になるため。
+      //
+      // 共有層の override（components/** を含む）より後に置くこと。overrides の
+      // options はマージではなく上書きなので、共有層で禁じている分も再掲している。
+      // ---------------------------------------------------------------
+      "includes": ["src/components/layouts/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "paths": {
+                  "react": {
+                    "importNames": [
+                      "*",
+                      "default",
+                      "Children",
+                      "cloneElement",
+                      "createRef",
+                      "PureComponent"
+                    ],
+                    "message": "React をまるごと取り込むこと（import React from 'react' / import * as React from 'react'）はできません。必要な API は named import で個別に取り込んでください（import type { ComponentProps, ReactNode } from 'react'）。"
+                  },
+                  "react-dom": {
+                    "importNames": ["*", "default", "useFormState"],
+                    "message": "react-dom をまるごと取り込むことはできません。必要な API は named import で取り込んでください。useFormState は React 19 で useActionState（react から import）に置き換わっています。"
+                  }
+                },
+                "patterns": [
+                  {
+                    "group": ["@/app/**"],
+                    "message": "layouts から app を import することはできません。外枠がページを知ると依存が逆流します。ページ固有の値は props で受け取ってください。"
+                  },
+                  {
+                    // 親を遡る相対 import を塞がないと、@/ エイリアスに対する上の判定を
+                    // 相対パス表記ですり抜けられる。layouts に親を遡る用事はない。
+                    "group": ["../**"],
+                    "message": "layouts では親ディレクトリをさかのぼる相対 import を使えません。この記法で依存チェックをすり抜けられるためです。同じ階層以下は ./、それ以外は @/ エイリアスで参照してください。"
+                  },
+                  {
+                    "group": ["./**", "../**", "@/**"],
+                    "importNamePattern": "[*]",
+                    "message": "自前モジュールを `import * as` で読み込むことはできません。`import { Foo } from '...'` の形で参照してください。外部ライブラリは対象外です。"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      // features は他 feature と app / layouts を知らない。自 feature 内は相対 import で書く。
       "includes": ["src/features/**"],
       "linter": {
         "rules": {
@@ -395,11 +493,11 @@
                 "patterns": [
                   {
                     "group": ["@/features/**"],
-                    "message": "他の feature を直接 import することはできません。共有したい実装は @/lib などの共有層へ引き上げるか、ページの frontmatter で両方を呼んで合成してください。自 feature 内の参照は相対パスで書きます。"
+                    "message": "他の feature を直接 import することはできません。共有したい実装は @/lib などの共有層へ引き上げるか、ページで両方を呼んで合成してください。自 feature 内の参照は相対パスで書きます。"
                   },
                   {
-                    "group": ["@/pages/**", "@/layouts/**"],
-                    "message": "features から pages / layouts を import することはできません。ページに依存せず、必要な値は引数で受け取ってください。合成はページの frontmatter 側で行います。"
+                    "group": ["@/app/**", "@/components/layouts/**"],
+                    "message": "features から app / layouts を import することはできません。ページに依存せず、必要な値は props で受け取ってください。合成はページ側で行います。"
                   },
                   {
                     // ファイルは feature ディレクトリ直下に置く。2 階層さかのぼると
@@ -430,8 +528,9 @@
       // サブコンポーネントは Card.Header ではなく CardHeader のフラットな named export
       // で公開する。knip が未使用 export を追跡でき、noBarrelFile とも衝突しないため。
       //
-      // 現在 components 配下は ui のみ。ドメインを知らない部品が今後増えても
-      // （seo / errors など）共有層の override が効くよう、両方を残している。
+      // components 配下には ui のほかに layouts があり、layouts は上の override で
+      // 別扱いにしている。ドメインを知らない部品が今後増えても（seo / errors など）
+      // 共有層の override が効くよう、includes は両方を残している。
       // 共有層の override（components/** を含む）より後に置くこと。overrides の options は
       // マージではなく上書きなので、共有層で禁じている分もすべて再掲している。
       // ---------------------------------------------------------------
@@ -464,7 +563,12 @@
                 },
                 "patterns": [
                   {
-                    "group": ["@/features/**", "@/pages/**", "@/layouts/**", "@/stores/**"],
+                    "group": [
+                      "@/features/**",
+                      "@/app/**",
+                      "@/components/layouts/**",
+                      "@/stores/**"
+                    ],
                     "message": "ui にドメイン・データ取得・グローバルステートを持ち込むことはできません。ui は props と render prop だけで動く最下層です。状態は呼び出し側が持ってください。"
                   },
                   {

@@ -9,7 +9,7 @@
 ## 使い方
 
 ```bash
-pnpm dev:up       # dev サーバー (:4321) と Agentation のサーバー (:4747)
+pnpm dev:up       # dev サーバー (:3000) と Agentation のサーバー (:4747)
 ```
 
 右下にツールバーが出る。クリックして有効にすると、ページ上の要素を選んでコメントを書ける。
@@ -68,18 +68,18 @@ acknowledge → 修正 → resolve のループに入る。
 
 ## 本番には出ない
 
-ツールバーは `src/layouts/base-layout.astro` の `<script>` から、
-`import.meta.env.DEV` の枝の中で dynamic import している。本番ビルドでは Vite が
-`DEV` を `false` に畳み、枝ごと消えるので、チャンク自体が生まれない。
+ツールバーは `src/components/layouts/dev-tools.tsx` の `useEffect` から、
+`process.env.NODE_ENV !== 'development'` で早期 return した先で動的 import している。
+本番ビルドではバンドラが `NODE_ENV` を `"production"` に畳んで枝ごと消すので、
+チャンク自体が生まれない。
 
-island (`client:only="react"`) で書くとこうはならない。テンプレート側を
-`import.meta.env.DEV` で切ってもビルドはチャンクを吐き、どこからも参照されない 412KB が
-`dist/` に残って、そのまま Cloudflare に上がる。**dev 専用のものを island にしない**のは
-そのため。
+静的な import で書くとこうはならない。描画しなくてもビルドはチャンクを吐き、
+どこからも参照されない 412KB が `out/` に残って、そのまま Cloudflare に上がる。
+**dev 専用のものを静的に import しない**のはそのため。
 
 ## 更新するとき
 
-- ポートを変える → `scripts/dev.sh` の `PORT` と `agentation-toolbar.tsx` の
+- ポートを変える → `scripts/dev.sh` の `AGENTATION_PORT` と `agentation-toolbar.tsx` の
   `ENDPOINT` の両方
 - 指摘の保存先 → 既定は `~/.agentation/store.db` (SQLite)。リポジトリの中には置かれない
 - `agentation-mcp` は devDependency に入れてある。`.mcp.json` も `scripts/dev.sh` も

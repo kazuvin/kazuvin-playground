@@ -75,27 +75,28 @@ Tailwind 標準の `gray` は `--color-gray-*: initial` で消してあるので
 実体は `@fontsource-variable/*` で self-host する。配信経路は 2 通りに分かれていて、
 分けている理由がそのままレイアウトシフト対策になっている。
 
-- **欧文 (`Noto Sans Mono`)** は `astro.config.mjs` の `fonts` で宣言し、
-  `src/layouts/base-layout.astro` の `<Font>` が描画する。
-  Astro が `<link rel="preload">` と、**実ファイルのメトリクスから算出した代替
-  `@font-face`** (`size-adjust` / `ascent-override` / `descent-override`) を出す。
-  代替書体で描かれている間も行の高さと字幅が本番の書体と一致するので、
-  差し替わった瞬間にレイアウトが動かない (代替は `Courier New` で `size-adjust` は
-  99.98%、つまりほぼ等倍)。トークンは family 名ではなく Astro が発行する
-  `--font-noto-sans-mono` を参照する (Astro が family 名をハッシュ付きに書き換えるため)。
+- **欧文 (`Noto Sans Mono`)** は `src/styles/fonts.ts` の `next/font/local` で宣言し、
+  `src/app/layout.tsx` が `<html>` にその class を当てる。Next が `<link rel="preload">` を出し、
+  family 名をビルドごとのハッシュ付きに書き換えて `--font-noto-sans-mono` に入れる。
+  トークンが family 名ではなくこの CSS 変数を参照するのはそのため。
   載せるサブセットは `latin` だけ (20KB 台)。`preload` は宣言した全 variant に効くので、
   英日サイトでまず出番のない `latin-ext` や `cyrillic` まで毎回落ちてしまう。
   漏れた文字は `Noto Sans JP` → system mono にグリフ単位で落ちる。
 - **`Noto Sans JP`** だけは Fontsource の CSS をそのまま import し、外部の
   スタイルシートに残す。`@font-face` が 124 本 (CJK を字種で分割したもの) あり、
-  `<Font>` に載せると head に全部インライン展開されて HTML が 1 ページあたり
-  100KB 増える。分割配信のまま外部 CSS に置けばキャッシュも効く。
-  なお CJK には上記のメトリクス補正が効かない (Astro が使う代替は `Courier New` で、
-  CJK グリフを持たない)。ここは 1 サイズ・1 行間に寄せてあることで実害を抑えている
-  (段が 1 つしかないので、和文が代替で描かれている間もずれ方が一定になる)。
+  head にインライン展開すると HTML が 1 ページあたり 100KB 増える。
+  分割配信のまま外部 CSS に置けばキャッシュも効く。
+
+**メトリクス補正済みの代替 face は出していない** (`adjustFontFallback: false`)。
+`next/font/local` が土台にできるのは `Arial` か `Times New Roman` だけで、どちらも
+プロポーショナル —— 字送りが等幅と合わない。このサイトは左レールの下限幅を `ch` で
+見積もっており (`src/components/layouts/app-sidebar.tsx`)、`1ch` が Arial の "0" 由来になると
+その見積もりがずれる。行の高さより字送りのほうが効くので、代替は等幅
+(`Noto Sans JP` → `ui-monospace` → system mono) のまま落とすほうを採っている。
+preload 済みかつ latin サブセットだけなので、差し替えを待つ時間はごく短い。
 
 Fontsource は可変フォントを `"Noto Sans Mono Variable"` のような別名で登録するため、
-family 名は静的版と互換ではない。Storybook は Astro を通らないので、
+family 名は静的版と互換ではない。Storybook は Next を通らないので、
 `.storybook/preview.ts` が `@fontsource-variable/*` を直接 import し、
 `.storybook/fonts.css` が上記の CSS 変数を Fontsource の family 名に解決する。
 
@@ -114,7 +115,7 @@ rem の基準 (`html`) は **16px のまま触らない**。`html` を 87.5% に
 上げれば全段が比例して伸びる。
 
 `body` にも font-size を敷かない。ここは rem の基準を 16px に保つ層で、実際に描かれる
-テキストのサイズは**レイアウトシェル** (`common-layout.astro` の `<main>` と
+テキストのサイズは**レイアウトシェル** (`page-shell.tsx` の `<main>` と
 左右のレール) が `text-base` として与える。
 
 | Tailwind キー | rem         | px  | line     | tracking | 用途                          |
@@ -325,14 +326,14 @@ tier-1 の画面端スペーシング (24 / 32 / 24) を供給するシェル。
 
 ## このリポジトリに取り込むにあたっての判断
 
-元プロジェクトは React Native 前提の JSX + 素の CSS。ここでは Astro + React + Tailwind v4 + TSX
+元プロジェクトは React Native 前提の JSX + 素の CSS。ここでは Next.js + React + Tailwind v4 + TSX
 に移植し、既存の `src/components/ui/` に統合した。以下は 1:1 ではない箇所。
 
 ### 意図的な差分
 
 | 項目                    | 元                            | ここ                                                         | 理由                                                                               |
 | ----------------------- | ----------------------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
-| フォント配信            | Google Fonts CDN の `@import` | `@fontsource-variable/*` で self-host + Astro Fonts API      | サードパーティ接続を避ける。preload とメトリクス補正済み代替でレイアウトシフトも消す |
+| フォント配信            | Google Fonts CDN の `@import` | `@fontsource-variable/*` で self-host + `next/font/local`     | サードパーティ接続を避ける。preload と latin サブセットで差し替え待ちを短くする      |
 | `accent` の意味         | 唯一の色相                    | 同左                                                         | shadcn 系の `bg-accent` (ホバー面) とは非互換。既存 5 箇所は `bg-muted` に移行済み |
 | `destructive`           | 存在しない                    | `primary` と同じ黒にマップ                                   | 既存の `bg-destructive` を壊さず、かつ色でステータスを伝えない                     |
 | `chart-1`〜`chart-5`    | 存在しない                    | 削除                                                         | 未使用で、チャートパレットはこのシステムに無い                                     |

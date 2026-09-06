@@ -1,10 +1,6 @@
 /*
- * 日付を組み立てる唯一の場所。
- *
- * ノートの日付は frontmatter の YYYY-MM-DD が出典で、それ以外の形では持ち回らない。
- * `new Date('2025-11-03')` は UTC 0 時と解釈され、日本時間では前日になる。各所で
- * 直に触られると同じ間違いが何度でも入るので、Date に触れてよいのはこのファイルだけに
- * 限り、no-raw-date.grit（Biome プラグイン）が他のファイルでの使用を lint で落とす。
+ * Date に触れてよい唯一のファイル (他は no-raw-date.grit が落とす)。
+ * `new Date('2025-11-03')` は UTC 0 時と解釈され、日本時間では前日になる。
  */
 
 interface IsoDateParts {
@@ -13,7 +9,7 @@ interface IsoDateParts {
   day: number
 }
 
-/** YYYY-MM-DD を年・月・日に分解する（月は 1 始まり） */
+/** 月は 1 始まりで返す */
 function splitIsoDate(dateString: string): IsoDateParts {
   const [year, month, day] = dateString.split('-').map(Number)
 
@@ -33,13 +29,7 @@ function parseIsoDate(dateString: string): Date {
   return new Date(Date.UTC(year, month - 1, day))
 }
 
-/**
- * YYYY-MM-DD を読み手向けの表記に整える
- *
- * @param dateString - ISO の日付文字列（例: "2025-11-03"）
- * @param locale - 表記に使うロケール（既定: "en-US"）
- * @returns 整形済みの文字列（例: "November 3, 2025"）
- */
+/** "2025-11-03" → "November 3, 2025" */
 export function formatDate(dateString: string, locale = 'en-US'): string {
   return parseIsoDate(dateString).toLocaleDateString(locale, {
     year: 'numeric',
@@ -50,10 +40,8 @@ export function formatDate(dateString: string, locale = 'en-US'): string {
 }
 
 /**
- * YYYY-MM-DD から並べ替え用の月キー（YYYY-MM）を作る
- *
- * 文字列の切り出しだけで済ませる。Date を経由すると解釈のタイムゾーン次第で
- * 月末・月初が隣の月に落ちるため。
+ * 並べ替え用の月キー (YYYY-MM)。Date を経由すると月末・月初が隣の月に落ちるので
+ * 文字列の切り出しだけで済ませる。
  */
 export function toMonthKey(dateString: string): string {
   const { year, month } = splitIsoDate(dateString)

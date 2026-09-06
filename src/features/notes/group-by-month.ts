@@ -1,9 +1,6 @@
 import { toMonthKey, toMonthLabel } from '@/lib/date'
 import type { NotesByMonth, SearchableItem } from '@/lib/types'
 
-/**
- * ノートを月ごとにグループ化する
- */
 export function groupNotesByMonth(notes: SearchableItem[]): Record<string, NotesByMonth> {
   return notes.reduce(
     (acc, note) => {
@@ -23,9 +20,6 @@ export function groupNotesByMonth(notes: SearchableItem[]): Record<string, Notes
   )
 }
 
-/**
- * 月ごとのノートを新しい順にソートする
- */
 export function sortMonthsDescending(
   notesByMonth: Record<string, NotesByMonth>,
 ): [string, NotesByMonth][] {

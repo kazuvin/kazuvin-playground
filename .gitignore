@@ -9,9 +9,10 @@
 # testing
 /coverage
 
-# astro
-/dist/
-/.astro/
+# next
+/.next/
+/out/
+next-env.d.ts
 
 # misc
 .DS_Store

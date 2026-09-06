@@ -4,11 +4,8 @@ import * as DialogPrimitive from '@radix-ui/react-dialog'
 import type { ComponentProps, HTMLAttributes } from 'react'
 import { cn } from '@/lib/cn'
 
-/*
- * Radix のプリミティブは const の別名ではなく、薄い関数コンポーネントで包んで公開する。
- * useComponentExportOnlyModules（Fast Refresh の担保）が、この階層の export を
- * 「このファイルで宣言されたコンポーネント」だけに限っているため。
- */
+/* Radix のプリミティブは const の別名ではなく関数で包む。useComponentExportOnlyModules が
+   export をこのファイルで宣言したコンポーネントに限っているため。 */
 function Dialog(props: ComponentProps<typeof DialogPrimitive.Root>) {
   return <DialogPrimitive.Root {...props} />
 }
