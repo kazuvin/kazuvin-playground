@@ -24,13 +24,11 @@ export function CommandSearchTrigger() {
 
   return (
     <>
-      {/* ⌘ (U+2318) を文字で置くと、この 1 文字のために Noto Sans JP の CJK チャンク
-           (25KB) を落とすことになるので図形で持つ。 */}
       <button
         type="button"
-        aria-label="検索"
         onClick={toggle}
-        className="inline-flex cursor-pointer items-center gap-0.5 rounded-xl bg-primary px-3 py-1 font-semibold text-primary-foreground text-sm"
+        aria-keyshortcuts="Meta+K Control+K"
+        className="inline-flex h-control w-48 cursor-pointer items-center gap-gap rounded-control border border-input bg-background px-3 text-muted-foreground text-sm transition-colors duration-120 ease-standard hover:bg-muted lg:w-full"
       >
         <svg
           aria-hidden="true"
@@ -40,11 +38,32 @@ export function CommandSearchTrigger() {
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          className="size-3"
+          className="size-3.5 shrink-0"
         >
-          <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-4.35-4.35" />
         </svg>
-        K
+        <span className="flex-1 text-left">検索</span>
+        {/* ⌘ (U+2318) を文字で置くと、この 1 文字のために Noto Sans JP の CJK チャンク
+            (25KB) を落とすことになるので図形で持つ。 */}
+        <span
+          aria-hidden="true"
+          className="inline-flex shrink-0 items-center gap-0.5 rounded-sm border border-border-hairline bg-background px-1 py-0.5 text-2xs"
+        >
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="size-2.5"
+          >
+            <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
+          </svg>
+          K
+        </span>
       </button>
       {isMounted && (
         <CommandSearch

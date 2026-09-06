@@ -7,16 +7,18 @@ import { SiteNav } from './site-nav'
 
 /*
  * 下の 2 つは初回描画で <nav> が parse される前に箱を確保するためにある。外すと
- * lg 以上ではページ全体が 41.6px 横に飛び、lg 未満では <main> が 36px 下がる。
+ * lg 以上ではページ全体が横に飛び、lg 未満では <main> が 36px 下がる。
  * min-* なのは auto / h-dvh の性質を殺さないため。
  */
 
-/** 一番長いラベル + 左右の px-edge-h。lg 以上の auto トラックの下限になる */
-const RAIL_MIN_WIDTH = `calc(${Math.max(...NAV_ITEMS.map((item) => item.label.length))}ch + 2 * var(--spacing-edge-h))`
+/** lg 以上の auto トラックの下限。「一番長いラベル + 左右の px-edge-h」と、右レールと
+    同じ 15rem の広いほう。ラベルだけに張り付かせると、幅を借りている検索フィールドが
+    13ch まで縮んで「検索」と ⌘K が詰まる。ch はレールの text-sm (13px) で読む。 */
+const RAIL_MIN_WIDTH = `max(calc(${Math.max(...NAV_ITEMS.map((item) => item.label.length))}ch + 2 * var(--spacing-edge-h)), 15rem)`
 
-/** py-gap ×2 + ロゴ行 (h-8) + ナビの mt-gap + ナビ 1 行 + 下端の hairline */
+/** py-gap ×2 + ロゴ行 (h-control) + ナビの mt-gap + ナビ 1 行 + 下端の hairline */
 const BAR_MIN_HEIGHT =
-  'calc(2 * var(--spacing-gap) + 8 * var(--spacing) + var(--spacing-gap) + 2 * var(--spacing-gap-tight) + var(--text-base--line-height) + 1px)'
+  'calc(2 * var(--spacing-gap) + var(--spacing-control) + var(--spacing-gap) + 2 * var(--spacing-gap-tight) + var(--text-sm--line-height) + 1px)'
 
 /* カスタムプロパティは CSSProperties の索引に無いので、ここでだけ形を合わせる */
 const RESERVED_SIZE = {
@@ -28,7 +30,7 @@ export function AppSidebar() {
   return (
     <aside
       style={RESERVED_SIZE}
-      className="sticky top-0 z-20 min-h-(--bar-min-h) self-start border-border-hairline border-b bg-background/80 px-edge-h py-gap text-base backdrop-blur-2xl lg:h-dvh lg:min-w-(--rail-min-w) lg:overflow-y-auto lg:border-b-0 lg:bg-transparent lg:pt-edge-top lg:pb-edge-bottom lg:backdrop-blur-none"
+      className="sticky top-0 z-20 min-h-(--bar-min-h) self-start border-border-hairline border-b bg-background/80 px-edge-h py-gap text-sm backdrop-blur-2xl lg:h-dvh lg:min-w-(--rail-min-w) lg:overflow-y-auto lg:border-b-0 lg:bg-transparent lg:pt-edge-top lg:pb-edge-bottom lg:backdrop-blur-none"
     >
       <div className="flex items-center justify-between gap-gap lg:flex-col lg:items-start lg:gap-block-tight">
         <Link
