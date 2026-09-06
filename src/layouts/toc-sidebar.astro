@@ -4,8 +4,8 @@ import { Text } from '@/components/ui/text'
 import { selectTocHeadings } from '@/lib/nav'
 
 /*
- * ページ専用ナビの右レール。今のところ中身は記事の目次だけで、見出しを持たない
- * ページ (トップ・一覧・Playgrounds) では要素ごと描かれない。
+ * ページ専用ナビの右レール。中身は記事やカタログの目次で、見出しを持たない
+ * ページ (トップ・一覧) では要素ごと描かれない。
  *
  * 位置は common-layout の grid の 3 トラック目。画面の右端ではなく本文の右隣に
  * 付き、self-start + h-dvh の sticky で上端に貼り付く。
@@ -13,6 +13,9 @@ import { selectTocHeadings } from '@/lib/nav'
  * 出したり引っ込めたりしても本文の位置は動かない。トラックは
  * grid-template-columns が常に確保していて、埋まるかどうかとは無関係だから。
  * 「目次のあるページだけ本文が左にずれる」という遷移ごとのガタつきが出ない。
+ *
+ * 現在地の追従は下の <script>。リンクは素の #anchor なので、JS が来る前でも
+ * 飛べる（滑らかに送るのは globals.css の scroll-behavior で、JS は関与しない）。
  */
 interface Props {
   headings?: MarkdownHeading[]
@@ -24,7 +27,10 @@ const items = selectTocHeadings(headings)
 
 {
   items.length > 0 && (
-    <aside class="px-edge-h pt-edge-top pb-edge-bottom sticky top-0 hidden h-dvh self-start overflow-y-auto text-base xl:block">
+    <aside
+      data-toc-rail
+      class="px-edge-h pt-edge-top pb-edge-bottom sticky top-0 hidden h-dvh self-start overflow-y-auto scroll-smooth text-base xl:block"
+    >
       <nav aria-labelledby="toc-label">
         <Text role="overline" id="toc-label">
           On this page
@@ -33,8 +39,9 @@ const items = selectTocHeadings(headings)
           {items.map((heading) => (
             <li class={heading.depth === 3 ? 'pl-block-tight' : undefined}>
               <a
+                data-toc-link
                 href={`#${heading.slug}`}
-                class="text-subtle-foreground hover:text-foreground ease-standard block text-sm leading-snug transition-colors duration-120"
+                class="text-subtle-foreground hover:text-foreground data-[active=true]:text-foreground ease-standard block text-sm leading-snug transition-colors duration-120 data-[active=true]:font-medium"
               >
                 {heading.text}
               </a>
@@ -45,3 +52,111 @@ const items = selectTocHeadings(headings)
     </aside>
   )
 }
+
+<script>
+  /*
+   * 目次の現在地追従。読んでいる見出しに印を移し、レール自体もその項目が見える
+   * ところまで送る。カタログのように 30 項目を超える目次だと、印だけ動かしても
+   * 画面の外で光っていることになるため。
+   *
+   * IntersectionObserver ではなく毎フレームの位置計算にしてある。observer は
+   * 「入った / 出た」しか教えないので、画面に 1 つも見出しが無い長い節を読んでいる
+   * 間にどれを点けるかを別に決める必要があり、結局この計算に戻る。
+   *
+   * 島にはしない。DOM に触るだけで state を持たないので、素の script で足りる。
+   */
+  const RAIL_MARGIN = 24
+
+  /** 見出しの scroll-margin-top と同じ値。lg 未満は左ナビが横バーとして上に被る。 */
+  function headingOffset(): number {
+    return window.matchMedia('(min-width: 64rem)').matches ? 32 : 96
+  }
+
+  /** rail は引数で受ける。null 判定を閉包の外に置くと、巻き上げられた関数宣言の
+      中では narrowing が効かず 'possibly null' になる。 */
+  function trackToc(rail: HTMLElement): void {
+    const entries = Array.from(rail.querySelectorAll<HTMLAnchorElement>('[data-toc-link]'))
+      .map((link) => ({
+        link,
+        heading: document.getElementById(decodeURIComponent(link.hash.slice(1))),
+      }))
+      .filter((entry): entry is { link: HTMLAnchorElement; heading: HTMLElement } => {
+        return entry.heading !== null
+      })
+
+    if (entries.length === 0) {
+      return
+    }
+
+    function activeIndex(): number {
+      // 最下部まで来たら最後の項目。画面より短い最後の節が一度も点かないのを防ぐ
+      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
+        return entries.length - 1
+      }
+
+      const threshold = headingOffset() + 1
+      let index = 0
+      for (let i = 0; i < entries.length; i += 1) {
+        if (entries[i].heading.getBoundingClientRect().top > threshold) {
+          break
+        }
+        index = i
+      }
+      return index
+    }
+
+    /** レールの中だけを送る。ページ側のスクロール位置には触らない。 */
+    function reveal(link: HTMLElement): void {
+      const railBox = rail.getBoundingClientRect()
+      const linkBox = link.getBoundingClientRect()
+
+      if (linkBox.top < railBox.top + RAIL_MARGIN) {
+        rail.scrollTop -= railBox.top + RAIL_MARGIN - linkBox.top
+      } else if (linkBox.bottom > railBox.bottom - RAIL_MARGIN) {
+        rail.scrollTop += linkBox.bottom - (railBox.bottom - RAIL_MARGIN)
+      }
+    }
+
+    let current = -1
+    function sync(): void {
+      const next = activeIndex()
+      if (next === current) {
+        return
+      }
+      current = next
+
+      entries.forEach(({ link }, index) => {
+        if (index === next) {
+          link.dataset.active = 'true'
+          link.setAttribute('aria-current', 'location')
+          return
+        }
+        delete link.dataset.active
+        link.removeAttribute('aria-current')
+      })
+
+      reveal(entries[next].link)
+    }
+
+    let queued = false
+    function schedule(): void {
+      if (queued) {
+        return
+      }
+      queued = true
+      requestAnimationFrame(() => {
+        queued = false
+        sync()
+      })
+    }
+
+    sync()
+    window.addEventListener('scroll', schedule, { passive: true })
+    window.addEventListener('resize', schedule)
+  }
+
+  const rail = document.querySelector<HTMLElement>('[data-toc-rail]')
+  if (rail !== null) {
+    trackToc(rail)
+  }
+</script>

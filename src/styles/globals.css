@@ -321,6 +321,15 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* 目次や共有された #anchor から飛ぶときは滑らかに送る。右レールの現在地追従
+   (src/layouts/toc-sidebar.astro) はこの動きに乗って印を移すだけで、スクロール
+   そのものには触らない。動きを減らす設定にしている人には効かせない。 */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 /* The focus ring is one of the two permitted uses of the accent: 2px at a
    2px offset, which is why --radius-focus is --radius-control + 2. */
 :where(button, a, [tabindex]):focus-visible {

@@ -165,17 +165,34 @@ app 層だけなので、features を使うコンポーネントは `layouts/` �
 
 ```
 src/features/
-└── notes/
-    ├── notes.ts                 # コレクションの取得と変換 (getPublishedNotes など)
-    ├── group-by-month.ts        # 純粋関数
-    ├── group-by-month.test.ts   # 対応するテスト
-    ├── search-index.ts          # 検索インデックスの取得・絞り込み・グループ化
-    ├── search-index.test.ts
-    ├── note-card.tsx            # ドメインの型を受け取る UI
-    ├── notes-timeline.tsx
-    ├── note-timeline-item.tsx
-    └── command-search.tsx       # コマンドパレット (island)
+├── notes/
+│   ├── notes.ts                 # コレクションの取得と変換 (getPublishedNotes など)
+│   ├── group-by-month.ts        # 純粋関数
+│   ├── group-by-month.test.ts   # 対応するテスト
+│   ├── search-index.ts          # 検索インデックスの取得・絞り込み・グループ化
+│   ├── search-index.test.ts
+│   ├── note-card.tsx            # ドメインの型を受け取る UI
+│   ├── notes-timeline.tsx
+│   ├── note-timeline-item.tsx
+│   └── command-search.tsx       # コマンドパレット (island)
+└── design-system/
+    ├── parse-theme.ts           # globals.css の @theme をトークン一覧に落とす
+    ├── parse-theme.test.ts
+    ├── token-groups.ts          # トークンをカタログの節に振り分ける
+    ├── token-groups.test.ts
+    ├── catalog.ts               # ?raw で globals.css を読み、目次と節を組む
+    ├── token-table.tsx          # 1 節ぶんの表 (静的。島にしない)
+    ├── section-heading.astro    # 見出し。id から catalog.ts を引く
+    ├── dialog-demo.tsx          # compound をひとまとまりで動かす island
+    └── command-demo.tsx
 ```
+
+`/design-system` のカタログが値を持たないのは、この feature が `src/styles/globals.css` の
+`@theme` を**ビルド時に読んで**組み立てているからです。トークンを 1 つ足せばカタログの行も
+右の目次も増え、接頭辞を知らないトークンは Uncategorised の節に出ます。プレビューの色や
+サイズが Tailwind のクラスではなく inline style なのは、Tailwind が**使われていない
+`@theme` 変数を出力から落とす**ためで、解決済みの実値を流す以外に一致させる方法が
+ありません (経緯は `parse-theme.ts` 冒頭)。
 
 **features には UI を置けます。** ドメインを知っている island は、`components/` ではなく
 ここが居場所です (`components/` は features を import できないため)。
