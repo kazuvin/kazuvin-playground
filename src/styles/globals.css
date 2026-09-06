@@ -8,8 +8,9 @@
  *
  * Three constraints are load-bearing and easy to break by accident:
  *   1. The primary action surface is BLACK (--color-gray-900), not the accent.
- *   2. The accent (rgb 60 130 247) is permitted on the focus ring and the
- *      selected state only — never a fill, never status, never decoration.
+ *   2. The accent (rgb 242 49 130 — the logo's pink) is permitted on the focus
+ *      ring and the selected state only — never a fill, never status, never
+ *      decoration.
  *   3. Text never exceeds 0.875rem (14px). Headings and body share that one
  *      size; hierarchy is weight, colour and whitespace. The scale has no
  *      step above it — text-lg and friends are deliberately undefined.
@@ -56,11 +57,14 @@
   --color-gray-800: #2c2c31;
   --color-gray-900: #16161a;
 
-  /** ---- the one chromatic value — 4 stops, focus + selection only ---- */
-  --color-accent: rgb(60, 130, 247);
-  --color-accent-600: #2d6bd8;
-  --color-accent-700: #2354ab;
-  --color-accent-tint: #eff5fe;
+  /** ---- the one chromatic value — 4 stops, focus + selection only.
+      基準は public/logo.png のピンクそのもの (#f23182)。600 / 700 / tint は
+      同じ色相のまま、明度と彩度だけを動かした段で、白地に対する 3:1 (非文字の
+      コントラスト下限) は基準の 3.79 で満たしている。 ---- */
+  --color-accent: rgb(242, 49, 130);
+  --color-accent-600: #cb2a6e;
+  --color-accent-700: #9b2356;
+  --color-accent-tint: #feeff5;
 
   /** ---- semantic: surfaces ---- */
   --color-background: var(--color-gray-0);

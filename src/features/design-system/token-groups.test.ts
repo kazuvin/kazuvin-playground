@@ -16,7 +16,7 @@ describe('groupThemeTokens', () => {
   })
 
   it('should keep the accent between the ramp and the semantic colours', () => {
-    const groups = group('  --color-accent: rgb(60, 130, 247);\n  --color-accent-tint: #eff5fe;')
+    const groups = group('  --color-accent: rgb(242, 49, 130);\n  --color-accent-tint: #feeff5;')
 
     expect(groups.map((entry) => entry.id)).toEqual(['accent'])
     expect(groups[0].rows.map((row) => row.key)).toEqual(['accent', 'accent-tint'])

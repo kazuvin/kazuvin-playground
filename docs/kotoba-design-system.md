@@ -17,7 +17,7 @@ claude.ai/design のプロジェクト **"Kotoba Design System"** からこの�
 この 3 つは事故で壊しやすく、壊すとデザインシステムとして成立しなくなる。
 
 1. **プライマリアクションの面は黒** (`--color-gray-900`)。アクセントカラーではない。
-2. **アクセント (`rgb(60,130,247)`) はフォーカスリングと選択状態にのみ使う。**
+2. **アクセント (`rgb(242,49,130)` — ロゴのピンク) はフォーカスリングと選択状態にのみ使う。**
    塗り・ステータス・装飾には一切使わない。1 画面あたりの塗り面積は「線」の量に収まる。
 3. **文字は `0.875rem` (14px) より大きくしない。** 見出しも本文もこの 1 サイズで、
    階層は太さ・色・余白で作る。上の段を足したくなったら、まず余白を疑う。
@@ -53,9 +53,9 @@ claude.ai/design のプロジェクト **"Kotoba Design System"** からこの�
 | 強い境界                | `border-strong` / `input`        | `#C3C3CB`             | `--color-border-strong`               |
 | 無効面                  | `disabled`                       | `#EBEBEE`             | `--color-action-disabled-bg`          |
 | 無効ラベル              | `disabled-foreground`            | `#9A9AA3`             | `--color-action-disabled-label`       |
-| **アクセント**          | `accent`                         | `rgb(60,130,247)`     | `--accent-500`                        |
+| **アクセント**          | `accent`                         | `rgb(242,49,130)`     | `--accent-500`                        |
 | フォーカスリング        | `ring`                           | = `accent`            | `--color-focus-ring`                  |
-| 選択ティント            | `selected`                       | `#EFF5FE`             | `--color-selected-bg`                 |
+| 選択ティント            | `selected`                       | `#FEEFF5`             | `--color-selected-bg`                 |
 | 選択枠線                | `selected-border`                | = `accent`            | `--color-selected-border`             |
 
 ニュートラルランプは `gray-0 / 25 / 50 / 100 / 200 / 300 / 400 / 500 / 600 / 800 / 900` の 11 段。
