@@ -11,5 +11,6 @@ export const APP_DESCRIPTION = 'Kazuvin Playground is a place to experiment with
 export const NAV_ITEMS = [
   { label: 'Notes', href: '/notes' },
   { label: 'Playgrounds', href: '/playgrounds' },
+  { label: 'Products', href: '/products' },
   { label: 'Design System', href: '/design-system' },
 ] as const

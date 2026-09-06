@@ -90,6 +90,8 @@ src/pages/
 │   └── [slug].astro        # /notes/:slug (getStaticPaths で全件を静的生成)
 ├── playgrounds/
 │   └── index.astro         # /playgrounds
+├── products/
+│   └── index.astro         # /products
 ├── design-system/
 │   └── index.astro         # /design-system
 └── notes-index.json.ts     # /notes-index.json (静的エンドポイント)
