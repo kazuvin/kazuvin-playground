@@ -10,6 +10,11 @@
 - `pnpm ci:check` は lint → typecheck → test → build の順に走り、
   GitHub Actions の CI と同じ内容を再現する。
 
+## コメント
+
+- 残す価値があるときだけ書く（linter を無視せざるを得ない理由など、コードを読んでも
+  復元できない「なぜ」）。コードが言っていることを言い換えるコメントは書かない。
+
 ## 画面への指摘
 
 `pnpm dev` の右下に出る Agentation のツールバーで書かれた指摘は、MCP 経由で読める。
