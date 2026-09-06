@@ -61,6 +61,7 @@
     "@vitest/browser-playwright": "4.1.11",
     "@vitest/coverage-v8": "4.1.11",
     "@vitest/ui": "^4.1.11",
+    "agentation": "^3.0.2",
     "babel-plugin-react-compiler": "^1.0.0",
     "happy-dom": "^20.0.10",
     "knip": "^6.33.0",

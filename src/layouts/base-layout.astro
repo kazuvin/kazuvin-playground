@@ -35,5 +35,25 @@ const pageTitle = title ? `${title} | ${APP_NAME}` : APP_NAME
   </head>
   <body>
     <slot />
+    {
+      /* Agentation。画面の要素をクリックして指摘を書き残す開発用ツールバーで、
+         クリックした要素のセレクタ・クラス名・位置を添えた markdown をエージェント
+         に渡す。endpoint を与えた指摘は localStorage ではなく agentation-mcp の
+         HTTP サーバに載り、MCP 経由で Claude Code が直接読む (.mcp.json 参照)。
+         サーバが起きていなければツールバーは localStorage に落ちるだけなので、
+         MCP を使わないときも dev は壊れない。
+
+         island (client:only) ではなく素の script で載せている。island は
+         テンプレート側を import.meta.env.DEV で切っても、ビルドがチャンクを
+         必ず吐く: どこからも参照されない 412KB が dist に残り、そのまま
+         Cloudflare に上がる。dynamic import を DEV の枝に入れれば、本番では
+         Vite が DEV を false に畳んで枝ごと消えるのでチャンク自体が生まれない。 */
+    }
+    <script>
+      if (import.meta.env.DEV) {
+        const { mountAgentationToolbar } = await import('@/components/dev/agentation-toolbar')
+        mountAgentationToolbar()
+      }
+    </script>
   </body>
 </html>
