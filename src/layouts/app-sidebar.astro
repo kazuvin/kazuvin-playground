@@ -28,7 +28,19 @@ const navItems = NAV_ITEMS.map((item) => ({
   <div
     class="gap-gap lg:gap-block-tight flex items-center justify-between lg:flex-col lg:items-start"
   >
-    <a href="/" class="font-semibold">{APP_NAME}</a>
+    {
+      /* サイト名の文字はロゴマークが引き取る。読み上げと検索に残る名前は alt が持つ。
+
+         astro:assets ではなく public/ の素の <img>。<Image> の変換には sharp の
+         実体が要る (依存に無い) が、この 1 枚は表示サイズが 32/40px に固定で、
+         書き出し済みの 104x160 (3x 相当) から先の最適化で得るものが無い。
+         width/height は原画の実寸で、比を先に伝えて読み込み時のずれを防ぐ。
+         表示サイズは class 側が決める。レールの上端に出る唯一の画像なので
+         loading は既定の eager のまま (lazy にすると初回に一瞬空く)。 */
+    }
+    <a href="/" class="ease-standard inline-flex transition-opacity duration-120 hover:opacity-70">
+      <img src="/logo.png" alt={APP_NAME} width="104" height="160" class="h-8 w-auto lg:h-10" />
+    </a>
     {/* サイト全体でこれだけが island。ほかは静的 HTML のまま配信される */}
     <CommandSearch client:idle />
   </div>
