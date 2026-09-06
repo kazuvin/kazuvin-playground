@@ -415,9 +415,9 @@ html {
     margin-bottom: var(--spacing-gap);
     /* 右レールの目次や共有された #anchor から飛んだとき、見出しが上端に
        貼り付かないよう逃がす。lg 未満は左ナビが sticky な横バーとして上に
-       被るので、そのぶん多めに取る (バーは中身で高さが決まるため、実測より
-       やや大きい固定値を置いて下に潜らせない)。 */
-    scroll-margin-top: 96px;
+       被るので、そのぶん多めに取る (バーは 57px = py-gap × 2 + h-control +
+       ヘアライン。中身で決まるので、実測よりやや大きい固定値を置く)。 */
+    scroll-margin-top: 72px;
   }
 
   @media (width >= 64rem) {

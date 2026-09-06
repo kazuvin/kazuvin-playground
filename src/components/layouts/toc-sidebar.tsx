@@ -12,7 +12,7 @@ const RAIL_MARGIN = 24
 
 /** 見出しの scroll-margin-top と同じ値。lg 未満は左ナビが横バーとして上に被る。 */
 function headingOffset(): number {
-  return window.matchMedia('(min-width: 64rem)').matches ? 32 : 96
+  return window.matchMedia('(min-width: 64rem)').matches ? 32 : 72
 }
 
 const GUIDE_GEOMETRY = {

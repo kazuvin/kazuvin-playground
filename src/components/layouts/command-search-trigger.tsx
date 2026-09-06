@@ -20,6 +20,8 @@ export function CommandSearchTrigger() {
     setIsOpen((previous) => !previous)
   }
 
+  /* ボタンは lg 未満で隠れる (行き先はハンバーガーが引き取る) が、⌘K は幅に
+     関係なく受ける。キーボードのある狭い窓から閉め出さないため。 */
   useKeyboardShortcut({ key: 'k', metaKey: true, ctrlKey: true }, toggle)
 
   return (
@@ -28,7 +30,7 @@ export function CommandSearchTrigger() {
         type="button"
         onClick={toggle}
         aria-keyshortcuts="Meta+K Control+K"
-        className="inline-flex h-control w-48 cursor-pointer items-center gap-gap rounded-control border border-input bg-background px-3 text-muted-foreground text-sm transition-colors duration-120 ease-standard hover:bg-muted lg:w-full"
+        className="hidden h-control w-full cursor-pointer items-center gap-gap rounded-control border border-input bg-background px-3 text-muted-foreground text-sm transition-colors duration-120 ease-standard hover:bg-muted lg:inline-flex"
       >
         <svg
           aria-hidden="true"

@@ -181,6 +181,7 @@ src/components/layouts/
 ├── app-shell.tsx               # 3 カラムの grid + 左レール。app/layout.tsx が使う
 ├── app-sidebar.tsx             # 左レール: ロゴ・検索・ナビ (Server Component)
 ├── site-nav.tsx                # 　└ 行き先 (Client。usePathname で現在地を出す)
+├── mobile-nav.tsx              # 　└ lg 未満のハンバーガー (Client。中身は site-nav)
 ├── command-search-trigger.tsx  # 　└ ⌘K のボタン (Client。押されて初めて本体を読む)
 ├── page-shell.tsx              # <main> + 右レール。各ページが使う
 ├── toc-sidebar.tsx             # 右レール: ページ専用ナビ (記事の目次)
@@ -216,6 +217,15 @@ src/components/layouts/
 - 左レールは `lg` (1024px) 以上で縦レール、それ未満では 1 カラムに畳まれた grid の
   1 行目 (全幅の横バー) になります。通常フローに残るので `<main>` にバーの高さを
   px で焼き込まずに済みます。
+- **`lg` 未満のバーに並ぶのはロゴとハンバーガーだけ**です (高さ 57px)。行き先は
+  `mobile-nav.tsx` がバーの下に開くパネルへ移し、検索ボタンは畳みます (`⌘K` 自体は
+  幅に関係なく効きます)。パネルは `site-nav.tsx` を `variant="menu"` で呼ぶので、
+  行き先の出典もリンクの現在地判定もレールと 1 つのままです。
+- **パネルは塗り切り、閉じる面 (スクリム) は敷きません。** バーが持つ
+  `backdrop-filter` は `position: fixed` の containing block になるため、バーの子から
+  画面全体を覆う面は作れません。外側を触ったときに閉じるのは `document` の
+  `pointerdown` で拾っています。同じ理由でパネル側も半透明にはできません
+  (入れ子の `backdrop-filter` は本文をぼかせず、文字が透けて重なります)。
 - 右レールは `xl` (1280px) 以上でのみ出ます。3 段が収まる幅は 1168px
   (左レール 240 + 32 + 624 + 32 + 240) ですが、その幅ちょうどで出すとレールがウィンドウの
   端に貼り付くため、左右に 56px 残る `xl` まで待ちます。
