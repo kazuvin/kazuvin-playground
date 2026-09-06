@@ -196,8 +196,8 @@
       out as a margin. edge 24 < block 32, and nothing inside an element
       exceeds 20 — that ordering is the rule. ---- */
   --spacing-edge-h: 24px;
-  --spacing-edge-top: 32px;
-  --spacing-edge-bottom: 24px;
+  --spacing-edge-top: 56px;
+  --spacing-edge-bottom: 48px;
   --spacing-block: 32px;
   --spacing-block-loose: 48px;
   --spacing-block-tight: 20px;
