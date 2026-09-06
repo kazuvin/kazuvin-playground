@@ -23,16 +23,23 @@ Node と pnpm のバージョンは `mise.toml` に固定してある。
 ```bash
 mise install      # 任意。Node 24 / pnpm 10 を揃える
 pnpm install      # lefthook のフックもここで入る
-pnpm dev          # http://localhost:4321
+pnpm dev:up       # 開発に要るものをまとめて起こす
 ```
 
-`pnpm dev` の画面には右下に [Agentation](docs/agentation.md) のツールバーが出る。
-直したい箇所をクリックしてコメントを書くと、セレクタや位置を添えた指摘として
-Claude Code に渡せる。本番のバンドルには入らない。
+`pnpm dev:up` は dev サーバー (http://localhost:4321) と
+[Agentation](docs/agentation.md) のサーバー (:4747) を両方バックグラウンドで起こす。
+止めるのは `pnpm dev:down`、ログは `pnpm exec astro dev logs --follow`。
+dev サーバーだけを手元のターミナルに出したいときは `pnpm dev`。
+
+画面の右下には Agentation のツールバーが出る。直したい箇所をクリックしてコメントを
+書くと、セレクタや位置を添えた指摘として Claude Code に渡せる。本番のバンドルには
+入らない。
 
 | コマンド          | 内容                                                  |
 | ----------------- | ----------------------------------------------------- |
 | `pnpm dev`        | 開発サーバーを起動                                    |
+| `pnpm dev:up`     | 開発サーバー + Agentation をまとめて起動              |
+| `pnpm dev:down`   | 上で起こしたものを止める                              |
 | `pnpm build`      | `dist/` に静的サイトを出力                            |
 | `pnpm preview`    | ビルド結果をローカルで配信                            |
 | `pnpm typecheck`  | 型チェック (`astro check`)                            |

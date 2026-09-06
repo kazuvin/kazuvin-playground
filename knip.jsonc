@@ -9,6 +9,9 @@
   "ignoreDependencies": [
     // globals.css の `@import "tailwindcss"` から使う。
     // knip は CSS の import を辿らないので検出できない。
-    "tailwindcss"
+    "tailwindcss",
+    // .mcp.json と scripts/dev.sh から実体 (node_modules/.bin) を叩く。
+    // どちらも JS ではないので knip の対象外。
+    "agentation-mcp"
   ]
 }

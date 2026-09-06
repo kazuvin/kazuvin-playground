@@ -3,6 +3,8 @@ packages:
 
 # pnpm 11 で onlyBuiltDependencies から allowBuilds に移行
 allowBuilds:
+  # agentation-mcp が指摘の保存に使う。prebuild-install が実体を落とす。
+  better-sqlite3: true
   esbuild: true
   lefthook: true
   sharp: true

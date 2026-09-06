@@ -9,7 +9,7 @@
 ## 使い方
 
 ```bash
-pnpm dev          # http://localhost:4321
+pnpm dev:up       # dev サーバー (:4321) と Agentation のサーバー (:4747)
 ```
 
 右下にツールバーが出る。クリックして有効にすると、ページ上の要素を選んでコメントを書ける。
@@ -38,10 +38,15 @@ stdio で起動し、そのプロセスが 2 つの口を開ける。
   の `ENDPOINT` がこのポートを指している
 - **MCP (stdio)** — エージェントが指摘を読み書きするための口
 
-つまり **MCP サーバーは Claude Code が起きている間だけ動く**。`pnpm dev` だけを起動している
+このプロセスは Claude Code が起きている間しか動かない。`pnpm dev` だけを起動している
 ときはツールバーが接続先を見つけられず、指摘は localStorage に残る (コピーでの受け渡しは
-そのまま使える)。手で常駐させたいときは `npx agentation-mcp server` を別のシェルで動かす。
-ポートが埋まっていれば HTTP は諦めて MCP だけが立つので、二重起動しても壊れない。
+そのまま使える)。
+
+`pnpm dev:up` はこれを埋めるためのもので、Claude Code とは別に同じサーバーを常駐させる
+(`scripts/dev.sh`)。二重起動にはならない。起こす前に `/health` を叩いて、応答があれば
+何もしないため。仮に両方立ったとしても、後から来た方はポートが埋まっているのを見て HTTP を
+諦め、MCP だけを stdio に出す。指摘の実体は `~/.agentation/store.db` に 1 つなので、
+どちらのプロセスから見ても同じものが見える。
 
 エージェントに公開されるツールは 9 つ。
 
@@ -74,6 +79,9 @@ island (`client:only="react"`) で書くとこうはならない。テンプレ�
 
 ## 更新するとき
 
-- ポートを変える → `agentation-mcp server --port` と `agentation-toolbar.tsx` の
+- ポートを変える → `scripts/dev.sh` の `PORT` と `agentation-toolbar.tsx` の
   `ENDPOINT` の両方
 - 指摘の保存先 → 既定は `~/.agentation/store.db` (SQLite)。リポジトリの中には置かれない
+- `agentation-mcp` は devDependency に入れてある。`.mcp.json` も `scripts/dev.sh` も
+  `npx` ではなくローカルの実体を呼ぶので、バージョンは lockfile に固定され、
+  Claude Code の起動時にネットワークを待たない

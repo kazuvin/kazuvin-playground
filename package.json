@@ -10,6 +10,8 @@
   },
   "scripts": {
     "dev": "astro dev",
+    "dev:up": "sh scripts/dev.sh up",
+    "dev:down": "sh scripts/dev.sh down",
     "build": "astro build",
     "preview": "astro preview",
     "typecheck": "astro check",
@@ -62,6 +64,7 @@
     "@vitest/coverage-v8": "4.1.11",
     "@vitest/ui": "^4.1.11",
     "agentation": "^3.0.2",
+    "agentation-mcp": "^1.2.0",
     "babel-plugin-react-compiler": "^1.0.0",
     "happy-dom": "^20.0.10",
     "knip": "^6.33.0",
