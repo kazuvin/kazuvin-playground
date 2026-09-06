@@ -17,6 +17,7 @@ paths:
 | テストを書く、置き場所を決める | `docs/testing.md` |
 | `biome.jsonc` の lint ルールを変える | `docs/coding-standards.md` / `docs/directory-structure.md` |
 | CI を変える | `docs/ci-cd.md` |
+| 画面を見た指摘を受け取る、Agentation / MCP を触る | `docs/agentation.md` |
 
 ## 書く前に決まっていること
 

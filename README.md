@@ -14,6 +14,7 @@ MDX で書いたノートを静的サイトとして配信する個人サイト�
 | テスト           | Vitest (unit) + Storybook のブラウザテスト                                       |
 | lint / format    | Biome (`.astro` の整形のみ Prettier)                                             |
 | 配信             | Cloudflare Workers 静的アセット (`wrangler.jsonc`)                               |
+| エージェント連携 | Agentation + MCP (`.mcp.json` / `docs/agentation.md`)                            |
 
 ## 開発
 
@@ -24,6 +25,10 @@ mise install      # 任意。Node 24 / pnpm 10 を揃える
 pnpm install      # lefthook のフックもここで入る
 pnpm dev          # http://localhost:4321
 ```
+
+`pnpm dev` の画面には右下に [Agentation](docs/agentation.md) のツールバーが出る。
+直したい箇所をクリックしてコメントを書くと、セレクタや位置を添えた指摘として
+Claude Code に渡せる。本番のバンドルには入らない。
 
 | コマンド          | 内容                                                  |
 | ----------------- | ----------------------------------------------------- |
@@ -95,3 +100,4 @@ Worker スクリプトは持たず、`dist/` を静的アセットとして配�
 - [Kotoba Design System](docs/kotoba-design-system.md)
 - [テスト](docs/testing.md)
 - [CI/CD](docs/ci-cd.md)
+- [Agentation](docs/agentation.md) — 画面の指摘をエージェントに渡す (MCP)

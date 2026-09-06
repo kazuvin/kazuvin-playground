@@ -21,6 +21,7 @@ kazuvin-playground/
 ├── public/                 # 静的アセット (そのまま dist/ にコピーされる)
 ├── docs/                   # プロジェクトドキュメント
 ├── .claude/rules/          # Claude Code 用のルール (frontmatter の paths で対象を絞る)
+├── .mcp.json               # Claude Code が起動する MCP サーバー (Agentation)
 ├── astro.config.mjs        # Astro の設定
 ├── biome.jsonc             # lint / format と層の境界の設定 (ガードレールの本体)
 ├── no-raw-date.grit        # Biome の GritQL プラグイン (生の Date を禁じる)
@@ -257,17 +258,19 @@ Compound Components のパーツも 1 ファイルにまとめて flat named exp
 
 ```
 src/components/
-└── ui/                     # UI プリミティブ。components 配下はこれだけ
-    ├── button.tsx          # variant のクラス定義も private でこの中
-    ├── button.stories.tsx
-    ├── card.tsx
-    ├── card.stories.tsx
-    ├── command.tsx
-    ├── dialog.tsx
-    ├── page-header.tsx
-    ├── screen.tsx
-    ├── text.tsx
-    └── timeline.tsx
+├── ui/                     # UI プリミティブ
+│   ├── button.tsx          # variant のクラス定義も private でこの中
+│   ├── button.stories.tsx
+│   ├── card.tsx
+│   ├── card.stories.tsx
+│   ├── command.tsx
+│   ├── dialog.tsx
+│   ├── page-header.tsx
+│   ├── screen.tsx
+│   ├── text.tsx
+│   └── timeline.tsx
+└── dev/                    # 開発時だけ動くもの。本番のバンドルには入らない
+    └── agentation-toolbar.tsx
 ```
 
 **`src/components/` はドメインを知らない部品だけの置き場です。** ドメインを知っている UI
@@ -277,6 +280,9 @@ src/components/
 `shared` のような広い名前のディレクトリは作りません。何でも入ってしまうためです。
 ドメイン非依存だが UI プリミティブでもないもの (SEO、エラーバウンダリなど) が出てきたら、
 そのとき `components/seo/` `components/errors/` のように**役割名で**追加します。
+`components/dev/` はその 1 例で、開発時だけ動くものを置きます
+([Agentation](agentation.md) のツールバー)。本番に出ないものが `ui/` に混ざると、
+どれが配信されるのか読めなくなるため分けています。
 
 #### .astro と .tsx の使い分け
 
