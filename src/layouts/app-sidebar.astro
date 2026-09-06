@@ -1,0 +1,57 @@
+---
+import { APP_NAME, NAV_ITEMS } from '@/config/app'
+import { CommandSearch } from '@/features/notes/command-search'
+import { cn } from '@/lib/cn'
+import { isActiveNavItem } from '@/lib/nav'
+
+/*
+ * グローバルナビの左レール。ヘッダーは持たず、旧 app-header.astro が持っていた
+ * サイト名・コマンドパレット・行き先の 3 つをすべてここが引き取る。
+ *
+ * 位置取りが 2 通りあるのは意図的。どちらも sticky で、違うのは幅と流れ方だけ。
+ *   lg 以上: 本文の左隣に付く縦レール。common-layout の grid の 1 トラック目に
+ *            乗り、self-start + h-dvh で上端に貼り付く。画面の左端ではなく
+ *            <main> の隣に居る (端に逃がすと広い画面で本文から離れすぎる)。
+ *   lg 未満: 全幅の横バー。1 カラムに畳まれた grid の 1 行目で、通常フローに
+ *            残るぶん <main> 側にバーの高さを px で焼き込まずに済む。
+ */
+const pathname = Astro.url.pathname
+const navItems = NAV_ITEMS.map((item) => ({
+  ...item,
+  isActive: isActiveNavItem(pathname, item.href),
+}))
+---
+
+<aside
+  class="border-border-hairline bg-background/80 px-edge-h py-gap lg:pt-edge-top lg:pb-edge-bottom sticky top-0 z-20 self-start border-b text-base backdrop-blur-2xl lg:h-dvh lg:overflow-y-auto lg:border-b-0 lg:bg-transparent lg:backdrop-blur-none"
+>
+  <div
+    class="gap-gap lg:gap-block-tight flex items-center justify-between lg:flex-col lg:items-start"
+  >
+    <a href="/" class="font-semibold">{APP_NAME}</a>
+    {/* サイト全体でこれだけが island。ほかは静的 HTML のまま配信される */}
+    <CommandSearch client:idle />
+  </div>
+
+  <nav
+    aria-label="Site"
+    class="gap-block-tight mt-gap lg:mt-block lg:gap-gap-tight flex overflow-x-auto lg:flex-col lg:overflow-x-visible"
+  >
+    {
+      navItems.map((item) => (
+        <a
+          href={item.href}
+          aria-current={item.isActive ? 'page' : undefined}
+          class={cn(
+            'py-gap-tight ease-standard whitespace-nowrap transition-colors duration-120',
+            item.isActive
+              ? 'text-foreground font-medium'
+              : 'text-subtle-foreground hover:text-foreground',
+          )}
+        >
+          {item.label}
+        </a>
+      ))
+    }
+  </nav>
+</aside>

@@ -51,7 +51,7 @@ Biome は `.astro` の**フロントマターしか見ない**。テンプレー
   レビューで担保する。ロジックを `.astro` に書かず `features/` に置くのは、
   テスト可能にするためであると同時に、lint を効かせるためでもある。
 - `.astro` コンポーネントは `.ts` から re-export できない。利用側からパスを直接 import する
-  （`./app-header.astro`）。
+  （`./app-sidebar.astro`）。
 
 ## 変更後に通すもの
 

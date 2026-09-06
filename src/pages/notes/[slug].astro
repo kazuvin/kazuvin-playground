@@ -10,10 +10,12 @@ export const getStaticPaths = (async () => {
 }) satisfies GetStaticPaths
 
 const { note } = Astro.props
-const { Content } = await render(note)
+/* headings は右レールの目次になる。見出しを持たないノートでは空配列が返り、
+   レール自体が描かれない (絞り込みは @/lib/nav の selectTocHeadings)。 */
+const { Content, headings } = await render(note)
 ---
 
-<CommonLayout title={note.data.title} description={note.data.description}>
+<CommonLayout title={note.data.title} description={note.data.description} headings={headings}>
   <article class="note-content">
     <Content />
   </article>

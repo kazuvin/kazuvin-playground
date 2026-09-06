@@ -1,20 +1,56 @@
 ---
-import AppHeader from './app-header.astro'
+import type { MarkdownHeading } from 'astro'
+import AppSidebar from './app-sidebar.astro'
 import BaseLayout from './base-layout.astro'
+import TocSidebar from './toc-sidebar.astro'
 
+/*
+ * 3 カラムの外枠。ヘッダーは持たない。
+ *
+ *   左 (240px)  グローバルナビ。全ページ共通で、行き先と検索を担う。
+ *   中央 (624)  本文。読み幅 max-w-xl = 576 + 左右の 24 で 624。
+ *   右 (240px)  ページ専用ナビ。今は記事の目次で、無いページでは描かれない。
+ *
+ * 3 つは 1 本の grid に入っていて、レールは画面の端ではなく本文の両脇に付く。
+ * コンテナ幅 69rem = 15 + 39 + 15 rem がそのままトラックの合計で、余った幅は
+ * mx-auto が左右に等分する。レール同士の間隔は gap ではなく各セルの
+ * px-edge-h が作る (24 + 24 = 48px)。gap を足すと、この足し算にトラック外の
+ * 項が増えて幅の見通しが悪くなる。
+ *
+ * レールは fixed ではなく sticky + self-start + h-dvh。fixed だと本文の脇に
+ * 置けず left/right を calc で当てることになるが、sticky なら grid の
+ * トラックに乗ったまま上端に貼り付く。見た目の挙動は fixed と同じ。
+ *
+ * 段が増える幅は 2 つ。lg (1024px) で左が縦レールになり、xl (1280px) で右が出る。
+ * それ未満では左が横バーに畳まれ、右は出さない。3 段が収まる幅は 1104px だが、
+ * その幅ちょうどで出すとレールがウィンドウの端に貼り付くので、左右に 88px 残る
+ * xl (1280px) まで待つ。
+ *
+ * 目次の有無で本文は動かない。右のトラックは grid-template-columns が常に
+ * 確保していて、埋まるかどうかとは無関係だから。
+ */
 interface Props {
   /** ページ固有のタイトル */
   title?: string
   /** ページ固有の説明 */
   description?: string
+  /** 右レールに出す目次。render() が返す headings をそのまま渡す */
+  headings?: MarkdownHeading[]
 }
 
-const { title, description } = Astro.props
+const { title, description, headings } = Astro.props
 ---
 
 <BaseLayout title={title} description={description}>
-  <AppHeader class="sticky top-0 z-20 mx-16 px-4" />
-  <main class="mx-auto grid w-full max-w-2xl grid-cols-1 gap-10 px-3 text-base md:pb-24">
-    <slot />
-  </main>
+  <div
+    class="mx-auto grid w-full max-w-[69rem] grid-cols-1 lg:grid-cols-[15rem_minmax(0,1fr)] xl:grid-cols-[15rem_minmax(0,1fr)_15rem]"
+  >
+    <AppSidebar />
+    <main class="px-edge-h pt-edge-top pb-block-loose text-base md:pb-24">
+      <div class="mx-auto grid w-full max-w-xl grid-cols-1 gap-10">
+        <slot />
+      </div>
+    </main>
+    <TocSidebar headings={headings} />
+  </div>
 </BaseLayout>

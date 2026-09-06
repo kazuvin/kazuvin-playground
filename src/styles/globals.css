@@ -313,7 +313,7 @@
 
 /* body には font-size を敷かない。ここは rem の基準を 16px に保つ層で、
    実際に描かれるテキストのサイズはレイアウトシェル (common-layout の <main>
-   と app-header) が text-base = 0.875rem として与える。基準を 16px に置いた
+   と左右のサイドバー) が text-base = 0.875rem として与える。基準を 16px に置いた
    まま中身を 14px で組むので、rem の値がそのまま px の 1/16 として読める。 */
 body {
   @apply bg-background text-foreground font-sans;
@@ -364,6 +364,17 @@ body {
     @apply text-base text-foreground;
     text-wrap: balance;
     margin-bottom: var(--spacing-gap);
+    /* 右レールの目次や共有された #anchor から飛んだとき、見出しが上端に
+       貼り付かないよう逃がす。lg 未満は左ナビが sticky な横バーとして上に
+       被るので、そのぶん多めに取る (バーは中身で高さが決まるため、実測より
+       やや大きい固定値を置いて下に潜らせない)。 */
+    scroll-margin-top: 96px;
+  }
+
+  @media (width >= 64rem) {
+    .note-content :is(h1, h2, h3, h4) {
+      scroll-margin-top: var(--spacing-block);
+    }
   }
 
   .note-content h1 {

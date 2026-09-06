@@ -1,0 +1,47 @@
+---
+import type { MarkdownHeading } from 'astro'
+import { Text } from '@/components/ui/text'
+import { selectTocHeadings } from '@/lib/nav'
+
+/*
+ * ページ専用ナビの右レール。今のところ中身は記事の目次だけで、見出しを持たない
+ * ページ (トップ・一覧・Playgrounds) では要素ごと描かれない。
+ *
+ * 位置は common-layout の grid の 3 トラック目。画面の右端ではなく本文の右隣に
+ * 付き、self-start + h-dvh の sticky で上端に貼り付く。
+ *
+ * 出したり引っ込めたりしても本文の位置は動かない。トラックは
+ * grid-template-columns が常に確保していて、埋まるかどうかとは無関係だから。
+ * 「目次のあるページだけ本文が左にずれる」という遷移ごとのガタつきが出ない。
+ */
+interface Props {
+  headings?: MarkdownHeading[]
+}
+
+const { headings = [] } = Astro.props
+const items = selectTocHeadings(headings)
+---
+
+{
+  items.length > 0 && (
+    <aside class="px-edge-h pt-edge-top pb-edge-bottom sticky top-0 hidden h-dvh self-start overflow-y-auto text-base xl:block">
+      <nav aria-labelledby="toc-label">
+        <Text role="overline" id="toc-label">
+          On this page
+        </Text>
+        <ul class="mt-block-tight gap-gap-tight flex flex-col">
+          {items.map((heading) => (
+            <li class={heading.depth === 3 ? 'pl-block-tight' : undefined}>
+              <a
+                href={`#${heading.slug}`}
+                class="text-subtle-foreground hover:text-foreground ease-standard block text-sm leading-snug transition-colors duration-120"
+              >
+                {heading.text}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </aside>
+  )
+}

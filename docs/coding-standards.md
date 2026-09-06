@@ -45,7 +45,7 @@ Biome と Prettier の両方に同じ値を書いてあるので、`.astro` と�
 ## 命名規則
 
 bulletproof-react に倣い、**ファイル名は React コンポーネントも含めてすべて kebab-case** に
-統一する（`note-card.tsx`、`app-header.astro`）。Biome の `useFilenamingConvention` で
+統一する（`note-card.tsx`、`app-sidebar.astro`）。Biome の `useFilenamingConvention` で
 `kebab-case` のみを許可し、違反は lint で落ちる。
 
 - **ディレクトリ名も kebab-case**。ただし Biome が検査するのはファイル名だけなので、
@@ -87,7 +87,7 @@ knip が判定できない。実際、`DialogClose` / `TimelineIcon` / `CONTENT_
 「barrel はツリーシェイキングを壊す」は、少なくともこの構成では成り立たない。
 
 `.astro` コンポーネントはそもそも `.ts` から re-export すると型が解決できないので、
-利用側からパスを直接 import する（`./app-header.astro`）。
+利用側からパスを直接 import する（`./app-sidebar.astro`）。
 
 ### 自前モジュールは flat named import で参照する
 

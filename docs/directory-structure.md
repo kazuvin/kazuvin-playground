@@ -59,7 +59,7 @@ Biome の `noRestrictedImports` を `overrides` で層ごとに設定してお�
 | ui | `components/ui/` | `lib/cn` などドメインを知らないものだけ |
 
 トップレベルのディレクトリ名がそのまま層の名前になっています。
-`app-header.astro` が `components/` ではなく `layouts/` にあるのも、
+`app-sidebar.astro` が `components/` ではなく `layouts/` にあるのも、
 features (コマンドパレット) を参照する必要があるためです。
 
 - **feature 間の直接 import は禁止**。共有したくなったら `lib/` へ引き上げるか、
@@ -90,6 +90,8 @@ src/pages/
 │   └── [slug].astro        # /notes/:slug (getStaticPaths で全件を静的生成)
 ├── playgrounds/
 │   └── index.astro         # /playgrounds
+├── design-system/
+│   └── index.astro         # /design-system
 └── notes-index.json.ts     # /notes-index.json (静的エンドポイント)
 ```
 
@@ -123,15 +125,37 @@ const notes = (await getPublishedNotes()).map(toNoteSummary)
 ```
 src/layouts/
 ├── base-layout.astro       # <html>/<head>/<body>・フォント・globals.css・メタタグ
-├── app-header.astro        # サイトヘッダー (コマンドパレットの island を置く)
-└── common-layout.astro     # base-layout + app-header + main (通常のページはこちらを使う)
+├── app-sidebar.astro       # 左レール: グローバルナビ (コマンドパレットの island を置く)
+├── toc-sidebar.astro       # 右レール: ページ専用ナビ (記事の目次)
+└── common-layout.astro     # base-layout + 左右のレール + main (通常のページはこちら)
 ```
 
-`app-header.astro` が `components/` ではなく `layouts/` にあるのは、コマンドパレットの
+サイトの外枠は**ヘッダーを持たない 3 カラム**です。サイト名・検索・行き先は左レールが
+すべて引き取り、右レールにはそのページ専用のナビ (今は記事の目次) が入ります。
+
+3 つは `common-layout.astro` の 1 本の grid に並んでいて、**レールは画面の端ではなく
+本文の両脇に付きます**。コンテナ幅 `69rem` がそのままトラックの合計
+(15 + 39 + 15 rem = 240 + 624 + 240px) で、余った幅は `mx-auto` が左右に等分します。
+中央のトラックは読み幅 `max-w-xl` (576px) と左右の `px-edge-h` (24px) の和です。
+
+- **レールは `fixed` ではなく `sticky` + `self-start` + `h-dvh`。** `fixed` だと本文の脇に
+  置けず `left` / `right` を calc で当てることになりますが、`sticky` なら grid の
+  トラックに乗ったまま上端に貼り付きます。見た目の挙動は `fixed` と同じです。
+- **セル間の間隔は `gap` ではなく各セルの `px-edge-h`** (24 + 24 = 48px)。`gap` を足すと
+  上の足し算にトラック外の項が増えて、幅の見通しが悪くなります。
+- 左レールは `lg` (1024px) 以上で縦レール、それ未満では 1 カラムに畳まれた grid の
+  1 行目 (全幅の横バー) になります。通常フローに残るので `<main>` にバーの高さを
+  px で焼き込まずに済みます。
+- 右レールは `xl` (1280px) 以上でのみ出ます。3 段が収まる幅は 1104px ですが、その幅
+  ちょうどで出すとレールがウィンドウの端に貼り付くため、左右に 88px 残る `xl` まで待ちます。
+- **目次の有無で本文は動きません。** 右のトラックは `grid-template-columns` が常に
+  確保していて、埋まるかどうかとは無関係だからです。
+
+`app-sidebar.astro` が `components/` ではなく `layouts/` にあるのは、コマンドパレットの
 island (`@/features/notes/command-search`) を描画するためです。features を参照できるのは
 app 層だけなので、features を使うコンポーネントは `layouts/` か `pages/` に置きます。
 
-複数ページで共有する外枠 (ヘッダー・`<main>` の幅・メタタグ) は、
+複数ページで共有する外枠 (レール・`<main>` の幅・メタタグ) は、
 すべてこのディレクトリのレイアウトコンポーネントで表現します。
 
 ### features/ ディレクトリ
@@ -182,15 +206,15 @@ React コンポーネントだけです。
 
 ```astro
 ---
-// src/layouts/app-header.astro
+// src/layouts/app-sidebar.astro
 import { CommandSearch } from '@/features/notes/command-search'
 ---
 
-<header>
+<aside>
   <a href="/">Kazuvin Playground</a>
   {/* このコンポーネントだけが JS として配信される */}
   <CommandSearch client:idle />
-</header>
+</aside>
 ```
 
 | ディレクティブ   | 使いどころ                                       |
@@ -242,7 +266,7 @@ src/components/
   `ui/` のようにどこからでも再利用する部品
 
 `.astro` コンポーネントは `.ts` から re-export すると型が解決できないため、
-利用側からパスを直接 import します (例: `./app-header.astro`)。
+利用側からパスを直接 import します (例: `./app-sidebar.astro`)。
 
 #### コンポーネントの置き場所を決める
 

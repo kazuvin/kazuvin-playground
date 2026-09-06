@@ -115,7 +115,7 @@ rem の基準 (`html`) は **16px のまま触らない**。`html` を 87.5% に
 
 `body` にも font-size を敷かない。ここは rem の基準を 16px に保つ層で、実際に描かれる
 テキストのサイズは**レイアウトシェル** (`common-layout.astro` の `<main>` と
-`app-header.astro`) が `text-base` として与える。
+左右のレール) が `text-base` として与える。
 
 | Tailwind キー | rem         | px  | line     | tracking | 用途                          |
 | ------------- | ----------- | --- | -------- | -------- | ----------------------------- |
