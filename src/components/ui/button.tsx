@@ -26,7 +26,7 @@ const touchSlopClasses = {
 }
 
 const boxBaseClasses =
-  'box-border inline-flex items-center justify-center rounded-control border border-solid px-inset-x text-label transition-[background-color,border-color,opacity] duration-[120ms] ease-standard'
+  'box-border inline-flex items-center justify-center rounded-control border border-solid px-inset-x text-sm font-medium transition-[background-color,border-color,opacity] duration-[120ms] ease-standard'
 
 const boxSizeClasses = {
   default: 'h-control',

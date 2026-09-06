@@ -21,7 +21,12 @@ function CardHeader({ className, ...props }: CardHeaderProps) {
 type CardTitleProps = ComponentProps<'h3'>
 
 function CardTitle({ className, ...props }: CardTitleProps) {
-  return <h3 className={cn('font-semibold leading-none tracking-tight', className)} {...props} />
+  return (
+    <h3
+      className={cn('font-semibold text-base leading-snug tracking-tight', className)}
+      {...props}
+    />
+  )
 }
 
 type CardDescriptionProps = ComponentProps<'p'>

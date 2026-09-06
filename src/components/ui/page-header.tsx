@@ -10,9 +10,9 @@ interface PageHeaderProps extends HTMLAttributes<HTMLElement> {
 function PageHeader({ title, description, className, ...props }: PageHeaderProps) {
   return (
     <header className={cn('mb-block', className)} {...props}>
-      <Text role="expression">{title}</Text>
+      <Text role="title">{title}</Text>
       {description && (
-        <Text role="body" className="mt-gap">
+        <Text role="lead" className="mt-gap">
           {description}
         </Text>
       )}

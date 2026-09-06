@@ -102,7 +102,7 @@ function DialogTitle({ className, ref, ...props }: ComponentProps<typeof DialogP
   return (
     <DialogPrimitive.Title
       ref={ref}
-      className={cn('font-semibold text-lg leading-none tracking-tight', className)}
+      className={cn('font-semibold text-base leading-snug tracking-tight', className)}
       {...props}
     />
   )

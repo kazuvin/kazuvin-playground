@@ -12,13 +12,15 @@ claude.ai/design のプロジェクト **"Kotoba Design System"** からこの�
 
 ---
 
-## 壊してはいけない 2 つの制約
+## 壊してはいけない 3 つの制約
 
-この 2 つは事故で壊しやすく、壊すとデザインシステムとして成立しなくなる。
+この 3 つは事故で壊しやすく、壊すとデザインシステムとして成立しなくなる。
 
 1. **プライマリアクションの面は黒** (`--color-gray-900`)。アクセントカラーではない。
 2. **アクセント (`rgb(60,130,247)`) はフォーカスリングと選択状態にのみ使う。**
    塗り・ステータス・装飾には一切使わない。1 画面あたりの塗り面積は「線」の量に収まる。
+3. **文字は `0.875rem` (14px) より大きくしない。** 見出しも本文もこの 1 サイズで、
+   階層は太さ・色・余白で作る。上の段を足したくなったら、まず余白を疑う。
 
 赤いエラー・緑の成功といった**セマンティックカラーは存在しない**。
 ブリーフが色によるステータス表現を禁じているため、失敗状態は「言葉と位置」で表す。
@@ -89,31 +91,86 @@ Tailwind 標準の `gray` は `--color-gray-*: initial` で消してあるので
   `<Font>` に載せると head に全部インライン展開されて HTML が 1 ページあたり
   100KB 増える。分割配信のまま外部 CSS に置けばキャッシュも効く。
   なお CJK には上記のメトリクス補正が効かない (Astro が使う代替は `Courier New` で、
-  CJK グリフを持たない)。ここは font-size と line-height を px で固定していることで
-  実害を抑えている。
+  CJK グリフを持たない)。ここは 1 サイズ・1 行間に寄せてあることで実害を抑えている
+  (段が 1 つしかないので、和文が代替で描かれている間もずれ方が一定になる)。
 
 Fontsource は可変フォントを `"Noto Sans Mono Variable"` のような別名で登録するため、
 family 名は静的版と互換ではない。Storybook は Astro を通らないので、
 `.storybook/preview.ts` が `@fontsource-variable/*` を直接 import し、
 `.storybook/fonts.css` が上記の CSS 変数を Fontsource の family 名に解決する。
 
-7 つの role が**コンテンツ / クローム**の 2 群に分かれる。
+#### 基準サイズとスケール
 
-| role         | size | line | tracking | weight | 群         | 既定タグ |
-| ------------ | ---- | ---- | -------- | ------ | ---------- | -------- |
-| `expression` | 24   | 32   | -0.2     | 600    | コンテンツ | `h1`     |
-| `reading`    | 20   | 28   | -0.2     | 600    | コンテンツ | `h2`     |
-| `gloss`      | 17   | 24   | 0        | 400    | コンテンツ | `p`      |
-| `body`       | 15   | 22   | 0        | 400    | コンテンツ | `p`      |
-| `label`      | 14   | 18   | 0.2      | 600    | クローム   | `span`   |
-| `support`    | 12   | 16   | 0.1      | 400    | クローム   | `p`      |
-| `overline`   | 11   | 14   | 0.8      | 600    | クローム   | `p`      |
+**基準にして上限が `0.875rem` (14px)。** 見出しも本文も同じ 14px で組み、階層は
+**太さ・色・余白**だけで作る。サイズを上に伸ばして段を作らない。
+Linear や Vercel のダッシュボードが 13〜14px の 1 サイズにほぼ全部を寄せているのと同じ考え方で、
+等幅 1 書体で通しているこのサイトとは特に相性がいい
+(サイズを変えても字面の濃度が変わらない等幅では、大きさより太さのほうが段として読みやすい)。
 
-- **コンテンツ role は 15px が下限で、レイアウトを収めるために縮めない。**
-  学習素材が画面の主題であり、収まらないならスクロールさせる。密度は余白で作る。
-- `support` と `overline` だけが 14px 未満を許される。
-- line-height と letter-spacing は全 role で絶対値の px (React Native 向けに `em` / `%` は使わない)。
+rem の基準 (`html`) は **16px のまま触らない**。`html` を 87.5% に振って「1rem = 14px」に
+する手もあるが、Radix / Shiki / Fontsource などこちらが書いていない rem までまとめて動くうえ、
+ユーザーのブラウザ既定サイズと二重にかかるので採らない。1rem = 16px を基準に、
+スケールは **rem で相対的に**定義する。px 直書きと違って、ユーザーがブラウザの既定文字サイズを
+上げれば全段が比例して伸びる。
+
+`body` にも font-size を敷かない。ここは rem の基準を 16px に保つ層で、実際に描かれる
+テキストのサイズは**レイアウトシェル** (`common-layout.astro` の `<main>` と
+`app-header.astro`) が `text-base` として与える。
+
+| Tailwind キー | rem         | px  | line     | tracking | 用途                          |
+| ------------- | ----------- | --- | -------- | -------- | ----------------------------- |
+| `text-2xs`    | `0.6875rem` | 11  | 1rem     | 0.04em   | overline                      |
+| `text-xs`     | `0.75rem`   | 12  | 1rem     | 0.02em   | ラベル・チップ・メタデータ    |
+| `text-sm`     | `0.8125rem` | 13  | 1.25rem  | 0        | キャプション・コード・表      |
+| **`text-base`** | **`0.875rem`** | **14** | **1.25rem** | **0** | **基準。本文も見出しもここ** |
+| `text-mark`   | `2rem`      | 32  | 1        | -0.025em | 文字組みの外 (下記)           |
+
+- 梯子は 11 / 12 / 13 / 14 の **4 段だけ**で、上に伸びる段は持たない。
+- Tailwind 既定のスケールは `--text-*: initial` で消してある。`text-lg` や `text-2xl` は
+  **書いても効かない** (ニュートラルランプと同じ方針)。キー名は Tailwind 既定に揃えてあるので、
+  既存の `text-sm` / `text-xs` はそのままこのスケールに乗る。
+- line-height は 4px グリッドに着地する rem。長文だけ `leading-relaxed` (1.75) で開ける。
+- letter-spacing は em なので、どの段でも比率が保たれる。小さい段ほど開く
+  (等幅の 11〜12px は詰まると潰れる)。
+
+`text-mark` (32px) は**文字組みの外側**。絵文字や数字を「文字」ではなく「絵」として置く
+逃がし口で、テキストの段ではない (だから `2xs…base` の梯子に連なる名前を付けていない)。
+現状の使用箇所はトップの ☕️ と 404 の数字の 2 つだけで、**コピーには使わない。**
+
+#### font-weight
+
+**サイズに束ねない。** このシステムでは太さが階層そのものなので、`text-*` と `font-*` は
+必ず直交させる。出荷する太さは 4 段で、既定を消してあるので `font-light` / `font-black` は効かない。
+
+| Tailwind キー   | 値  | 用途                       |
+| --------------- | --- | -------------------------- |
+| `font-normal`   | 400 | 本文                       |
+| `font-medium`   | 500 | ラベル・ボタン             |
+| `font-semibold` | 600 | 見出し (h2 相当以下)       |
+| `font-bold`     | 700 | ページタイトル (h1 相当)   |
+
+#### role
+
+8 つの role が `Text` から使える。どれもスケールの上に乗っていて、独自のサイズは持たない。
+**上の 5 つはすべて同じ 14px** で、段を作っているのは太さと色だけ。サイズが落ちるのは、
+本文ではないメタデータ (`caption` / `label` / `overline`) に入ってからだけ。
+
+| role         | size          | weight | 色                 | 既定タグ |
+| ------------ | ------------- | ------ | ------------------ | -------- |
+| `title`      | `base` (14)   | 700    | `foreground`       | `h1`     |
+| `heading`    | `base` (14)   | 600    | `foreground`       | `h2`     |
+| `subheading` | `base` (14)   | 600    | `subtle-foreground`| `h3`     |
+| `body`       | `base` (14)   | 400    | `foreground`       | `p`      |
+| `lead`       | `base` (14)   | 400    | `subtle-foreground`| `p`      |
+| `caption`    | `sm` (13)     | 400    | `subtle-foreground`| `p`      |
+| `label`      | `xs` (12)     | 500    | `foreground`       | `span`   |
+| `overline`   | `2xs` (11)    | 600    | `muted-foreground` | `p`      |
+
+- 密度もサイズを削って作らない。詰めたいときは**余白のほう**を詰める。
 - 大文字は `overline` のみ。それ以外はボタンを含めすべてセンテンスケース。
+- 記事本文 (`.note-content`) も同じ 14px。h1〜h4 は太さ (700 → 600 → 600 → 500)、色、
+  そして直上の余白の 3 つで段を付ける。サイズ差が無いぶん余白の差は大きめに取ってある。
+
 
 ### spacing
 
@@ -202,20 +259,21 @@ DOM は 2 層になっている。外側の `<button>` がタップ領域とフ�
 
 ### `Text`
 
-画面上のすべてのコピー。role が typography トークン一式を選ぶ。
+画面上のすべてのコピー。role が typography トークン一式 (サイズ・太さ・色) を選ぶ。
 
 ```tsx
-<Text role="overline">Unit 4 · Requests</Text>
-<Text role="expression" lang="ja">お願いできますか</Text>
-<Text role="gloss">Could I ask you a favour?</Text>
-<Text role="support">Tap the phrase to hear it again</Text>
+<Text role="overline">Design system</Text>
+<Text role="title">Typography</Text>
+<Text role="lead">基準にして上限が 0.875rem。</Text>
+<Text role="caption">2026-09-06</Text>
 ```
 
-- 色は role が決める。`className` で上書きする場合も `--color-text-*` 相当の
+- サイズ・太さ・色は role が決める。`className` で色を上書きする場合も
   セマンティックキー (`text-muted-foreground` 等) を使い、生の hex は書かない。
-- `as` で既定タグを上書きできる。
-- 学習コンテンツ (expression / reading / gloss) は**引用素材**であり、
-  切り詰め・省略記号・略記は禁止。
+- **`className` でサイズを上げない。** 大きく見せたいときは role を上げる
+  (= 太さと色が変わる) か、余白を足す。
+- `as` で既定タグを上書きできる。見た目の段と HTML の見出しレベルは別物なので、
+  h2 の位置に `heading` 以外を置きたいときはここで調整する。
 
 ### `Screen`
 
@@ -225,7 +283,7 @@ tier-1 の画面端スペーシング (24 / 32 / 24) を供給するシェル。
 <Screen>
   <Text role="overline">Unit 4</Text>
   <div className="h-block" />
-  <Text role="expression" lang="ja">
+  <Text role="title" lang="ja">
     お願いできますか
   </Text>
 </Screen>
@@ -277,21 +335,30 @@ tier-1 の画面端スペーシング (24 / 32 / 24) を供給するシェル。
 | `chart-1`〜`chart-5`    | 存在しない                    | 削除                                                         | 未使用で、チャートパレットはこのシステムに無い                                     |
 | Tailwind `gray`         | —                             | `initial` で消してから 11 段を定義                           | システム外の灰色を書けなくする                                                     |
 | `Typography`(`variant`) | `Text`(`role`)                | `Text`(`role`) に置換                                        | 元のコンポーネント名と API に合わせた                                              |
+| typography スケール     | 7 role が px を直接持つ       | 4 段の rem スケール + 8 role                                 | 基準 14px に寄せ、role からサイズを剥がした (下記)                                 |
 | `Button` の variant     | —                             | `outline`/`ghost`/`link`/`destructive` と `sm`/`icon` を削除 | 「第 3 の variant は無い」ルール                                                   |
 
 `Typography` からの移行対応:
-`variant="h1"` → `role="expression"` / `variant="p"` → `role="body"` / `variant="small"` → `role="support"`
+`variant="h1"` → `role="title"` / `variant="p"` → `role="body"` / `variant="small"` → `role="caption"`
+
+旧 role (言語学習アプリ由来の 7 つ) からの移行対応:
+`expression` → `title` / `reading` → `heading` / `gloss` → `lead` / `body` → `body` /
+`label` → `label` / `support` → `caption` / `overline` → `overline`
+
+旧スケールは role が px を直接持っていた (`--text-expression: 24px` 等)。今は role が
+サイズを持たず、`@theme` の 4 段の rem スケールを参照する。`--text-expression` のような
+role 名のトークンは**もう存在しない**。
 
 ### `cn` の拡張 (`src/lib/cn.ts`)
 
 クラス結合と競合解決は shadcn の [`cn`](https://github.com/shadcn-ui/cn) を使う
 (`clsx` + `tailwind-merge` のドロップイン後継。両方を 1 パッケージに統合している)。
 
-Kotoba の 7 role は `text-` プレフィックスを font-size として使う。`cn` の既定設定は
-標準スケールしか知らないため、素のままだと `text-label` を**テキスト色**と誤判定し、
-後続の色クラスで黙って捨ててしまう (ボタンが継承フォントサイズで描画される)。
-`cn/config` の `createCn` で 7 role を `font-size` グループに登録して回避している。
-`src/lib/cn.test.ts` に回帰テストあり。
+スケールのキー名は Tailwind 既定に揃えてあるが、`text-2xs` と `text-mark` の 2 つだけは
+標準スケールに無い。`cn` の既定設定は標準スケールしか知らないため、素のままだと
+この 2 つを**テキスト色**と誤判定し、後続の色クラスで黙って捨ててしまう
+(要素が継承フォントサイズで描画される)。`cn/config` の `createCn` でこの 2 つを
+`font-size` グループに登録して回避している。`src/lib/cn.test.ts` に回帰テストあり。
 
 ### 未対応 / 既知の不整合
 
@@ -303,5 +370,6 @@ Kotoba の 7 role は `text-` プレフィックスを font-size として使う
   Kotoba のモーションは color と opacity のみ。
 - `note-card.tsx` に `dark:` クラスが残っている。Kotoba にダークモードは無く、
   ダークテーマの切り替え機構もこのリポジトリには無いので現状は無害。
-- `not-found.tsx` と `note-card.tsx` が `text-2xl` を直接使っている。
-  Kotoba の 7 role の外にあるサイズなので、本来は `<Text role="expression">` に寄せたい。
+- `card` / `dialog` / `command` / `timeline` と `features/notes/*` はまだ `Text` を通さず、
+  スケールのユーティリティ (`text-sm` 等) を直接書いている。値としては system 内なので
+  破綻はしないが、色と太さの組が role として保証されていない。

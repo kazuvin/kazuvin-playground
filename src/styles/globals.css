@@ -6,10 +6,13 @@
  * Imported from the claude.ai/design project "Kotoba Design System".
  * Rules, rationale and the four token tables: docs/kotoba-design-system.md
  *
- * Two constraints are load-bearing and easy to break by accident:
+ * Three constraints are load-bearing and easy to break by accident:
  *   1. The primary action surface is BLACK (--color-gray-900), not the accent.
  *   2. The accent (rgb 60 130 247) is permitted on the focus ring and the
  *      selected state only — never a fill, never status, never decoration.
+ *   3. Text never exceeds 0.875rem (14px). Headings and body share that one
+ *      size; hierarchy is weight, colour and whitespace. The scale has no
+ *      step above it — text-lg and friends are deliberately undefined.
  * ------------------------------------------------------------------------- */
 
 @theme {
@@ -107,44 +110,86 @@
   --color-disabled: var(--color-gray-100);
   --color-disabled-foreground: var(--color-gray-400);
 
-  /** ---- typography: CONTENT roles.
-      The learning material. A 15px floor, never scaled down for density. ---- */
-  --text-expression: 24px;
-  --text-expression--line-height: 32px;
-  --text-expression--letter-spacing: -0.2px;
-  --text-expression--font-weight: 600;
+  /** ---- typography ------------------------------------------------------
+      rem の基準 (html) は 16px のまま触らない。html を 87.5% に振って
+      「1rem = 14px」にする手もあるが、Radix / Shiki / Fontsource など
+      こちらが書いていない rem までまとめて動くうえ、ユーザーのブラウザ
+      既定サイズと二重にかかるので採らない。1rem = 16px を基準に、
+      スケールは rem で相対的に定義する。px 直書きと違って、ユーザーが
+      ブラウザの既定文字サイズを上げれば全段が比例して伸びる。
 
-  --text-reading: 20px;
-  --text-reading--line-height: 28px;
-  --text-reading--letter-spacing: -0.2px;
-  --text-reading--font-weight: 600;
+      **基準にして上限が 0.875rem (14px)。** 見出しも本文も同じ 14px で組み、
+      階層は「太さ・色・余白」だけで作る。サイズを上に伸ばして段を作らない。
+      これは Linear や Vercel のダッシュボードが 13〜14px の 1 サイズに
+      ほぼ全部を寄せているのと同じ考え方で、等幅 1 書体で通しているこの
+      サイトとは特に相性がいい (サイズを変えても字面の濃度が変わらない
+      等幅では、大きさより太さのほうが段として読みやすい)。
 
-  --text-gloss: 17px;
-  --text-gloss--line-height: 24px;
-  --text-gloss--letter-spacing: 0px;
-  --text-gloss--font-weight: 400;
+      梯子は 11 / 12 / 13 / 14 の 4 段だけ。上に伸びる段は持たない。
+      Tailwind 既定のスケールは --text-*: initial で消してあるので、
+      text-lg や text-2xl は書いても効かない (色ランプと同じ方針)。
+      キー名は Tailwind 既定と同じにしてあるので、既存の text-sm /
+      text-xs はそのままこのスケールに乗り換わる。
 
-  --text-body: 15px;
-  --text-body--line-height: 22px;
-  --text-body--letter-spacing: 0px;
-  --text-body--font-weight: 400;
+      line-height は 4px グリッドに着地する rem。letter-spacing は em で、
+      小さい段ほど開く (等幅の 11〜12px は詰まると潰れる)。
+      font-weight はサイズに束ねない。このシステムでは太さが階層そのもの
+      なので、text-* と font-* は必ず直交させる。 ---- */
 
-  /** ---- typography: CHROME roles. Labels and metadata, small on purpose.
-      `support` and `overline` are the only roles allowed under 14px. ---- */
-  --text-label: 14px;
-  --text-label--line-height: 18px;
-  --text-label--letter-spacing: 0.2px;
-  --text-label--font-weight: 600;
+  /** 行間。段ごとの既定は各 --text-*--line-height にあり、これは長文などで
+      明示的に上書きするための語彙。relaxed が和文の長文用。 */
+  --leading-none: 1;
+  --leading-tight: 1.25;
+  --leading-snug: 1.4;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.75;
+  --leading-loose: 2;
 
-  --text-support: 12px;
-  --text-support--line-height: 16px;
-  --text-support--letter-spacing: 0.1px;
-  --text-support--font-weight: 400;
+  /** 字間。widest だけは大文字組み (overline) 専用。 */
+  --tracking-tighter: -0.025em;
+  --tracking-tight: -0.015em;
+  --tracking-normal: 0em;
+  --tracking-wide: 0.02em;
+  --tracking-wider: 0.04em;
+  --tracking-widest: 0.1em;
 
-  --text-overline: 11px;
-  --text-overline--line-height: 14px;
-  --text-overline--letter-spacing: 0.8px;
-  --text-overline--font-weight: 600;
+  /** 太さは 4 段だけ。書体は可変 (100-900) だが、システムとして出荷するのは
+      この 4 つ。既定を消してあるので font-light / font-black は効かない。
+      サイズが 1 つに寄っているぶん、階層はここが担う。 */
+  --font-weight-*: initial;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /** サイズスケール 4 段。コメントの px はルート 16px 時の実寸。
+      base が基準であり上限で、この上に段は無い。 */
+  --text-*: initial;
+
+  --text-2xs: 0.6875rem; /* 11 / 16 */
+  --text-2xs--line-height: 1rem;
+  --text-2xs--letter-spacing: var(--tracking-wider);
+
+  --text-xs: 0.75rem; /* 12 / 16 */
+  --text-xs--line-height: 1rem;
+  --text-xs--letter-spacing: var(--tracking-wide);
+
+  --text-sm: 0.8125rem; /* 13 / 20 */
+  --text-sm--line-height: 1.25rem;
+  --text-sm--letter-spacing: var(--tracking-normal);
+
+  /** 基準サイズ。本文も見出しもここに乗る。スケールの上限でもある。 */
+  --text-base: 0.875rem; /* 14 / 20 */
+  --text-base--line-height: 1.25rem;
+  --text-base--letter-spacing: var(--tracking-normal);
+
+  /** 文字組みの外側。絵文字や数字を「文字」ではなく「絵」として置く 1 箇所
+      だけのための逃がし口で、テキストの段ではない (だから 2xs…base の梯子に
+      連なる名前を付けていない)。現状の使用箇所はトップの ☕️ と 404 の数字の
+      2 つだけ。コピーには使わない。 */
+  --text-mark: 2rem; /* 32 */
+  --text-mark--line-height: var(--leading-none);
+  --text-mark--letter-spacing: var(--tracking-tighter);
 
   /** ---- spacing tiers. Tier 1 is owned exclusively by Screen; tier 2
       spaces siblings; tier 3 lives inside a component and never leaks
@@ -266,9 +311,14 @@
   }
 }
 
+/* body には font-size を敷かない。ここは rem の基準を 16px に保つ層で、
+   実際に描かれるテキストのサイズはレイアウトシェル (common-layout の <main>
+   と app-header) が text-base = 0.875rem として与える。基準を 16px に置いた
+   まま中身を 14px で組むので、rem の値がそのまま px の 1/16 として読める。 */
 body {
   @apply bg-background text-foreground font-sans;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 /* The focus ring is one of the two permitted uses of the accent: 2px at a
@@ -293,43 +343,46 @@ body {
  * Emphasis here is carried by weight, size, rule and indent — never by hue.
  * ------------------------------------------------------------------------- */
 @layer components {
+  /* 記事本文も基準の 14px。サイズを上げない代わりに行間を relaxed (1.75)
+     まで開けて、和文の長文でも行が追えるようにする。 */
   .note-content {
-    font-size: var(--text-gloss);
-    line-height: var(--text-gloss--line-height);
-    color: var(--color-foreground);
+    @apply text-base/relaxed text-foreground;
+    text-wrap: pretty;
+    /* 和文の長い URL や識別子で行が溢れないようにする。単語の途中で折るのは
+       溢れる場合だけ (anywhere)、通常の欧単語は分割しない。 */
+    overflow-wrap: anywhere;
   }
 
   .note-content > :first-child {
     margin-top: 0;
   }
 
-  .note-content h1,
-  .note-content h2,
-  .note-content h3,
-  .note-content h4 {
-    color: var(--color-foreground);
-    letter-spacing: var(--text-expression--letter-spacing);
-    margin-top: var(--spacing-block);
+  /* 見出しは 4 段とも本文と同じ 14px。段を作るのは太さ (700 → 600 → 600 →
+     500)、色 (foreground → subtle)、そして直上の余白の 3 つで、サイズは
+     一度も動かさない。サイズ差が無いぶん余白の差は大きめに取る。 */
+  .note-content :is(h1, h2, h3, h4) {
+    @apply text-base text-foreground;
+    text-wrap: balance;
     margin-bottom: var(--spacing-gap);
   }
 
   .note-content h1 {
-    font-size: var(--text-expression);
-    line-height: var(--text-expression--line-height);
-    font-weight: var(--text-expression--font-weight);
+    @apply font-bold;
+    margin-top: var(--spacing-block-loose);
   }
 
   .note-content h2 {
-    font-size: var(--text-reading);
-    line-height: var(--text-reading--line-height);
-    font-weight: var(--text-reading--font-weight);
+    @apply font-semibold;
+    margin-top: var(--spacing-block);
   }
 
-  .note-content h3,
+  .note-content h3 {
+    @apply font-semibold text-subtle-foreground;
+    margin-top: var(--spacing-block-tight);
+  }
+
   .note-content h4 {
-    font-size: var(--text-gloss);
-    line-height: var(--text-gloss--line-height);
-    font-weight: var(--text-label--font-weight);
+    @apply font-medium text-subtle-foreground;
     margin-top: var(--spacing-block-tight);
   }
 
@@ -352,7 +405,7 @@ body {
   }
 
   .note-content strong {
-    font-weight: var(--text-label--font-weight);
+    @apply font-semibold;
   }
 
   .note-content ul,
@@ -384,9 +437,10 @@ body {
     color: var(--color-subtle-foreground);
   }
 
+  /* 地の文が既に等幅なので、インラインコードは書体でもサイズでもなく面で
+     区別する。サイズを落とすと行の中で字面が沈むため、周囲を継ぐ。 */
   .note-content :not(pre) > code {
     font-family: var(--font-mono);
-    font-size: var(--text-body);
     background-color: var(--color-muted);
     border: 1px solid var(--color-border-hairline);
     border-radius: var(--radius-sm);
@@ -400,8 +454,7 @@ body {
     border: 1px solid var(--color-border-hairline);
     border-radius: var(--radius-card);
     overflow-x: auto;
-    font-size: var(--text-body);
-    line-height: var(--text-body--line-height);
+    @apply text-sm;
   }
 
   .note-content img {
@@ -420,7 +473,7 @@ body {
     overflow-x: auto;
     margin-block: var(--spacing-block-tight);
     border-collapse: collapse;
-    font-size: var(--text-body);
+    @apply text-sm;
   }
 
   .note-content th,
@@ -432,6 +485,6 @@ body {
 
   .note-content th {
     background-color: var(--color-muted);
-    font-weight: var(--text-label--font-weight);
+    @apply font-semibold;
   }
 }

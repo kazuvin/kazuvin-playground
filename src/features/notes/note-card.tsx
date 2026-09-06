@@ -13,7 +13,7 @@ export function NoteCard({ note }: NoteCardProps) {
     <a href={`/notes/${note.slug}`} className="block">
       <Card className="transition-colors hover:border-border-strong">
         <CardHeader>
-          <CardTitle className="text-2xl">{note.metadata.title}</CardTitle>
+          <CardTitle>{note.metadata.title}</CardTitle>
           <time dateTime={note.metadata.date} className="text-muted-foreground text-sm">
             {formattedDate}
           </time>
@@ -21,7 +21,7 @@ export function NoteCard({ note }: NoteCardProps) {
         {(Boolean(note.metadata.description) || note.metadata.tags.length > 0) && (
           <CardContent>
             {note.metadata.description && (
-              <CardDescription className="text-base">{note.metadata.description}</CardDescription>
+              <CardDescription>{note.metadata.description}</CardDescription>
             )}
             {note.metadata.tags.length > 0 && (
               <div className="mt-4 flex flex-wrap gap-2">

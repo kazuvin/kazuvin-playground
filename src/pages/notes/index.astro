@@ -16,7 +16,7 @@ const notes = (await getPublishedNotes()).map(toNoteSummary)
 
     {
       notes.length === 0 ? (
-        <Text role="support">No notes yet. Check back later!</Text>
+        <Text role="caption">No notes yet. Check back later!</Text>
       ) : (
         <div class="grid gap-6">
           {notes.map((note) => (

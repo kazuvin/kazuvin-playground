@@ -27,20 +27,20 @@ export const PhraseStudy: Story = {
     >
       <div className="flex items-baseline justify-between">
         <Text role="overline">Unit 4 · Requests</Text>
-        <Text role="support">1 / 2</Text>
+        <Text role="label">1 / 2</Text>
       </div>
 
       <div className="h-block" />
 
-      <Text role="expression" lang="ja">
+      <Text role="title" lang="ja">
         お願いできますか
       </Text>
 
       <div className="h-gap" />
-      <Text role="support">onegai dekimasu ka</Text>
+      <Text role="caption">onegai dekimasu ka</Text>
 
       <div className="h-block-tight" />
-      <Text role="gloss">Could I ask you a favour?</Text>
+      <Text role="lead">Could I ask you a favour?</Text>
 
       <div className="h-block-tight" />
       <Text role="body">
