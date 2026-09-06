@@ -10,9 +10,13 @@ import { selectTocHeadings } from '@/lib/nav'
  * 位置は common-layout の grid の 3 トラック目。画面の右端ではなく本文の右隣に
  * 付き、self-start + h-dvh の sticky で上端に貼り付く。
  *
- * 出したり引っ込めたりしても本文の位置は動かない。トラックは
- * grid-template-columns が常に確保していて、埋まるかどうかとは無関係だから。
- * 「目次のあるページだけ本文が左にずれる」という遷移ごとのガタつきが出ない。
+ * 箱の幅は w-fit で中身に追従する。上限はトラックの 15rem で、そこに達した
+ * 見出しは折り返す (max-w-full)。見出しが短いページでは箱もそのぶん狭くなる。
+ *
+ * 一方でトラックのほうは 15rem 固定のまま。出したり引っ込めたりしても本文の
+ * 位置は動かない。トラックは grid-template-columns が常に確保していて、
+ * 埋まるかどうかとは無関係だから。「目次のあるページだけ本文が左にずれる」
+ * という遷移ごとのガタつきが出ない。
  *
  * 現在地の追従は下の <script>。リンクは素の #anchor なので、JS が来る前でも
  * 飛べる（滑らかに送るのは globals.css の scroll-behavior で、JS は関与しない）。
@@ -29,7 +33,7 @@ const items = selectTocHeadings(headings)
   items.length > 0 && (
     <aside
       data-toc-rail
-      class="px-edge-h pt-edge-top pb-edge-bottom sticky top-0 hidden h-dvh self-start overflow-y-auto scroll-smooth text-base xl:block"
+      class="px-edge-h pt-edge-top pb-edge-bottom sticky top-0 hidden h-dvh w-fit max-w-full self-start overflow-y-auto scroll-smooth text-base xl:block"
     >
       <nav aria-labelledby="toc-label">
         <Text role="overline" id="toc-label">
