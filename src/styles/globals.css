@@ -253,9 +253,11 @@
   --animate-scale-in: 0.2s ease scale-in;
   --animate-scale-out: 0.2s ease scale-out;
   --animate-slide-up: 0.5s ease slide-up;
+  --animate-slide-left: 0.3s ease slide-left;
   --animate-fade-scale-in: var(--animate-fade-in), var(--animate-scale-in);
   --animate-fade-scale-out: var(--animate-fade-out), var(--animate-scale-out);
   --animate-fade-slide-up: var(--animate-fade-in), var(--animate-slide-up);
+  --animate-fade-slide-left: var(--animate-fade-in), var(--animate-slide-left);
 
   /** keyframes */
   @keyframes fade-in {
@@ -309,6 +311,15 @@
     }
     to {
       transform: translateY(0);
+    }
+  }
+
+  @keyframes slide-left {
+    from {
+      transform: translateX(20px);
+    }
+    to {
+      transform: translateX(0);
     }
   }
 }

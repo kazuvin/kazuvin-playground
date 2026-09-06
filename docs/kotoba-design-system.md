@@ -373,6 +373,9 @@ role 名のトークンは**もう存在しない**。
   Kotoba にエレベーションは無い (分離はヘアラインか余白)。
 - `dialog` / `command` が `scale-in` / `scale-out` アニメーションを使っている。
   Kotoba のモーションは color と opacity のみ。
+- 右レールの目次 (`toc-sidebar`) が登場時に `fade-slide-left`、現在地の印の移動に
+  `transform` のトランジションを使っている。同じく color と opacity の外側。
+  どちらも `motion-safe:` の内側なので、動きを減らす設定では止まる。
 - `note-card.tsx` に `dark:` クラスが残っている。Kotoba にダークモードは無く、
   ダークテーマの切り替え機構もこのリポジトリには無いので現状は無害。
 - `card` / `dialog` / `command` / `timeline` と `features/notes/*` はまだ `Text` を通さず、
