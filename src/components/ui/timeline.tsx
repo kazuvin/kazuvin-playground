@@ -9,16 +9,12 @@ function TimelineItem({ ref, className, ...props }: ComponentProps<'li'>) {
   return <li ref={ref} className={cn('relative', className)} {...props} />
 }
 
-/* 端の処理はドットの居場所で変わる。TimelineHeader 側にいるなら上下いっぱい、
-   同じセパレーターに同居するならドットの中心から次のドットの中心まで。 */
+/* 基準は TimelineItem。top-4 / left-4 / -bottom-4 はインジケーター (size-8) の半分で、
+   この項目のドットの中心から次の項目のドットの中心までを結ぶ。 */
 function TimelineConnector({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div
-      className={cn(
-        'absolute inset-y-0 left-[15px] w-[2px] bg-border',
-        '[[data-timeline-indicator]+&]:top-4 [[data-timeline-indicator]+&]:-bottom-4',
-        className,
-      )}
+      className={cn('absolute top-4 -bottom-4 left-4 w-px -translate-x-1/2 bg-border', className)}
       {...props}
     />
   )
@@ -38,10 +34,10 @@ function TimelineDot({
   return (
     <div
       className={cn(
-        'size-3 rounded-full border-2 bg-background',
+        'size-2.5 rounded-full border bg-background',
         isActive && 'border-primary bg-primary',
         isCompleted && !isActive && 'border-primary bg-primary',
-        !isActive && !isCompleted && 'border-muted-foreground',
+        !isActive && !isCompleted && 'border-border-strong',
         className,
       )}
       {...props}
@@ -49,13 +45,11 @@ function TimelineDot({
   )
 }
 
-/* data 属性はレールの位置決めに使う目印を兼ねる (TimelineConnector 参照)。
-   z-10 はレールをドットの下に潜らせるためのもので、これが無いと後ろに書かれた
-   コネクターが 2px の線でドットを縦に割る。 */
+/* z-10 はレールをドットの下に潜らせるためのもので、これが無いと後ろに書かれた
+   コネクターが 1px の線でドットを縦に割る。 */
 function TimelineIndicator({ className, ...props }: ComponentProps<'div'>) {
   return (
     <div
-      data-timeline-indicator
       className={cn('relative z-10 flex size-8 shrink-0 items-center justify-center', className)}
       {...props}
     />
@@ -69,11 +63,11 @@ function TimelineHeader({ className, ...props }: ComponentProps<'div'>) {
 /* 項目の下の余白は本文側 (TimelineBody) が持つ。ここに padding を置くと
    セパレーターがその手前で止まり、レールが項目のあいだで切れる。 */
 function TimelineContent({ className, ...props }: ComponentProps<'div'>) {
-  return <div className={cn('relative flex gap-4', className)} {...props} />
+  return <div className={cn('flex gap-4', className)} {...props} />
 }
 
 function TimelineSeparator({ className, ...props }: ComponentProps<'div'>) {
-  return <div className={cn('relative flex w-8 shrink-0', className)} {...props} />
+  return <div className={cn('flex w-8 shrink-0', className)} {...props} />
 }
 
 function TimelineBody({ className, ...props }: ComponentProps<'div'>) {
