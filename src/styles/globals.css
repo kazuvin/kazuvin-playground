@@ -193,8 +193,16 @@
 
   /** ---- spacing tiers. Tier 1 is owned exclusively by Screen; tier 2
       spaces siblings; tier 3 lives inside a component and never leaks
-      out as a margin. edge 24 < block 32, and nothing inside an element
-      exceeds 20 — that ordering is the rule. ---- */
+      out as a margin.
+
+      Tier 1 reads per axis, not as one rung of a single ladder. Across
+      (24) it stays under block (32): the reading column is already narrow,
+      and every extra pixel of gutter comes straight out of line length.
+      Down (56 / 48) it sits above block, because the site has no header —
+      the top of the page meets browser chrome rather than a sibling, and
+      wants more air than two blocks need between them.
+
+      Tier 3 is the one flat rule: nothing inside an element exceeds 20. ---- */
   --spacing-edge-h: 24px;
   --spacing-edge-top: 56px;
   --spacing-edge-bottom: 48px;
