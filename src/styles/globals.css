@@ -206,7 +206,15 @@
       the top of the page meets browser chrome rather than a sibling, and
       wants more air than two blocks need between them.
 
-      Tier 3 is the one flat rule: nothing inside an element exceeds 20. ---- */
+      Tier 3 is the one flat rule: nothing inside an element exceeds 20.
+
+      **Do not write the class `inline-block`.** Tailwind builds an
+      `inline-<spacing key>` utility for `inline-size` out of this namespace, so
+      the moment `--spacing-block` exists, `inline-block` emits BOTH
+      `display: inline-block` and `inline-size: 32px` — and `inline-size` beats a
+      `w-*` on the same element, which silently crushes the box to 32px wide and
+      spills its label out. Use `inline-flex` for a shrink-to-fit inline box.
+      `block` itself is safe: there is no `block-*` (block-size) utility. ---- */
   --spacing-edge-h: 24px;
   --spacing-edge-top: 56px;
   --spacing-edge-bottom: 48px;

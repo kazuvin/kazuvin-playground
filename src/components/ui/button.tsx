@@ -45,6 +45,9 @@ const boxStateClasses = {
   secondary: 'border-border-strong bg-background text-foreground group-active:bg-muted',
 }
 
+/* 横に縮まないほうは inline-flex で書く。inline-block は使えない —
+   Tailwind の inline-* (inline-size) が --spacing-block を拾ってしまい、
+   display と一緒に inline-size: 32px まで付く (globals.css の tier 2 を参照)。 */
 function getButtonTouchClasses({
   size,
   fullWidth,
@@ -52,7 +55,7 @@ function getButtonTouchClasses({
   return [
     touchBaseClasses,
     touchSlopClasses[size],
-    fullWidth ? 'block w-full' : 'inline-block w-auto',
+    fullWidth ? 'block w-full' : 'inline-flex w-auto',
   ].join(' ')
 }
 
