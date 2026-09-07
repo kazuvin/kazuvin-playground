@@ -4,7 +4,7 @@ import type { CSSProperties } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { Text } from '@/components/ui/text'
 import { cn } from '@/lib/cn'
-import { selectTocHeadings } from '@/lib/nav'
+import { selectTocHeadings, tocActiveLine } from '@/lib/nav'
 import type { MarkdownHeading } from '@/lib/types'
 
 /** レールの中で現在地を動かすときに上下へ残す余白 */
@@ -70,12 +70,14 @@ export function TocSidebar({ headings = [] }: TocSidebarProps) {
     }
 
     function activeEntry(): string {
-      // 最下部まで来たら最後の項目。画面より短い最後の節が一度も点かないのを防ぐ
-      if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2) {
-        return entries[entries.length - 1].slug
-      }
+      const threshold =
+        tocActiveLine({
+          scrollY: window.scrollY,
+          viewportHeight: window.innerHeight,
+          scrollHeight: document.documentElement.scrollHeight,
+          offset: headingOffset(),
+        }) + 1
 
-      const threshold = headingOffset() + 1
       let current = entries[0].slug
       for (const entry of entries) {
         if (entry.element.getBoundingClientRect().top > threshold) {
