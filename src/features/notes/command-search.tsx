@@ -57,9 +57,11 @@ export function CommandSearch({ open, onClose }: CommandSearchProps) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg p-0">
+      <DialogContent className="max-w-lg overflow-hidden p-0">
         <DialogTitle className="sr-only">検索</DialogTitle>
-        <Command>
+        {/* 枠と角丸はダイアログが持っているので、Command 側は面だけ出す。
+            両方が border を引くと 1px の線が二重に見える。 */}
+        <Command className="rounded-none border-0 bg-transparent">
           <CommandInput placeholder="検索..." value={search} onValueChange={setSearch} />
           <CommandList>
             <CommandEmpty>
@@ -77,21 +79,19 @@ export function CommandSearch({ open, onClose }: CommandSearchProps) {
                     }}
                     value={`${item.metadata.title} ${item.metadata.tags?.join(' ') ?? ''}`}
                   >
-                    <div className="flex flex-1 items-center justify-between">
-                      <div className="font-medium">{item.metadata.title}</div>
-                      {item.metadata.tags && item.metadata.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-1">
-                          {item.metadata.tags.map((tag) => (
-                            <span
-                              key={tag}
-                              className="rounded bg-primary px-1.5 py-0.5 text-primary-foreground text-xs"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+                    <span className="flex-1 truncate font-medium">{item.metadata.title}</span>
+                    {item.metadata.tags && item.metadata.tags.length > 0 && (
+                      <span className="flex shrink-0 flex-wrap gap-gap-tight">
+                        {item.metadata.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="rounded-chip border border-border-hairline px-1.5 py-0.5 text-2xs text-muted-foreground"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </span>
+                    )}
                   </CommandItem>
                 ))}
               </CommandGroup>

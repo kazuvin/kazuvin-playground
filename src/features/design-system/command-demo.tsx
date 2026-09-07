@@ -15,7 +15,7 @@ import {
 /*
  * 画面に入るまで mount しない。cmdk は mount 時に先頭の項目へ scrollIntoView を掛け、
  * 画面外だとページごとその位置 (実測 12,000px 付近) まで飛ぶため。
- * 箱の高さ (h-64) を外側が先に持つのは、中身が入っても下の節を動かさないため。
+ * 箱の高さ (h-80) を外側が先に持つのは、中身が入っても下の節を動かさないため。
  */
 export function CommandDemo() {
   const ref = useRef<HTMLDivElement>(null)
@@ -43,7 +43,7 @@ export function CommandDemo() {
   }, [])
 
   return (
-    <div ref={ref} className="h-64">
+    <div ref={ref} className="h-80">
       {isVisible && (
         <Command className="h-full">
           <CommandInput placeholder="絞り込む…" />
@@ -52,7 +52,9 @@ export function CommandDemo() {
             <CommandGroup heading="Notes">
               <CommandItem>
                 はじめてのノート
-                <CommandShortcut>⏎</CommandShortcut>
+                {/* ⏎ (U+23CE) は Noto Sans Mono の latin サブセットに無く、この 1 文字のために
+                    Noto Sans JP の CJK チャンクを落とすことになるので語で置く。 */}
+                <CommandShortcut>Enter</CommandShortcut>
               </CommandItem>
               <CommandItem>2 つ目のノート</CommandItem>
             </CommandGroup>
