@@ -29,7 +29,14 @@ import { DialogDemo } from '@/features/design-system/dialog-demo'
 import { SectionHeading } from '@/features/design-system/section-heading'
 import { TokenTable } from '@/features/design-system/token-table'
 import { cn } from '@/lib/cn'
-import styles from './page.module.css'
+
+/* トークン名やクラス名を地の文に混ぜるための小さな見た目。globals.css の
+   .note-content のインラインコードと同じ作りだが、あちらは記事本文にしか掛からない。
+
+   CSS Module に閉じない。このページだけの CSS チャンクができると、左レールの
+   Link を hover した時点の prefetch がそれを preload as=style として先に読み、
+   遷移しなければ「preloaded but not used」が Chrome のコンソールに出る。 */
+const dsCode = 'rounded-sm border border-border-hairline bg-muted px-1 py-px font-mono'
 
 const TITLE = 'Design System'
 const DESCRIPTION = 'Kotoba Design System — tokens, primitives and the rules behind them'
@@ -81,8 +88,8 @@ export default function DesignSystemPage() {
       <div>
         <PageHeader title={TITLE} description={DESCRIPTION} />
         <Text role="caption">
-          トークンの節は <code className={styles.dsCode}>src/styles/globals.css</code> の{' '}
-          <code className={styles.dsCode}>@theme</code>{' '}
+          トークンの節は <code className={dsCode}>src/styles/globals.css</code> の{' '}
+          <code className={dsCode}>@theme</code>{' '}
           をビルド時に読んで組み立てている。値をここに書き写して いないので、CSS
           を触ればこのページも同じだけ動く。
         </Text>
@@ -131,7 +138,7 @@ export default function DesignSystemPage() {
         <div>
           <SectionHeading id="components" />
           <Text role="lead" className="mt-gap">
-            <code className={styles.dsCode}>src/components/ui/</code>{' '}
+            <code className={dsCode}>src/components/ui/</code>{' '}
             のプリミティブ。すべて上のトークンだけで 組まれていて、固有の色やサイズを持たない。
           </Text>
         </div>
@@ -144,9 +151,7 @@ export default function DesignSystemPage() {
           <ul className="mt-block-tight divide-y divide-border-hairline border-border-hairline border-y">
             {TEXT_ROLES.map((role) => (
               <li key={role} className="flex items-baseline gap-block-tight py-inset-y">
-                <code className={cn(styles.dsCode, 'w-28 shrink-0 text-muted-foreground')}>
-                  {role}
-                </code>
+                <code className={cn(dsCode, 'w-28 shrink-0 text-muted-foreground')}>{role}</code>
                 <div className="min-w-0 flex-1">
                   <Text role={role}>見出しも本文も 14px — Aa あア 012</Text>
                 </div>
