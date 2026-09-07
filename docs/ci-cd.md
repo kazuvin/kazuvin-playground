@@ -180,13 +180,17 @@ GitHub Actions では pnpm のキャッシュを活用しています：
 
 ```yaml
 - name: Setup Node.js
-  uses: actions/setup-node@v4
+  uses: actions/setup-node@v7
   with:
     node-version-file: ".node-version"
     cache: "pnpm"
 ```
 
 これにより、2 回目以降の実行で依存関係のインストールが高速になります。
+
+`cache: "pnpm"` は明示する必要があります。`setup-node` は v6 でキャッシュの
+自動有効化を npm だけに絞ったため、pnpm と yarn は入力で指定しないと
+キャッシュが効きません。
 
 Node のバージョンはローカルが `mise.toml`、CI が `.node-version` を見ます。
 どちらかを上げるときは両方を揃えてください。
@@ -356,7 +360,7 @@ jobs:
     name: Security Check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: pnpm audit
 ```
 
