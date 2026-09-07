@@ -1,23 +1,22 @@
 @import "tailwindcss";
 
 /* ---------------------------------------------------------------------------
- * Kotoba Design System — token layer
+ * Kotoba Design System — トークン層
  *
- * Imported from the claude.ai/design project "Kotoba Design System".
- * Rules, rationale and the four token tables: docs/kotoba-design-system.md
+ * claude.ai/design のプロジェクト "Kotoba Design System" から取り込んだもの。
+ * ルール・根拠・4 つのトークン表は docs/kotoba-design-system.md にある。
  *
- * Three constraints are load-bearing and easy to break by accident:
- *   1. The primary action surface is BLACK (--color-gray-900), not the accent.
- *   2. The accent (rgb 242 49 130 — the logo's pink) is permitted on the focus
- *      ring and the selected state only — never a fill, never status, never
- *      decoration.
- *   3. Text never exceeds 0.875rem (14px). Headings and body share that one
- *      size; hierarchy is weight, colour and whitespace. The scale has no
- *      step above it — text-lg and friends are deliberately undefined.
+ * 次の 3 つは事故で壊しやすく、壊すとデザインシステムとして成立しなくなる。
+ *   1. プライマリアクションの面は黒 (--color-gray-900)。アクセントではない。
+ *   2. アクセント (rgb 242 49 130 — ロゴのピンク) はフォーカスリングと選択状態に
+ *      のみ使う。塗り・ステータス・装飾には一切使わない。
+ *   3. 文字は 0.875rem (14px) を超えない。見出しも本文もこの 1 サイズで、階層は
+ *      太さ・色・余白で作る。上に伸びる段は持たない — text-lg などは意図して
+ *      未定義にしてある。
  * ------------------------------------------------------------------------- */
 
 @theme {
-  /** Spacing base unit — every shipped spacing value is 4 × n */
+  /** 余白の基本単位。出荷される余白の値はすべて 4 × n */
   --spacing: 4px;
 
   /** Font — 本文も見出しもコードも等幅で通す。欧文は Noto Sans Mono、和文は
@@ -41,9 +40,10 @@
   --font-sans: var(--font-noto-sans-mono, ui-monospace), monospace;
   --font-mono: var(--font-noto-sans-mono, ui-monospace), monospace;
 
-  /** ---- neutral ramp — the entire non-accent palette, including the
-      primary action fill. Tailwind's default gray is cleared first so no
-      off-system grey can leak in through an unlisted step. ---- */
+  /** ---- ニュートラルランプ ----
+      アクセント以外のすべての色 — 面も境界もテキストも、そしてプライマリ
+      アクションの塗りもここが担う。Tailwind 既定の gray を先に消してあるので、
+      梯子に無いシステム外の灰色が紛れ込むことはない。 */
   --color-gray-*: initial;
   --color-gray-0: #ffffff;
   --color-gray-25: #fafafb;
@@ -57,16 +57,17 @@
   --color-gray-800: #2c2c31;
   --color-gray-900: #16161a;
 
-  /** ---- the one chromatic value — 4 stops, focus + selection only.
+  /** ---- 唯一の有彩色 ----
+      4 段だけ。使ってよいのはフォーカスリングと選択状態の 2 箇所のみ。
       基準は src/assets/logo.png のピンクそのもの (#f23182)。600 / 700 / tint は
       同じ色相のまま、明度と彩度だけを動かした段で、白地に対する 3:1 (非文字の
-      コントラスト下限) は基準の 3.79 で満たしている。 ---- */
+      コントラスト下限) は基準の 3.79 で満たしている。 */
   --color-accent: rgb(242, 49, 130);
   --color-accent-600: #cb2a6e;
   --color-accent-700: #9b2356;
   --color-accent-tint: #feeff5;
 
-  /** ---- semantic: surfaces ---- */
+  /** ---- セマンティック: 面 ---- */
   --color-background: var(--color-gray-0);
   --color-foreground: var(--color-gray-900);
   --color-card: var(--color-gray-0);
@@ -76,8 +77,8 @@
   --color-inverse: var(--color-gray-900);
   --color-inverse-foreground: var(--color-gray-0);
 
-  /** ---- semantic: quiet surfaces + secondary text.
-      --color-muted is the only tint in the system. ---- */
+  /** ---- セマンティック: 静かな面と二次テキスト ----
+      --color-muted はこのシステムで唯一のティント。 */
   --color-muted: var(--color-gray-50);
   --color-muted-foreground: var(--color-gray-500);
   --color-subtle: var(--color-gray-50);
@@ -85,36 +86,35 @@
   --color-secondary: var(--color-gray-50);
   --color-secondary-foreground: var(--color-gray-900);
 
-  /** ---- semantic: primary action — black, not chromatic ---- */
+  /** ---- セマンティック: プライマリアクション — 有彩色ではなく黒 ---- */
   --color-primary: var(--color-gray-900);
   --color-primary-foreground: var(--color-gray-0);
   --color-primary-pressed: var(--color-gray-800);
 
-  /** ---- semantic: destructive.
-      There is no colour-coded status in this system: a failure state is
-      words plus position, not a hue. The key is kept so existing
-      `bg-destructive` classes still resolve, but it renders as the
-      primary black. ---- */
+  /** ---- セマンティック: 破壊的操作 ----
+      このシステムに色分けされたステータスは無い。失敗状態は色相ではなく
+      「言葉と位置」で表す。既存の `bg-destructive` が解決できるようキーは
+      残してあるが、描かれるのはプライマリの黒。 */
   --color-destructive: var(--color-gray-900);
   --color-destructive-foreground: var(--color-gray-0);
 
-  /** ---- semantic: borders. No elevation system — separation is a 1px
-      hairline or whitespace. ---- */
+  /** ---- セマンティック: 境界 ----
+      エレベーションは存在しない。分離は 1px のヘアラインか余白で行う。 */
   --color-border: var(--color-gray-200);
   --color-border-hairline: var(--color-gray-100);
   --color-border-strong: var(--color-gray-300);
   --color-input: var(--color-gray-300);
 
-  /** ---- semantic: focus + selection — the ONLY uses of the accent ---- */
+  /** ---- セマンティック: フォーカスと選択 — アクセントを使う唯一の場所 ---- */
   --color-ring: var(--color-accent);
   --color-selected: var(--color-accent-tint);
   --color-selected-border: var(--color-accent);
 
-  /** ---- semantic: disabled ---- */
+  /** ---- セマンティック: 無効状態 ---- */
   --color-disabled: var(--color-gray-100);
   --color-disabled-foreground: var(--color-gray-400);
 
-  /** ---- typography ------------------------------------------------------
+  /** ---- タイポグラフィ ----
       rem の基準 (html) は 16px のまま触らない。html を 87.5% に振って
       「1rem = 14px」にする手もあるが、Radix / Shiki / Fontsource など
       こちらが書いていない rem までまとめて動くうえ、ユーザーのブラウザ
@@ -138,7 +138,7 @@
       line-height は 4px グリッドに着地する rem。letter-spacing は em で、
       小さい段ほど開く (等幅の 11〜12px は詰まると潰れる)。
       font-weight はサイズに束ねない。このシステムでは太さが階層そのもの
-      なので、text-* と font-* は必ず直交させる。 ---- */
+      なので、text-* と font-* は必ず直交させる。 */
 
   /** 行間。段ごとの既定は各 --text-*--line-height にあり、これは長文などで
       明示的に上書きするための語彙。relaxed が和文の長文用。 */
@@ -195,26 +195,24 @@
   --text-mark--line-height: var(--leading-none);
   --text-mark--letter-spacing: var(--tracking-tighter);
 
-  /** ---- spacing tiers. Tier 1 is owned exclusively by Screen; tier 2
-      spaces siblings; tier 3 lives inside a component and never leaks
-      out as a margin.
+  /** ---- 余白の tier ----
+      tier 1 は Screen の専有、tier 2 は兄弟要素のあいだ、tier 3 はコンポーネントの
+      内側にあり margin として外に漏れない。
 
-      Tier 1 reads per axis, not as one rung of a single ladder. Across
-      (24) it stays under block (32): the reading column is already narrow,
-      and every extra pixel of gutter comes straight out of line length.
-      Down (56 / 48) it sits above block, because the site has no header —
-      the top of the page meets browser chrome rather than a sibling, and
-      wants more air than two blocks need between them.
+      tier 1 は 1 本の梯子ではなく軸ごとに読む。左右 (24) がブロック間 (32) より
+      小さいのは、読み幅がもともと狭く、ガターを広げたぶんがそのまま行長から
+      引かれるため。上下 (56 / 48) がブロック間より大きいのは、ヘッダーを持たない
+      このサイトではページの上端が兄弟要素ではなくブラウザの UI と接するから。
 
-      Tier 3 is the one flat rule: nothing inside an element exceeds 20.
+      tier 3 だけは軸によらない 1 つの規則で、要素の内側は 20 を超えない。
 
-      **Do not write the class `inline-block`.** Tailwind builds an
-      `inline-<spacing key>` utility for `inline-size` out of this namespace, so
-      the moment `--spacing-block` exists, `inline-block` emits BOTH
-      `display: inline-block` and `inline-size: 32px` — and `inline-size` beats a
-      `w-*` on the same element, which silently crushes the box to 32px wide and
-      spills its label out. Use `inline-flex` for a shrink-to-fit inline box.
-      `block` itself is safe: there is no `block-*` (block-size) utility. ---- */
+      **`inline-block` というクラスは書かない。** Tailwind はこの名前空間から
+      `inline-size` 用の `inline-<余白キー>` ユーティリティを作るので、
+      `--spacing-block` が存在した時点で `inline-block` は
+      `display: inline-block` と `inline-size: 32px` の両方を吐く。しかも
+      `inline-size` は同じ要素の `w-*` に勝つため、箱が黙って 32px 幅に潰れて
+      ラベルがはみ出す。中身の幅に縮む inline の箱には `inline-flex` を使う。
+      `block` 単体は安全 (`block-*` = block-size のユーティリティは無い)。 */
   --spacing-edge-h: 24px;
   --spacing-edge-top: 56px;
   --spacing-edge-bottom: 48px;
@@ -226,15 +224,16 @@
   --spacing-gap: 8px;
   --spacing-gap-tight: 4px;
 
-  /** ---- tap geometry. Visual box and hit box are separate tokens:
-      changing the label size never moves the box. ---- */
+  /** ---- タップ形状 ----
+      視覚的な箱とタップ領域は別のトークン。ラベルのサイズを変えても箱は動かない。 */
   --spacing-tap-min: 44px;
   --spacing-control: 40px;
   --spacing-control-lg: 52px;
   --spacing-hitslop: 2px;
 
-  /** ---- radius. 12 for controls, 16 for cards, 14 for the focus ring
-      (control + 2px offset), 999 for pills. No other values. ---- */
+  /** ---- 角丸 ----
+      コントロールは 12、カードは 16、フォーカスリングは 14 (コントロール + オフセット
+      2px)、ピルは 999。これ以外の値は使わない。 */
   --radius-sm: 8px;
   --radius-md: 12px;
   --radius-lg: 16px;
@@ -243,11 +242,12 @@
   --radius-focus: 14px;
   --radius-chip: 999px;
 
-  /** ---- motion. 120ms on colour and opacity only. No bounce, no spring,
-      no scale on content. ---- */
+  /** ---- モーション ----
+      120ms、color と opacity のみ。バウンスもスプリングも無く、中身を拡大縮小
+      させることもしない。 */
   --ease-standard: cubic-bezier(0.2, 0, 0.2, 1);
 
-  /** Animation */
+  /** アニメーション */
   --animate-fade-in: 0.2s ease fade-in;
   --animate-fade-out: 0.2s ease fade-out;
   --animate-scale-in: 0.2s ease scale-in;
@@ -259,7 +259,7 @@
   --animate-fade-slide-up: var(--animate-fade-in), var(--animate-slide-up);
   --animate-fade-slide-left: var(--animate-fade-in), var(--animate-slide-left);
 
-  /** keyframes */
+  /** キーフレーム */
   @keyframes fade-in {
     from {
       opacity: 0;
@@ -370,8 +370,8 @@ html {
   }
 }
 
-/* The focus ring is one of the two permitted uses of the accent: 2px at a
-   2px offset, which is why --radius-focus is --radius-control + 2. */
+/* フォーカスリングはアクセントを使ってよい 2 箇所のうちの 1 つ。2px オフセットの
+   2px で描くので、--radius-focus は --radius-control + 2 になっている。 */
 :where(button, a, [tabindex]):focus-visible {
   outline: 2px solid var(--color-ring);
   outline-offset: 2px;
@@ -379,17 +379,16 @@ html {
 }
 
 /* ---------------------------------------------------------------------------
- * Article body — the rendered MDX of a note.
+ * 記事本文 — ノートの MDX を描いたもの。
  *
- * This replaces the per-element component map that used to live in
- * mdx-components.tsx. That map was off-system in three ways worth not
- * repeating: it reached for `gray-700` (the ramp has no 700 — see
- * `--color-gray-*: initial` above, so the rule was simply dead), it coloured
- * links and inline code with blue/pink (the accent is permitted on the focus
- * ring and the selected state only), and it carried `dark:` variants for a
- * mode this token layer does not define.
+ * もともと mdx-components.tsx にあった要素ごとのコンポーネント写像を置き換えた
+ * もの。あの写像はシステムから 3 通りに外れていて、どれも繰り返す価値がない。
+ * `gray-700` を参照していた (ランプに 700 は無い — 上の `--color-gray-*: initial`
+ * を参照。つまりあの規則は単に死んでいた)、リンクとインラインコードを青やピンクで
+ * 塗っていた (アクセントはフォーカスリングと選択状態にのみ使う)、そしてこの
+ * トークン層が定義していないモードのための `dark:` を持っていた。
  *
- * Emphasis here is carried by weight, size, rule and indent — never by hue.
+ * ここでの強調は太さ・サイズ・罫線・字下げが担う。色相では作らない。
  * ------------------------------------------------------------------------- */
 @layer components {
   /* 記事本文も基準の 14px。サイズを上げない代わりに行間を relaxed (1.75)
@@ -450,8 +449,8 @@ html {
     margin-block: var(--spacing-block-tight);
   }
 
-  /* The accent is not available for links, so the underline is the whole
-     affordance. It thickens on hover rather than changing colour. */
+  /* リンクにアクセントは使えないので、下線だけがアフォーダンスのすべて。
+     ホバーでは色を変えず、線を太くする。 */
   .note-content a {
     color: inherit;
     text-decoration: underline;
@@ -507,7 +506,7 @@ html {
     padding: 1px 4px;
   }
 
-  /* Shiki paints the block itself (github-light); the surround is ours. */
+  /* ブロックの中身は Shiki が塗る (github-light)。周りだけがこちらの担当。 */
   .note-content pre {
     margin-block: var(--spacing-block-tight);
     padding: var(--spacing-inset-y) var(--spacing-inset-x);

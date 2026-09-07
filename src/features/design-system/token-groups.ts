@@ -2,7 +2,7 @@ import type { ThemeToken } from './parse-theme'
 
 /*
  * 振り分けは名前の前方一致だけ。先勝ちで見るので --color-gray-* を --color-* より前に
- * 置く。定義に無い名前は捨てずに Uncategorised へ落ちる。
+ * 置く。定義に無い名前は捨てずに「未分類」へ落ちる。
  */
 
 export type TokenPreview =
@@ -45,91 +45,91 @@ interface TokenGroupDefinition {
 const GROUP_DEFINITIONS: TokenGroupDefinition[] = [
   {
     id: 'neutral-ramp',
-    title: 'Neutral ramp',
+    title: 'ニュートラルランプ',
     utility: 'bg-gray-* / text-gray-* / border-gray-*',
     preview: 'color',
     pattern: /^--color-(gray-.+)$/,
   },
   {
     id: 'accent',
-    title: 'Accent',
+    title: 'アクセント',
     utility: 'bg-accent / text-accent / border-accent',
     preview: 'color',
     pattern: /^--color-(accent.*)$/,
   },
   {
     id: 'semantic-color',
-    title: 'Semantic colour',
+    title: 'セマンティックカラー',
     utility: 'bg-* / text-* / border-*',
     preview: 'color',
     pattern: /^--color-(.+)$/,
   },
   {
     id: 'font-weight',
-    title: 'Font weight',
+    title: '文字の太さ',
     utility: 'font-*',
     preview: 'weight',
     pattern: /^--font-weight-(.+)$/,
   },
   {
     id: 'font-family',
-    title: 'Font family',
+    title: '書体',
     utility: 'font-*',
     preview: 'font',
     pattern: /^--font-(.+)$/,
   },
   {
     id: 'type-scale',
-    title: 'Type scale',
+    title: 'サイズスケール',
     utility: 'text-*',
     preview: 'text',
     pattern: /^--text-(.+)$/,
   },
   {
     id: 'leading',
-    title: 'Line height',
+    title: '行間',
     utility: 'leading-*',
     preview: 'leading',
     pattern: /^--leading-(.+)$/,
   },
   {
     id: 'tracking',
-    title: 'Letter spacing',
+    title: '字間',
     utility: 'tracking-*',
     preview: 'tracking',
     pattern: /^--tracking-(.+)$/,
   },
   {
     id: 'spacing-base',
-    title: 'Spacing base',
+    title: '余白の基本単位',
     utility: 'p-4 / gap-2 … の 1 単位',
     preview: 'value',
     pattern: /^--(spacing)$/,
   },
   {
     id: 'spacing-scale',
-    title: 'Spacing scale',
+    title: '余白スケール',
     utility: 'p-* / m-* / gap-* / h-*',
     preview: 'spacing',
     pattern: /^--spacing-(.+)$/,
   },
   {
     id: 'radius',
-    title: 'Radius',
+    title: '角丸',
     utility: 'rounded-*',
     preview: 'radius',
     pattern: /^--radius-(.+)$/,
   },
   {
     id: 'ease',
-    title: 'Easing',
+    title: 'イージング',
     utility: 'ease-*',
     preview: 'ease',
     pattern: /^--ease-(.+)$/,
   },
   {
     id: 'animation',
-    title: 'Animation',
+    title: 'アニメーション',
     utility: 'animate-*',
     preview: 'animation',
     pattern: /^--animate-(.+)$/,
@@ -140,7 +140,7 @@ const GROUP_DEFINITIONS: TokenGroupDefinition[] = [
     カタログの知らない接頭辞が増えた、というシグナルになる。 */
 const UNCATEGORISED: Omit<TokenGroupDefinition, 'pattern'> = {
   id: 'uncategorised',
-  title: 'Uncategorised',
+  title: '未分類',
   utility: '—',
   preview: 'value',
 }
