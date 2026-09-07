@@ -1,7 +1,11 @@
+'use client'
+
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
 import logo from '@/assets/logo.png'
 import { APP_NAME, NAV_ITEMS } from '@/config/app'
+import { useWindowScroll } from '@/hooks/use-window-scroll'
+import { cn } from '@/lib/cn'
 import { CommandSearchTrigger } from './command-search-trigger'
 import { MobileNav } from './mobile-nav'
 import { SiteNav } from './site-nav'
@@ -18,10 +22,18 @@ const RESERVED_SIZE = {
 } as CSSProperties
 
 export function AppSidebar() {
+  const [{ y }] = useWindowScroll()
+
   return (
     <aside
       style={RESERVED_SIZE}
-      className="sticky top-0 z-20 self-start border-border-hairline border-b bg-background/80 px-edge-h py-gap text-sm backdrop-blur-2xl lg:h-dvh lg:min-w-(--rail-min-w) lg:overflow-y-auto lg:border-b-0 lg:bg-transparent lg:pt-edge-top lg:pb-edge-bottom lg:backdrop-blur-none"
+      /* 境界は「下に本文が潜っている」ことの印なので、先頭にいる間は出さない。
+         border-b は常に敷いたまま色だけを動かす。付け外しにすると 1px ぶん
+         本文が跳ねる。 */
+      className={cn(
+        'sticky top-0 z-20 self-start border-b bg-background/80 px-edge-h py-gap text-sm backdrop-blur-2xl transition-colors duration-120 ease-standard lg:h-dvh lg:min-w-(--rail-min-w) lg:overflow-y-auto lg:border-b-0 lg:bg-transparent lg:pt-edge-top lg:pb-edge-bottom lg:backdrop-blur-none',
+        y > 0 ? 'border-border-hairline' : 'border-transparent',
+      )}
     >
       <div className="flex items-center justify-between gap-gap lg:flex-col lg:items-start lg:gap-block-tight">
         <Link

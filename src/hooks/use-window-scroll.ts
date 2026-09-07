@@ -12,10 +12,10 @@ export interface ScrollToOptions {
 }
 
 export function useWindowScroll(): [WindowScrollPosition, (options: ScrollToOptions) => void] {
-  const [scrollPosition, setScrollPosition] = useState<WindowScrollPosition>({
-    x: typeof window !== 'undefined' ? window.scrollX : 0,
-    y: typeof window !== 'undefined' ? window.scrollY : 0,
-  })
+  /* 初期値は 0 固定。ここで window を読むと、復元スクロールで開いた回の
+     ハイドレーションが SSR の HTML と食い違う。実際の位置は下の effect が
+     マウント直後に入れる。 */
+  const [scrollPosition, setScrollPosition] = useState<WindowScrollPosition>({ x: 0, y: 0 })
 
   useEffect(() => {
     if (typeof window === 'undefined') {

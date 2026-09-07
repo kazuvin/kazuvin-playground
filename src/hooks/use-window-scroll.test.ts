@@ -2,8 +2,7 @@ import { act, renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useWindowScroll } from './use-window-scroll'
 
-// Skip these tests in CI environment as they require full browser environment
-describe.skip('useWindowScroll', () => {
+describe('useWindowScroll', () => {
   beforeEach(() => {
     // Ensure window object exists
     if (typeof window === 'undefined') {
@@ -71,6 +70,19 @@ describe.skip('useWindowScroll', () => {
     const [scrollPosition] = result.current
 
     expect(scrollPosition).toEqual({ x: 0, y: 0 })
+  })
+
+  it('should sync to the already scrolled position after mount', () => {
+    Object.defineProperty(window, 'scrollY', {
+      writable: true,
+      configurable: true,
+      value: 320,
+    })
+
+    const { result } = renderHook(() => useWindowScroll())
+    const [scrollPosition] = result.current
+
+    expect(scrollPosition).toEqual({ x: 0, y: 320 })
   })
 
   it('should update scroll position when window scrolls', () => {
