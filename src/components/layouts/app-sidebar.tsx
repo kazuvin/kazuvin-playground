@@ -9,6 +9,7 @@ import { cn } from '@/lib/cn'
 import { CommandSearchTrigger } from './command-search-trigger'
 import { MobileNav } from './mobile-nav'
 import { SiteNav } from './site-nav'
+import { SocialLinks } from './social-links'
 
 /** lg 以上の auto トラックの下限。「一番長いラベル + 左右の px-edge-h」と、右レールと
     同じ 15rem の広いほう。ラベルだけに張り付かせると、幅を借りている検索フィールドが
@@ -31,7 +32,7 @@ export function AppSidebar() {
          border-b は常に敷いたまま色だけを動かす。付け外しにすると 1px ぶん
          本文が跳ねる。 */
       className={cn(
-        'sticky top-0 z-20 self-start border-b bg-background/80 px-edge-h py-gap text-sm backdrop-blur-2xl transition-colors duration-120 ease-standard lg:h-dvh lg:min-w-(--rail-min-w) lg:overflow-y-auto lg:border-b-0 lg:bg-transparent lg:pt-edge-top lg:pb-edge-bottom lg:backdrop-blur-none',
+        'sticky top-0 z-20 self-start border-b bg-background/80 px-edge-h py-gap text-sm backdrop-blur-2xl transition-colors duration-120 ease-standard lg:flex lg:h-dvh lg:min-w-(--rail-min-w) lg:flex-col lg:overflow-y-auto lg:border-b-0 lg:bg-transparent lg:pt-edge-top lg:pb-edge-bottom lg:backdrop-blur-none',
         y > 0 ? 'border-border-hairline' : 'border-transparent',
       )}
     >
@@ -54,6 +55,8 @@ export function AppSidebar() {
       </div>
 
       <SiteNav />
+
+      <SocialLinks />
     </aside>
   )
 }
