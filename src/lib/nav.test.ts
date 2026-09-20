@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { isActiveNavItem, selectTocHeadings, tocActiveLine } from './nav'
+import { isActiveNavItem, selectActiveHeading, selectTocHeadings, tocActiveLine } from './nav'
 import type { MarkdownHeading } from './types'
 
 describe('isActiveNavItem', () => {
@@ -81,5 +81,53 @@ describe('tocActiveLine', () => {
   it('should not move the line on a page that cannot scroll', () => {
     const still = { scrollY: 0, viewportHeight: 800, scrollHeight: 800, offset: 32 }
     expect(tocActiveLine(still)).toBe(32)
+  })
+})
+
+describe('selectActiveHeading', () => {
+  const positions = [
+    { slug: 'intro', top: -400 },
+    { slug: 'usage', top: -120 },
+    { slug: 'api', top: 600 },
+  ]
+
+  it('should pick the last heading above the line', () => {
+    expect(selectActiveHeading(positions, 32)).toBe('usage')
+  })
+
+  it('should pick the first heading when none has crossed the line yet', () => {
+    const below = [
+      { slug: 'intro', top: 400 },
+      { slug: 'usage', top: 900 },
+    ]
+    expect(selectActiveHeading(below, 32)).toBe('intro')
+  })
+
+  it('should pick the last heading once every one is above the line', () => {
+    expect(selectActiveHeading(positions, 1200)).toBe('api')
+  })
+
+  it('should treat a heading exactly on the line as crossed', () => {
+    const onLine = [
+      { slug: 'intro', top: 0 },
+      { slug: 'usage', top: 32 },
+      { slug: 'api', top: 33 },
+    ]
+    expect(selectActiveHeading(onLine, 32)).toBe('usage')
+  })
+
+  it('should stop at the first heading below the line', () => {
+    /* 文書順が前提。線より下のものが出た時点で打ち切るので、後ろに紛れ込んだ
+       負の top は拾わない */
+    const outOfOrder = [
+      { slug: 'intro', top: -100 },
+      { slug: 'usage', top: 500 },
+      { slug: 'api', top: -50 },
+    ]
+    expect(selectActiveHeading(outOfOrder, 32)).toBe('intro')
+  })
+
+  it('should return null when there are no headings', () => {
+    expect(selectActiveHeading([], 32)).toBeNull()
   })
 })

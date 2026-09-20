@@ -4,7 +4,7 @@ import type { CSSProperties } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { Text } from '@/components/ui/text'
 import { cn } from '@/lib/cn'
-import { selectTocHeadings, tocActiveLine } from '@/lib/nav'
+import { selectActiveHeading, selectTocHeadings, tocActiveLine } from '@/lib/nav'
 import type { MarkdownHeading } from '@/lib/types'
 
 /** レールの中で現在地を動かすときに上下へ残す余白 */
@@ -69,8 +69,10 @@ export function TocSidebar({ headings = [] }: TocSidebarProps) {
       return
     }
 
-    function activeEntry(): string {
-      const threshold =
+    /* 測るのはここだけ。どれを点けるかの規則は @/lib/nav の selectActiveHeading にある
+       (DOM を読まない形にしてテストできるようにしたもの)。 */
+    function activeEntry(): string | null {
+      const line =
         tocActiveLine({
           scrollY: window.scrollY,
           viewportHeight: window.innerHeight,
@@ -78,14 +80,13 @@ export function TocSidebar({ headings = [] }: TocSidebarProps) {
           offset: headingOffset(),
         }) + 1
 
-      let current = entries[0].slug
-      for (const entry of entries) {
-        if (entry.element.getBoundingClientRect().top > threshold) {
-          break
-        }
-        current = entry.slug
-      }
-      return current
+      return selectActiveHeading(
+        entries.map((entry) => ({
+          slug: entry.slug,
+          top: entry.element.getBoundingClientRect().top,
+        })),
+        line,
+      )
     }
 
     let queued = false

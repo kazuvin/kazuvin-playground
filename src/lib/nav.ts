@@ -46,3 +46,28 @@ export function tocActiveLine({
   const progress = Math.min(Math.max(1 - (maxScroll - scrollY) / span, 0), 1)
   return offset + travel * progress
 }
+
+export interface TocHeadingPosition {
+  slug: string
+  /** ビューポート座標の上端 (getBoundingClientRect().top) */
+  top: number
+}
+
+/**
+ * 判定線を越えた最後の見出しが現在地。
+ *
+ * 1 つも越えていなくても先頭を点けるのは、ページ最上部で目次が消灯しないため。
+ * 並びは文書順である前提で、越えていないものが出た時点で打ち切る。
+ */
+export function selectActiveHeading(positions: TocHeadingPosition[], line: number): string | null {
+  let current: string | null = positions[0]?.slug ?? null
+
+  for (const position of positions) {
+    if (position.top > line) {
+      break
+    }
+    current = position.slug
+  }
+
+  return current
+}
