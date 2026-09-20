@@ -22,8 +22,9 @@ type CardTitleProps = ComponentProps<'h3'>
 
 function CardTitle({ className, ...props }: CardTitleProps) {
   return (
+    // oxlint-disable-next-line jsx-a11y/heading-has-content -- children は props の spread で渡る。見出しの中身は呼び出し側の責任
     <h3
-      className={cn('font-semibold text-base leading-snug tracking-tight', className)}
+      className={cn('text-base leading-snug font-semibold tracking-tight', className)}
       {...props}
     />
   )
@@ -32,7 +33,7 @@ function CardTitle({ className, ...props }: CardTitleProps) {
 type CardDescriptionProps = ComponentProps<'p'>
 
 function CardDescription({ className, ...props }: CardDescriptionProps) {
-  return <p className={cn('text-muted-foreground text-sm', className)} {...props} />
+  return <p className={cn('text-sm text-muted-foreground', className)} {...props} />
 }
 
 type CardContentProps = ComponentProps<'div'>

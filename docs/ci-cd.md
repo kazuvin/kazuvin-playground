@@ -26,7 +26,9 @@ CI ワークフローは以下の 3 つのジョブで構成されています�
 
 **実行内容**:
 
-- Biome による lint と整形チェック (リポジトリ全体。生成物と `public/` だけ除外)
+- Oxlint による lint (型情報ルール込み) と、Oxfmt による整形チェック (生成物と `public/` だけ除外)
+  - `--deny-warnings` を付けている。Oxlint は既定で warning を終了コードに反映しないため、
+    これが無いと a11y や `jsx-key` の指摘が CI を素通りする
 - `tsc --noEmit` による型チェック
 
 #### 2. Test
@@ -311,7 +313,7 @@ pnpm run build
 
 ### 1. コミット前のチェックは自動で走る
 
-lefthook が pre-commit で Biome (staged なファイルのみ) と `tsc --noEmit` を実行し、
+lefthook が pre-commit で Oxlint / Oxfmt (staged なファイルのみ) と `tsc --noEmit` を実行し、
 commit-msg で commitlint が Conventional Commits を検証します。
 `pnpm install` 時に `prepare` スクリプトからフックが同期されます。
 
@@ -335,14 +337,14 @@ VS Code や WebStorm などのエディタで、保存時に自動整形や lint
 
 #### VS Code の設定例 (.vscode/settings.json)
 
-`.vscode/settings.json` に設定済みです。整形は全ファイル Biome に渡します。
+`.vscode/settings.json` に設定済みです。拡張機能は `oxc.oxc-vscode` です。
 
 ```json
 {
-  "editor.defaultFormatter": "biomejs.biome",
+  "editor.defaultFormatter": "oxc.oxc-vscode",
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.biome": "explicit"
+    "source.fixAll.oxc": "explicit"
   },
   "typescript.tsdk": "node_modules/typescript/lib"
 }

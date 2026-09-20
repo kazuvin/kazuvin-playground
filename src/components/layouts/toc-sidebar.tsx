@@ -239,7 +239,7 @@ export function TocSidebar({ headings = [] }: TocSidebarProps) {
                   data-depth={heading.depth}
                   data-active={isActive ? 'true' : undefined}
                   aria-current={isActive ? 'location' : undefined}
-                  className="block py-gap-tight text-sm text-subtle-foreground leading-snug transition-colors duration-120 ease-standard hover:text-foreground data-[active=true]:font-medium data-[active=true]:text-foreground"
+                  className="block py-gap-tight text-sm leading-snug text-subtle-foreground transition-colors duration-120 ease-standard hover:text-foreground data-[active=true]:font-medium data-[active=true]:text-foreground"
                 >
                   {heading.text}
                 </a>

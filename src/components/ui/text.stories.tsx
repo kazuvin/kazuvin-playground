@@ -86,7 +86,7 @@ export const Scale: Story = {
   render: () => (
     <table className="w-full max-w-[520px] border-collapse text-left">
       <thead>
-        <tr className="border-border-hairline border-b">
+        <tr className="border-b border-border-hairline">
           {['key', 'rem', 'px', 'sample'].map((head) => (
             <th key={head} className="py-gap pr-block">
               <Text role="overline" as="span">
@@ -104,7 +104,7 @@ export const Scale: Story = {
           { key: 'text-base', rem: '0.875rem', px: '14', cls: 'text-base' },
           { key: 'text-mark', rem: '2rem', px: '32', cls: 'text-mark' },
         ].map((step) => (
-          <tr key={step.key} className="border-border-hairline border-b">
+          <tr key={step.key} className="border-b border-border-hairline">
             <td className="py-gap pr-block">
               <Text role="label" as="span">
                 {step.key}

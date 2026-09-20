@@ -13,7 +13,7 @@ MDX で書いたノートを静的サイトとして配信する個人サイト�
 | デザインシステム | Kotoba Design System (`src/styles/globals.css` / `docs/kotoba-design-system.md`) |
 | コンテンツ       | MDX (`content/notes`) + zod で frontmatter を検証                                |
 | テスト           | Vitest (unit) + Storybook のブラウザテスト                                       |
-| lint / format    | Biome (1 ファイルで全部を見る)                                                   |
+| lint / format    | Oxlint (型情報ルール込み) + Oxfmt                                                |
 | 配信             | Cloudflare Workers 静的アセット (`wrangler.jsonc`)                               |
 | エージェント連携 | Agentation + MCP (`.mcp.json` / `docs/agentation.md`)                            |
 
@@ -53,7 +53,7 @@ dev サーバーだけを手元のターミナルに出したいときは `pnpm 
 | `pnpm build`      | `out/` に静的サイトを出力                             |
 | `pnpm preview`    | ビルドして Cloudflare と同じ条件で配信                |
 | `pnpm typecheck`  | 型チェック (`tsc --noEmit`)                           |
-| `pnpm lint`       | Biome のチェック                                      |
+| `pnpm lint`       | Oxlint + Oxfmt のチェック                             |
 | `pnpm lint:fix`   | 同上を自動修正                                        |
 | `pnpm format`     | 整形のみ実行                                          |
 | `pnpm test`       | テストを 1 回実行                                     |
@@ -64,11 +64,11 @@ dev サーバーだけを手元のターミナルに出したいときは `pnpm 
 
 ## ガードレール
 
-設計上の決めごとは lint で機械的に落としている。設定は `biome.jsonc` の 1 ファイルに集約
-してあり、ルールごとに「なぜそうするか」をコメントで書いてある。
+設計上の決めごとは lint で機械的に落としている。lint の設定は `.oxlintrc.json`、整形は
+`.oxfmtrc.json` にあり、ルールごとに「なぜそうするか」をコメントで書いてある。
 
 - **層の境界**: 依存は `共有層 → features → app / layouts` の一方向。
-  `noRestrictedImports` を層ごとの `overrides` で設定している
+  `no-restricted-imports` を層ごとの `overrides` で設定している
 - **barrel の禁止**: `index.ts` の再エクスポートは置かない。knip が export 単位で
   未使用を検出できなくなるため
 - **kebab-case**: ファイル名はコンポーネントも含めてすべて kebab-case。
@@ -76,9 +76,9 @@ dev サーバーだけを手元のターミナルに出したいときは `pnpm 
 - **モダン React**: `import * as React` / `forwardRef` / `FC` などを禁止
 - **Node のビルトイン**: ブラウザに降りうるコードでは禁止。許すのは
   「ビルド時にしか動かない」と名指ししたファイルだけ (`src/app/**` と content を読む 2 つ)
-- **日付**: 生の `new Date()` は GritQL プラグイン (`no-raw-date.grit`) が落とす。
+- **日付**: 生の `new Date()` は自作の Oxlint プラグイン (`tools/oxlint-plugin.mjs` の `no-raw-date`) が落とす。
   組み立ては `src/lib/date.ts` に閉じる
-- **commit 時**: lefthook が Biome / `tsc` / commitlint を走らせる
+- **commit 時**: lefthook が Oxlint / Oxfmt / `tsc` / commitlint を走らせる
 
 詳細は [コーディング規約](docs/coding-standards.md) を参照。
 

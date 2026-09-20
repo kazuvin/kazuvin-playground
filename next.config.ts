@@ -23,11 +23,8 @@ const nextConfig: NextConfig = {
   images: { unoptimized: true },
 
   /* React Compiler を通す。再レンダーの抑制はコンパイラに任せる方針なので
-     (biome.jsonc の noRestrictedImports のメッセージと対)、useMemo /
+     (.oxlintrc.json の no-restricted-imports のメッセージと対)、useMemo /
      useCallback / memo を手で置かない。
-
-     Biome の nursery/useReactCompiler は入れていない。2.5.12 時点では
-     日本語コメントを含むファイルで panic する (バイト境界の扱いのバグ)。
 
      Storybook は @storybook/react-vite が別のパイプラインを持つためコンパイラを
      通らない。意味論は変えない前提なので揃えていない。 */

@@ -79,7 +79,7 @@ export function MobileNav() {
       {/* top-full はバーの下端 (border 込み)。バーの半透明を継がずに塗り切るのは、
           入れ子の backdrop-filter が本文をぼかせず文字が重なって読めないため。 */}
       {isOpen && (
-        <div className="absolute inset-x-0 top-full border-border-hairline border-b bg-background px-edge-h py-gap motion-safe:animate-fade-in">
+        <div className="absolute inset-x-0 top-full border-b border-border-hairline bg-background px-edge-h py-gap motion-safe:animate-fade-in">
           <SiteNav variant="menu" onNavigate={close} />
         </div>
       )}

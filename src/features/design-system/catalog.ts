@@ -28,13 +28,11 @@ export const TOKEN_GROUPS: TokenGroup[] = groupThemeTokens(
 const CATALOG_SECTIONS: CatalogSection[] = [
   { id: 'principles', title: '原則', depth: 2 },
   { id: 'tokens', title: 'トークン', depth: 2 },
-  ...TOKEN_GROUPS.map(
-    (group): CatalogSection => ({
-      id: `token-${group.id}`,
-      title: group.title,
-      depth: 3,
-    }),
-  ),
+  ...TOKEN_GROUPS.map((group): CatalogSection => ({
+    id: `token-${group.id}`,
+    title: group.title,
+    depth: 3,
+  })),
   { id: 'components', title: 'コンポーネント', depth: 2 },
   { id: 'component-text', title: 'Text', depth: 3 },
   { id: 'component-page-header', title: 'PageHeader', depth: 3 },

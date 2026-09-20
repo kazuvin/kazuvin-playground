@@ -39,22 +39,22 @@ export const WithFooter: Story = {
         <form>
           <div className="grid w-full items-center gap-4">
             <div className="flex flex-col space-y-1.5">
-              <label htmlFor="name" className="font-medium text-sm">
+              <label htmlFor="name" className="text-sm font-medium">
                 Name
               </label>
               <input
                 id="name"
                 placeholder="Name of your project"
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               />
             </div>
             <div className="flex flex-col space-y-1.5">
-              <label htmlFor="framework" className="font-medium text-sm">
+              <label htmlFor="framework" className="text-sm font-medium">
                 Framework
               </label>
               <select
                 id="framework"
-                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <option value="">Select</option>
                 <option value="next">Next.js</option>
@@ -84,8 +84,8 @@ export const Notification: Story = {
       <CardContent className="grid gap-4">
         <div className="flex items-center space-x-4 rounded-md border p-4">
           <div className="flex-1 space-y-1">
-            <p className="font-medium text-sm leading-none">Push Notifications</p>
-            <p className="text-muted-foreground text-sm">Send notifications to device.</p>
+            <p className="text-sm leading-none font-medium">Push Notifications</p>
+            <p className="text-sm text-muted-foreground">Send notifications to device.</p>
           </div>
         </div>
         <div>
@@ -109,8 +109,8 @@ export const Notification: Story = {
             >
               <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
               <div className="space-y-1">
-                <p className="font-medium text-sm leading-none">{notification.title}</p>
-                <p className="text-muted-foreground text-sm">{notification.description}</p>
+                <p className="text-sm leading-none font-medium">{notification.title}</p>
+                <p className="text-sm text-muted-foreground">{notification.description}</p>
               </div>
             </div>
           ))}
@@ -130,7 +130,7 @@ export const Simple: Story = {
         <CardTitle>Simple Card</CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-muted-foreground text-sm">
+        <p className="text-sm text-muted-foreground">
           This is a simple card with just a title and content.
         </p>
       </CardContent>
@@ -150,7 +150,7 @@ export const AllComponents: Story = {
           <p className="text-sm">Card content can contain any React components or HTML elements.</p>
         </CardContent>
         <CardFooter>
-          <p className="text-muted-foreground text-sm">Card Footer</p>
+          <p className="text-sm text-muted-foreground">Card Footer</p>
         </CardFooter>
       </Card>
     </div>

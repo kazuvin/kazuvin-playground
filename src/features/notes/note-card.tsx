@@ -15,7 +15,7 @@ export function NoteCard({ note }: NoteCardProps) {
       <Card className="transition-colors hover:border-border-strong">
         <CardHeader>
           <CardTitle>{note.metadata.title}</CardTitle>
-          <time dateTime={note.metadata.date} className="text-muted-foreground text-sm">
+          <time dateTime={note.metadata.date} className="text-sm text-muted-foreground">
             {formattedDate}
           </time>
         </CardHeader>
@@ -29,7 +29,7 @@ export function NoteCard({ note }: NoteCardProps) {
                 {note.metadata.tags.map((tag) => (
                   <span
                     key={tag}
-                    className="rounded-chip bg-secondary px-2 py-1 text-secondary-foreground text-xs"
+                    className="rounded-chip bg-secondary px-2 py-1 text-xs text-secondary-foreground"
                   >
                     {tag}
                   </span>

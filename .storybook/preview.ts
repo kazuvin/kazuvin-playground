@@ -1,5 +1,4 @@
 import type { Preview } from '@storybook/react-vite'
-
 /* Storybook はアプリのレイアウトを描画しないので、フォントはここで読み込む。
    src/styles/fonts.ts と src/app/layout.tsx が読むのと同じ @fontsource-variable/* を使う。 */
 import '@fontsource-variable/noto-sans-mono'

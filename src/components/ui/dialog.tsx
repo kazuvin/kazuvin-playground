@@ -53,7 +53,7 @@ function DialogContent({
         {...props}
       >
         {children}
-        <DialogPrimitive.Close className="absolute top-4 right-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-muted data-[state=open]:text-muted-foreground">
+        <DialogPrimitive.Close className="absolute top-4 right-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-none disabled:pointer-events-none data-[state=open]:bg-muted data-[state=open]:text-muted-foreground">
           <svg
             aria-hidden="true"
             xmlns="http://www.w3.org/2000/svg"
@@ -99,7 +99,7 @@ function DialogTitle({ className, ref, ...props }: ComponentProps<typeof DialogP
   return (
     <DialogPrimitive.Title
       ref={ref}
-      className={cn('font-semibold text-base leading-snug tracking-tight', className)}
+      className={cn('text-base leading-snug font-semibold tracking-tight', className)}
       {...props}
     />
   )
@@ -113,7 +113,7 @@ function DialogDescription({
   return (
     <DialogPrimitive.Description
       ref={ref}
-      className={cn('text-muted-foreground text-sm', className)}
+      className={cn('text-sm text-muted-foreground', className)}
       {...props}
     />
   )

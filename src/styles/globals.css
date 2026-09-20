@@ -354,7 +354,7 @@
    と左右のサイドバー) が text-base = 0.875rem として与える。基準を 16px に置いた
    まま中身を 14px で組むので、rem の値がそのまま px の 1/16 として読める。 */
 body {
-  @apply bg-background text-foreground font-sans;
+  @apply bg-background font-sans text-foreground;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }

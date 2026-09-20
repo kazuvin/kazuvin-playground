@@ -111,7 +111,7 @@ function TokenTable({ group }: TokenTableProps) {
         {group.utility}
       </Text>
 
-      <ul className="mt-gap divide-y divide-border-hairline border-border-hairline border-y">
+      <ul className="mt-gap divide-y divide-border-hairline border-y border-border-hairline">
         {group.rows.map(({ key, token }) => (
           <li key={token.name} className="py-inset-y">
             {(token.label !== '' || token.note.length > 0) && (
@@ -136,19 +136,19 @@ function TokenTable({ group }: TokenTableProps) {
                 <Text role="label" as="span" className="block">
                   {key}
                 </Text>
-                <p className="mt-gap-tight break-all text-sm text-subtle-foreground">
+                <p className="mt-gap-tight text-sm break-all text-subtle-foreground">
                   {token.value}
                 </p>
                 {token.resolved !== token.value && (
-                  <p className="break-all text-muted-foreground text-xs">= {token.resolved}</p>
+                  <p className="text-xs break-all text-muted-foreground">= {token.resolved}</p>
                 )}
                 {token.value === 'initial' && (
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-xs text-muted-foreground">
                     Tailwind 既定のスケールを消している。この名前空間はここで定義した段しか持たない
                   </p>
                 )}
                 {token.modifiers.map((modifier) => (
-                  <p key={modifier.property} className="break-all text-muted-foreground text-xs">
+                  <p key={modifier.property} className="text-xs break-all text-muted-foreground">
                     {modifier.property}: {modifier.value}
                     {modifier.resolved !== modifier.value && ` = ${modifier.resolved}`}
                   </p>

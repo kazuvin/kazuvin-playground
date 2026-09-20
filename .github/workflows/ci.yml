@@ -28,7 +28,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # Biome が ts/tsx/json/css/その他すべてを見る
+      # oxlint (型情報ルール込み) と oxfmt --check。整形の確認は ts/tsx/json/css が対象
       - name: Run lint
         run: pnpm run lint
 

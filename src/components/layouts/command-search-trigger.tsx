@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
 
 const CommandSearch = dynamic(
-  // biome-ignore lint/style/noRestrictedImports: 遅延読み込みそのものが目的。動的 import は名前空間の取り込みとして拾われるが、静的な import に直すと分けた意味が無くなる
+  // oxlint-disable-next-line kazuvin/no-namespace-import -- 遅延読み込みそのものが目的。動的 import は名前空間の取り込みとして拾われるが、静的な import に直すと分けた意味が無くなる
   async () => (await import('@/features/notes/command-search')).CommandSearch,
   { ssr: false },
 )
@@ -30,7 +30,7 @@ export function CommandSearchTrigger() {
         type="button"
         onClick={toggle}
         aria-keyshortcuts="Meta+K Control+K"
-        className="hidden h-control w-full cursor-pointer items-center gap-gap rounded-control border border-input bg-background px-3 text-muted-foreground text-sm transition-colors duration-120 ease-standard hover:bg-muted lg:inline-flex"
+        className="hidden h-control w-full cursor-pointer items-center gap-gap rounded-control border border-input bg-background px-3 text-sm text-muted-foreground transition-colors duration-120 ease-standard hover:bg-muted lg:inline-flex"
       >
         <svg
           aria-hidden="true"

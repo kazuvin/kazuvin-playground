@@ -81,7 +81,7 @@ interface TimelineTitleProps extends ComponentProps<'div'> {
 function TimelineTitle({ className, isActive = false, ...props }: TimelineTitleProps) {
   return (
     <div
-      className={cn('font-semibold text-sm leading-none', isActive && 'text-primary', className)}
+      className={cn('text-sm leading-none font-semibold', isActive && 'text-primary', className)}
       {...props}
     />
   )

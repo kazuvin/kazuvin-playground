@@ -97,10 +97,10 @@ export default function DesignSystemPage() {
 
       <section>
         <SectionHeading id="principles" />
-        <ol className="mt-block-tight divide-y divide-border-hairline border-border-hairline border-y">
+        <ol className="mt-block-tight divide-y divide-border-hairline border-y border-border-hairline">
           {PRINCIPLES.map((principle, index) => (
             <li key={principle.heading} className="flex items-baseline gap-block-tight py-inset-y">
-              <span className="w-6 shrink-0 text-muted-foreground text-sm tabular-nums">
+              <span className="w-6 shrink-0 text-sm text-muted-foreground tabular-nums">
                 {index + 1}
               </span>
               <div className="min-w-0 flex-1">
@@ -148,7 +148,7 @@ export default function DesignSystemPage() {
           <Text role="caption" className="mt-gap">
             8 つの role。上の 5 つは同じ 14px で、違うのは太さと色だけ。
           </Text>
-          <ul className="mt-block-tight divide-y divide-border-hairline border-border-hairline border-y">
+          <ul className="mt-block-tight divide-y divide-border-hairline border-y border-border-hairline">
             {TEXT_ROLES.map((role) => (
               <li key={role} className="flex items-baseline gap-block-tight py-inset-y">
                 <code className={cn(dsCode, 'w-28 shrink-0 text-muted-foreground')}>{role}</code>

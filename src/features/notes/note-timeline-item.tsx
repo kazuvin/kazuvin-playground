@@ -19,7 +19,7 @@ export function NoteTimelineItem({ note }: NoteTimelineItemProps) {
             {note.metadata.tags?.map((tag) => (
               <span
                 key={tag}
-                className="rounded bg-secondary px-2 py-0.5 text-secondary-foreground text-xs"
+                className="rounded bg-secondary px-2 py-0.5 text-xs text-secondary-foreground"
               >
                 {tag}
               </span>

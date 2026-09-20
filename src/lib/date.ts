@@ -1,5 +1,5 @@
 /*
- * Date に触れてよい唯一のファイル (他は no-raw-date.grit が落とす)。
+ * Date に触れてよい唯一のファイル (他は tools/oxlint-plugin.mjs の kazuvin/no-raw-date が落とす)。
  * `new Date('2025-11-03')` は UTC 0 時と解釈され、日本時間では前日になる。
  */
 

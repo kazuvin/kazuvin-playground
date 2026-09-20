@@ -45,7 +45,7 @@ export const Default: Story = {
                   git init && git commit -m &quot;Initial commit&quot;
                 </code>
               </div>
-              <p className="text-muted-foreground text-xs">Branch: main • Commit: a1b2c3d</p>
+              <p className="text-xs text-muted-foreground">Branch: main • Commit: a1b2c3d</p>
             </div>
           </TimelineBody>
         </TimelineContent>
@@ -62,7 +62,7 @@ export const Default: Story = {
             <TimelineConnector />
           </TimelineSeparator>
           <TimelineBody>
-            <div className="space-y-1 text-muted-foreground text-xs">
+            <div className="space-y-1 text-xs text-muted-foreground">
               <p>✓ React 18.2.0</p>
               <p>✓ TypeScript 5.0.0</p>
               <p>✓ Tailwind CSS 3.3.0</p>

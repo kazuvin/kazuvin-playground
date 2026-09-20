@@ -1,7 +1,9 @@
 ---
 paths:
   - "src/**/*.{ts,tsx,css}"
-  - "biome.jsonc"
+  - ".oxlintrc.json"
+  - ".oxfmtrc.json"
+  - "tools/oxlint-plugin.mjs"
 ---
 
 # src を触るときのルール
@@ -15,7 +17,7 @@ paths:
 | コンポーネントを追加・修正する、命名や import の形で迷う | `docs/coding-standards.md` |
 | 色・余白・書体・角丸を決める、UI プリミティブを足す | `docs/kotoba-design-system.md` |
 | テストを書く、置き場所を決める | `docs/testing.md` |
-| `biome.jsonc` の lint ルールを変える | `docs/coding-standards.md` / `docs/directory-structure.md` |
+| `.oxlintrc.json` の lint ルールを変える | `docs/coding-standards.md` / `docs/directory-structure.md` |
 | CI を変える | `docs/ci-cd.md` |
 | 画面を見た指摘を受け取る、Agentation / MCP を触る | `docs/agentation.md` |
 
@@ -38,7 +40,7 @@ paths:
 
 ## lint が落とさないもの
 
-古い React の書き方・依存の向き・ファイル名・Node ビルトインの持ち込みは Biome と `tsc` が
+古い React の書き方・依存の向き・ファイル名・Node ビルトインの持ち込みは Oxlint と `tsc` が
 落とし、理由はそのメッセージに出る。機械が判定できないのは次の 4 つで、これはレビューでしか
 止まらない。
 
@@ -50,7 +52,7 @@ paths:
 - **コメントに設計の説明を書き写さない**。docs にあることはコードに複製せず、残すのは
   コードだけでは復元できない「なぜ」に限る（1〜3 行）。基準は
   `docs/coding-standards.md` の「コメント」。
-- **`biome.jsonc` の noNodejsModules 例外に `'use client'` のファイルを足さない**。
+- **`.oxlintrc.json` の `import/no-nodejs-modules` 例外に `'use client'` のファイルを足さない**。
   あの一覧は「ビルド時にしか動かない」という宣言で、ブラウザに降りるファイルを入れると
   ガードそのものが無意味になる。
 
@@ -63,7 +65,7 @@ paths:
 ## 変更後に通すもの
 
 ```sh
-pnpm lint        # Biome。--write 相当は pnpm lint:fix
+pnpm lint        # Oxlint + Oxfmt。--write 相当は pnpm lint:fix
 pnpm typecheck   # tsc --noEmit
 pnpm test        # vitest run
 ```

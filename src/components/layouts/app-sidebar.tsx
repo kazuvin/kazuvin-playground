@@ -41,7 +41,7 @@ export function AppSidebar() {
           href="/"
           className="inline-flex transition-opacity duration-120 ease-standard hover:opacity-70"
         >
-          {/* biome-ignore lint/performance/noImgElement: Static Export に画像最適化サーバーは無い (docs/directory-structure.md) */}
+          {/* oxlint-disable-next-line nextjs/no-img-element -- Static Export に画像最適化サーバーは無い (docs/directory-structure.md) */}
           <img
             src={logo.src}
             alt={APP_NAME}

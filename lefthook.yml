@@ -1,10 +1,18 @@
 pre-commit:
   parallel: true
   jobs:
-    - name: biome
-      glob: '*.{js,jsx,ts,tsx,mts,mjs,json,jsonc,css}'
-      run: pnpm exec biome check --write --no-errors-on-unmatched --files-ignore-unknown=true {staged_files}
-      stage_fixed: true
+    # oxlint --fix と oxfmt は同じファイルを書き換えるので、並列にせず順に流す
+    - group:
+        parallel: false
+        jobs:
+          - name: oxlint
+            glob: '*.{js,jsx,ts,tsx,mts,mjs}'
+            run: pnpm exec oxlint --fix {staged_files}
+            stage_fixed: true
+          - name: oxfmt
+            glob: '*.{js,jsx,ts,tsx,mts,mjs,json,jsonc,css}'
+            run: pnpm exec oxfmt --no-error-on-unmatched-pattern {staged_files}
+            stage_fixed: true
     # tsc はプロジェクト全体を見るのでファイル単位に絞れない
     - name: typecheck
       run: pnpm run typecheck

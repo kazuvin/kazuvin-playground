@@ -54,7 +54,7 @@ export const WithFooter: Story = {
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="grid grid-cols-4 items-center gap-4">
-            <label htmlFor="name" className="text-right font-medium text-sm">
+            <label htmlFor="name" className="text-right text-sm font-medium">
               Name
             </label>
             <input
@@ -64,7 +64,7 @@ export const WithFooter: Story = {
             />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
-            <label htmlFor="username" className="text-right font-medium text-sm">
+            <label htmlFor="username" className="text-right text-sm font-medium">
               Username
             </label>
             <input
@@ -193,7 +193,7 @@ export const FormExample: Story = {
         </DialogHeader>
         <form className="space-y-4 py-4">
           <div className="space-y-2">
-            <label htmlFor="email" className="font-medium text-sm">
+            <label htmlFor="email" className="text-sm font-medium">
               Email
             </label>
             <input
@@ -204,7 +204,7 @@ export const FormExample: Story = {
             />
           </div>
           <div className="space-y-2">
-            <label htmlFor="password" className="font-medium text-sm">
+            <label htmlFor="password" className="text-sm font-medium">
               Password
             </label>
             <input
@@ -215,7 +215,7 @@ export const FormExample: Story = {
             />
           </div>
           <div className="space-y-2">
-            <label htmlFor="confirm" className="font-medium text-sm">
+            <label htmlFor="confirm" className="text-sm font-medium">
               Confirm Password
             </label>
             <input

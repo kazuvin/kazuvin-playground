@@ -9,7 +9,7 @@
 - **プレゼンテーションとロジックの分離**: コンポーネントは UI に専念し、ロジックは features/hooks/stores で管理
 - **ドメイン駆動設計**: コンポーネントをドメイン非依存/依存で分類
 - **既定は Server Component**: ブラウザで動く必要があるものだけ `'use client'` を付け、境界は葉に寄せる
-- **一方向の依存**: 共有層 → features → app / layouts。向きは Biome が lint で強制する
+- **一方向の依存**: 共有層 → features → app / layouts。向きは Oxlint が lint で強制する
 
 命名と import の書き方は [コーディング規約](coding-standards.md) にあります。
 
@@ -25,8 +25,9 @@ kazuvin-playground/
 ├── .mcp.json               # Claude Code が起動する MCP サーバー (Agentation)
 ├── next.config.ts          # Next.js の設定 (Static Export の宣言もここ)
 ├── postcss.config.mjs      # Tailwind v4 を Next のビルドに載せる口
-├── biome.jsonc             # lint / format と層の境界の設定 (ガードレールの本体)
-├── no-raw-date.grit        # Biome の GritQL プラグイン (生の Date を禁じる)
+├── .oxlintrc.json          # lint と層の境界の設定 (ガードレールの本体)
+├── .oxfmtrc.json           # 整形の設定 (import 順と Tailwind クラスの整列も含む)
+├── tools/oxlint-plugin.mjs # 自作の Oxlint ルール (生の Date / enum / delete / import * as / export *)
 ├── knip.jsonc              # 未使用ファイル・export・依存の検出
 ├── lefthook.yml            # commit 前に走るフック
 ├── mise.toml               # Node / pnpm のバージョン (単一の情報源)
@@ -87,7 +88,7 @@ Cloudflare が読む `_headers` だけです。
 ## レイヤー境界
 
 依存は **`共有層 → features → app / layouts`** の一方向に限ります。
-Biome の `noRestrictedImports` を `overrides` で層ごとに設定しており、違反は lint で落ちます。
+Oxlint の `no-restricted-imports` を `overrides` で層ごとに設定しており、違反は lint で落ちます。
 
 | 層 | ディレクトリ | 参照してよい先 |
 | --- | --- | --- |
@@ -98,7 +99,7 @@ Biome の `noRestrictedImports` を `overrides` で層ごとに設定してお�
 
 ディレクトリ名がそのまま層の名前になっています。唯一またいでいるのが `components/` で、
 この下の `layouts/` だけが app 層、残り (`ui/` `dev/`) は共有層です。置き場所ではなく
-**何を参照してよいか**が層を決めるので、`biome.jsonc` では共有層の override
+**何を参照してよいか**が層を決めるので、`.oxlintrc.json` では共有層の override
 (`components/**` を含む) の後に `components/layouts/**` の override を置いて上書きしています。
 `app-sidebar.tsx` が `components/ui/` ではなく `components/layouts/` にあるのも、
 features (コマンドパレット) を参照する必要があるためです。
@@ -112,11 +113,11 @@ features (コマンドパレット) を参照する必要があるためです�
   (string / number) で受け取り、ドメインの型からの変換は `features/<domain>/` の UI で行う。
 - **親を遡る相対 import (`../`) は共有層・features・ui・layouts で禁止**。この記法を許すと
   `@/` エイリアスに対する境界チェックを表記の違いだけですり抜けられるため。
-- `overrides` の options はグローバル設定を**マージではなく上書き**する。そのため各 override で
+- `overrides` の rules 設定はグローバル設定を**マージではなく上書き**する。そのため各 override で
   React まるごと取り込み禁止の `paths` を再掲している。消すとその配下だけ素通りになる。
 
 テンプレートも含めてすべてが `.tsx` なので、この lint はサイトの全ファイルに効きます
-(`.astro` を Biome の対象外にしていた頃の抜け穴はもうありません)。
+(`.astro` を lint の対象外にしていた頃の抜け穴はもうありません)。
 
 ### app/ ディレクトリ
 
@@ -307,8 +308,8 @@ src/features/
 ビルド時に一度描かれて HTML に載り、そのうえで hydrate されます。左レールも右の目次も、
 JS が来る前から HTML に入っているのはこのためです。
 
-`src/**` には `noNodejsModules` を掛けており、ブラウザに届きうるコードに Node の
-ビルトインを持ち込めません。例外は `biome.jsonc` で**名指ししたファイルだけ**
+`src/**` には `import/no-nodejs-modules` を掛けており、ブラウザに届きうるコードに Node の
+ビルトインを持ち込めません。例外は `.oxlintrc.json` で**名指ししたファイルだけ**
 (`src/app/**` と、content / CSS を読む 2 つ) で、これは「ビルド時にしか動かない」という
 宣言でもあります。`'use client'` のファイルをここに足してはいけません。
 
@@ -510,8 +511,8 @@ bulletproof-react、vercel/commerce、Next.js の公式サンプルには**コ�
 `src/components/` にユーティリティのファイルは置きません。コンポーネントの中で完結する
 処理は本体に書き、切り出す段になったら上の 2 つのどちらかに行き先が決まります。
 
-`src/lib/date.ts` 以外での `new Date()` / `Date.now()` は GritQL プラグイン
-(`no-raw-date.grit`) が lint で落とします。詳細は
+`src/lib/date.ts` 以外での `new Date()` / `Date.now()` は自作の Oxlint ルール
+(`tools/oxlint-plugin.mjs` の `kazuvin/no-raw-date`) が lint で落とします。詳細は
 [コーディング規約](coding-standards.md#日付の扱い) を参照してください。
 
 ### config/ ディレクトリ
@@ -565,7 +566,7 @@ src/features/notes/
 `src/app/` だけは例外で、名前を決めるのは Next.js と URL です。規約ファイル
 (`page.tsx` / `layout.tsx` / `not-found.tsx` / `route.ts` / `sitemap.ts`)、動的ルートの
 `[param]`、そして `notes-index.json/` のように拡張子を含むディレクトリ名がそれにあたります。
-`biome.jsonc` はこのディレクトリだけ `useFilenamingConvention` を外しています。
+`.oxlintrc.json` はこのディレクトリだけ `unicorn/filename-case` を外しています。
 
 ## ベストプラクティス
 

@@ -46,7 +46,7 @@ export function useWindowScroll(): [WindowScrollPosition, (options: ScrollToOpti
     window.scrollTo({
       left: options.x,
       top: options.y,
-      behavior: options.behavior || 'smooth',
+      behavior: options.behavior ?? 'smooth',
     })
   }, [])
 

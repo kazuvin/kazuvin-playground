@@ -8,7 +8,7 @@ export default function NotFound() {
            たびに箱が広がってテキストが横に動く (最大 184.8px)。 */}
       <div className="flex min-h-[60vh] items-center justify-center">
         <div className="w-full max-w-xl text-center">
-          <h1 className="mb-block font-bold text-mark">404</h1>
+          <h1 className="mb-block text-mark font-bold">404</h1>
           <h2 className="mb-gap font-semibold">Page Not Found</h2>
           <p className="mb-block text-subtle-foreground">
             The page you are looking for does not exist.

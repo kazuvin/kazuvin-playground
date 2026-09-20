@@ -22,7 +22,7 @@ function Command({ className, ref, ...props }: ComponentProps<typeof CommandPrim
 function CommandInput({ className, ref, ...props }: ComponentProps<typeof CommandPrimitive.Input>) {
   return (
     <div
-      className="flex h-control-lg shrink-0 items-center gap-gap border-border-hairline border-b px-inset-x"
+      className="flex h-control-lg shrink-0 items-center gap-gap border-b border-border-hairline px-inset-x"
       cmdk-input-wrapper=""
     >
       <svg
@@ -54,7 +54,7 @@ function CommandList({ className, ref, ...props }: ComponentProps<typeof Command
   return (
     <CommandPrimitive.List
       ref={ref}
-      className={cn('max-h-72 min-h-0 flex-1 overflow-y-auto overflow-x-hidden py-gap', className)}
+      className={cn('max-h-72 min-h-0 flex-1 overflow-x-hidden overflow-y-auto py-gap', className)}
       {...props}
     />
   )
@@ -64,7 +64,7 @@ function CommandEmpty({ className, ref, ...props }: ComponentProps<typeof Comman
   return (
     <CommandPrimitive.Empty
       ref={ref}
-      className={cn('px-inset-x py-block text-center text-muted-foreground text-sm', className)}
+      className={cn('px-inset-x py-block text-center text-sm text-muted-foreground', className)}
       {...props}
     />
   )
@@ -77,7 +77,7 @@ function CommandGroup({ className, ref, ...props }: ComponentProps<typeof Comman
     <CommandPrimitive.Group
       ref={ref}
       className={cn(
-        'text-foreground [&_[cmdk-group-heading]]:px-inset-x [&_[cmdk-group-heading]]:py-gap [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-2xs [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:uppercase',
+        'text-foreground [&_[cmdk-group-heading]]:px-inset-x [&_[cmdk-group-heading]]:py-gap [&_[cmdk-group-heading]]:text-2xs [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group-heading]]:uppercase',
         className,
       )}
       {...props}
@@ -106,7 +106,7 @@ function CommandItem({ className, ref, ...props }: ComponentProps<typeof Command
     <CommandPrimitive.Item
       ref={ref}
       className={cn(
-        'relative flex min-h-tap-min cursor-pointer select-none items-center gap-gap px-inset-x py-gap text-sm text-subtle-foreground outline-none data-[disabled=true]:pointer-events-none data-[selected=true]:bg-selected data-[disabled=true]:text-disabled-foreground data-[selected=true]:text-foreground [&_svg]:pointer-events-none [&_svg]:size-3.5 [&_svg]:shrink-0',
+        'relative flex min-h-tap-min cursor-pointer items-center gap-gap px-inset-x py-gap text-sm text-subtle-foreground outline-none select-none data-[disabled=true]:pointer-events-none data-[disabled=true]:text-disabled-foreground data-[selected=true]:bg-selected data-[selected=true]:text-foreground [&_svg]:pointer-events-none [&_svg]:size-3.5 [&_svg]:shrink-0',
         className,
       )}
       {...props}
