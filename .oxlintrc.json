@@ -201,8 +201,9 @@
     // ---------------------------------------------------------------
     // role="caption" を div に付けている箇所が多数ある（table 以外の見出し用）
     "jsx-a11y/prefer-tag-over-role": "off",
-    // useEffect 内の同期 setState（command-search / toc-sidebar の 3 か所）
-    "react/set-state-in-effect": "off",
+    // effect 内の同期 setState。外部システムとの同期だけが正当な用途なので、
+    // 例外は行単位の disable コメントで名指しする（今は toc-sidebar の 1 行だけ）。
+    "react/set-state-in-effect": "error",
     "vitest/require-mock-type-parameters": "off"
   },
   "overrides": [
@@ -242,8 +243,8 @@
       // 'use client' を付けたファイルをここに足してはいけない。
       "files": [
         "src/app/**",
-        "src/features/notes/notes.ts",
-        "src/features/design-system/catalog.ts"
+        "src/features/notes/api/notes.ts",
+        "src/features/design-system/api/catalog.ts"
       ],
       "rules": {
         "import/no-nodejs-modules": "off"
@@ -382,6 +383,8 @@
     },
     {
       // features は他 feature と app / layouts を知らない。自 feature 内は相対 import で書く。
+      // feature 直下（<domain>/ 自身）に置くファイルの規定。api / components / utils などの
+      // サブディレクトリは、1 階層だけ上がれるよう次の override で上書きする。
       "files": ["src/features/**"],
       "rules": {
         "no-restricted-imports": [
@@ -417,10 +420,64 @@
                 "message": "features から app / layouts を import することはできません。ページに依存せず、必要な値は props で受け取ってください。合成はページ側で行います。"
               },
               {
-                // ファイルは feature ディレクトリ直下に置く。2 階層さかのぼると
-                // `../other-feature` が届いてしまう。
+                // feature 直下のファイルから 1 階層さかのぼると `../other-feature` が届く。
                 "group": ["../**"],
                 "message": "親ディレクトリをさかのぼる相対 import は feature の境界を越えるため使えません。自 feature 内の参照は ./ で、共有層は @/ エイリアスで参照してください。"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      // ---------------------------------------------------------------
+      // feature の中の階層（api / components / hooks / stores / types / utils）。
+      //
+      // 上の features の override をそのまま受けると ../ が一切書けず、components から
+      // utils を引けない。ここだけ「1 階層上がる」を開ける。
+      // src/features/<domain>/<dir>/ から見た ../ は必ず自分の feature の中なので、
+      // 境界を越えるのは ../../ からになる。そこを禁じれば向きは保たれる。
+      //
+      // features の override より後に置くこと。overrides の設定はマージではなく
+      // 上書きなので、あちらで禁じている分もすべて再掲している。
+      // ---------------------------------------------------------------
+      "files": ["src/features/*/*/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "react",
+                "importNames": [
+                  "*",
+                  "default",
+                  "Children",
+                  "cloneElement",
+                  "createRef",
+                  "PureComponent",
+                  "forwardRef"
+                ],
+                "message": "React をまるごと取り込むこと（import React from 'react' / import * as React from 'react'）はできません。必要な API は named import で個別に取り込んでください（import type { ComponentProps, ReactNode } from 'react'）。"
+              },
+              {
+                "name": "react-dom",
+                "importNames": ["*", "default", "useFormState"],
+                "message": "react-dom をまるごと取り込むことはできません。必要な API は named import で取り込んでください。useFormState は React 19 で useActionState（react から import）に置き換わっています。"
+              }
+            ],
+            "patterns": [
+              {
+                "group": ["@/features/**"],
+                "message": "他の feature を直接 import することはできません。共有したい実装は @/lib などの共有層へ引き上げるか、ページで両方を呼んで合成してください。自 feature 内の参照は相対パスで書きます。"
+              },
+              {
+                "group": ["@/app/**", "@/components/layouts/**"],
+                "message": "features から app / layouts を import することはできません。ページに依存せず、必要な値は props で受け取ってください。合成はページ側で行います。"
+              },
+              {
+                "group": ["../../**"],
+                "message": "2 階層以上さかのぼる相対 import は feature の境界を越えるため使えません。同じ feature の別ディレクトリは ../<dir>/ まで、共有層は @/ エイリアスで参照してください。"
               }
             ]
           }
@@ -470,7 +527,7 @@
               },
               {
                 "name": "@/lib/types",
-                "message": "ui にドメインの語彙を持ち込むことはできません。NoteSummary のような型を知った時点で、その画面でしか使えない部品になります。表示に必要な値は素の props（string / number）で受け取り、ドメインの型から ui の語彙への変換は features/<domain>/ の UI 側で行ってください。"
+                "message": "ui にドメインの語彙を持ち込むことはできません。MarkdownHeading のような型を知った時点で、その画面でしか使えない部品になります（feature に閉じた NoteSummary などは features/<domain>/types/ にあり、@/features/** の禁止で同じく塞がっています）。表示に必要な値は素の props（string / number）で受け取り、ドメインの型から ui の語彙への変換は features/<domain>/components/ 側で行ってください。"
               }
             ],
             "patterns": [

@@ -1,7 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
-import type { ThemeToken } from './parse-theme'
+import type { ThemeToken } from '../utils/parse-theme'
 
 /* 流し込む値は parse-theme が解決した実値なので、globals.css を変えれば動きも変わる。 */
 

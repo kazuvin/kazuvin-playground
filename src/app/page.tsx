@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import { PageShell } from '@/components/layouts/page-shell'
-import { groupNotesByMonth, sortMonthsDescending } from '@/features/notes/group-by-month'
-import { getPublishedNotes, toSearchableItem } from '@/features/notes/notes'
-import { NotesTimeline } from '@/features/notes/notes-timeline'
+import { getPublishedNotes, toSearchableItem } from '@/features/notes/api/notes'
+import { NotesTimeline } from '@/features/notes/components/notes-timeline'
+import { groupNotesByMonth, sortMonthsDescending } from '@/features/notes/utils/group-by-month'
 
 export const metadata: Metadata = {
   alternates: { canonical: '/' },

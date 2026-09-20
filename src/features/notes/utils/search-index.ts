@@ -1,20 +1,6 @@
-import type { SearchableItem, SearchableItemType } from '@/lib/types'
+import type { SearchableItem, SearchableItemType } from '../types/note'
 
-/* 実体は src/app/notes-index.json/route.ts がビルド時に出力する静的 JSON。 */
-const SEARCH_INDEX_URL = '/notes-index.json'
-
-/** 検索インデックスを取得する。ダイアログを開いた時点で初めて呼ばれる。 */
-export async function fetchSearchIndex(): Promise<SearchableItem[]> {
-  const response = await fetch(SEARCH_INDEX_URL)
-
-  if (!response.ok) {
-    throw new Error(
-      `検索インデックスを取得できませんでした: ${response.status} ${response.statusText}`,
-    )
-  }
-
-  return (await response.json()) as SearchableItem[]
-}
+/* 対象は ../api/search-index が取ってくる /notes-index.json の中身。 */
 
 /** タイトル・説明・タグを横断した部分一致。空の検索語は全件を返す。 */
 export function filterSearchableItems(items: SearchableItem[], query: string): SearchableItem[] {

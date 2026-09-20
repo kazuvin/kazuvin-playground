@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { NAV_ITEMS, SITE_URL } from '@/config/app'
-import { getPublishedNotes } from '@/features/notes/notes'
+import { getPublishedNotes } from '@/features/notes/api/notes'
 
 /* 載るのはグローバルナビと公開済みのノートだけ。ページを足しただけでは載らない。 */
 export const dynamic = 'force-static'

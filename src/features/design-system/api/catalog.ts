@@ -1,9 +1,9 @@
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import type { MarkdownHeading } from '@/lib/types'
-import { parseThemeTokens } from './parse-theme'
-import type { TokenGroup } from './token-groups'
-import { groupThemeTokens } from './token-groups'
+import { parseThemeTokens } from '../utils/parse-theme'
+import type { TokenGroup } from '../utils/token-groups'
+import { groupThemeTokens } from '../utils/token-groups'
 
 /*
  * カタログの目次の出典。トークンの節は globals.css から自動で増える。手で書くのは
@@ -40,6 +40,7 @@ const CATALOG_SECTIONS: CatalogSection[] = [
   { id: 'component-card', title: 'Card', depth: 3 },
   { id: 'component-dialog', title: 'Dialog', depth: 3 },
   { id: 'component-command', title: 'Command', depth: 3 },
+  { id: 'component-toast', title: 'Toast', depth: 3 },
   { id: 'component-timeline', title: 'Timeline', depth: 3 },
   { id: 'component-screen', title: 'Screen', depth: 3 },
   { id: 'patterns', title: 'パターン', depth: 2 },
@@ -48,7 +49,7 @@ const CATALOG_SECTIONS: CatalogSection[] = [
   { id: 'pattern-utilities', title: 'ユーティリティ', depth: 3 },
 ]
 
-/** 右レールに渡す目次。MDX から拾う見出し (features/notes/mdx.ts) と同じ形にしてある。 */
+/** 右レールに渡す目次。MDX から拾う見出し (features/notes/utils/mdx.ts) と同じ形にしてある。 */
 export const CATALOG_HEADINGS: MarkdownHeading[] = CATALOG_SECTIONS.map((section) => ({
   depth: section.depth,
   slug: section.id,

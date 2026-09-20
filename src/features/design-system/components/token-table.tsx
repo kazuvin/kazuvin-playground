@@ -1,8 +1,8 @@
 import type { CSSProperties } from 'react'
 import { Text } from '@/components/ui/text'
+import type { ThemeToken } from '../utils/parse-theme'
+import type { TokenGroup, TokenPreview } from '../utils/token-groups'
 import { MotionButton } from './motion-button'
-import type { ThemeToken } from './parse-theme'
-import type { TokenGroup, TokenPreview } from './token-groups'
 
 /*
  * プレビューは inline style で描く。`text-${key}` のように組み立てたクラス名は

@@ -16,9 +16,14 @@
 
 **対象**:
 
-- `features/<domain>/*.ts`: ドメインのロジック、純粋関数
+- `features/<domain>/{api,utils}/*.ts`: ドメインのロジック、純粋関数
+- `**/stores/*-store.ts`: Zustand ストアのアクション
 - `hooks/use-*.ts`: カスタムフック
 - `lib/*.ts`: 汎用ユーティリティ
+
+ストアはモジュールスコープなのでテストをまたいで状態が残ります。`beforeEach` で
+`useSomeStore.setState(初期値)` を呼んで戻してください
+(例: `src/features/notes/stores/command-search-store.test.ts`)。
 
 **環境**: happy-dom (Node.js 環境)
 
@@ -38,23 +43,18 @@
 
 ### 基本パターン
 
-**単一ファイル**:
+テストは対象と同じディレクトリに置きます。feature の中も同じで、
+`utils/` のテストは `utils/` に、`api/` のテストは `api/` に置きます。
 
 ```
 src/features/notes/
-├── group-by-month.ts
-└── group-by-month.test.ts  # 同階層に配置
-```
-
-**複数ファイル**:
-
-```
-src/features/notes/
+├── api/
+│   └── notes.ts
 └── utils/
-    ├── formatters.ts
-    ├── formatters.test.ts
-    ├── validators.ts
-    └── validators.test.ts
+    ├── group-by-month.ts
+    ├── group-by-month.test.ts  # 同階層に配置
+    ├── search-index.ts
+    └── search-index.test.ts
 ```
 
 ## テストコマンド
@@ -97,10 +97,10 @@ describe("functionToTest", () => {
 #### 例: グルーピング関数のテスト
 
 ```typescript
-// src/features/notes/group-by-month.test.ts
+// src/features/notes/utils/group-by-month.test.ts
 import { describe, it, expect } from "vitest";
 import { groupNotesByMonth } from "./group-by-month";
-import type { SearchableItem } from "@/lib/types";
+import type { SearchableItem } from "../types/note";
 
 describe("groupNotesByMonth", () => {
   it("should group notes by month correctly", () => {
@@ -207,10 +207,10 @@ describe("useWindowScroll", () => {
 ### ソート関数のテスト
 
 ```typescript
-// src/features/notes/group-by-month.test.ts
+// src/features/notes/utils/group-by-month.test.ts
 import { describe, it, expect } from "vitest";
 import { sortMonthsDescending } from "./group-by-month";
-import type { NotesByMonth } from "@/lib/types";
+import type { NotesByMonth } from "../types/note";
 
 describe("sortMonthsDescending", () => {
   it("should sort months in descending order", () => {

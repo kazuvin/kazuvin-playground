@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import type { ReactNode } from 'react'
 import { AppShell } from '@/components/layouts/app-shell'
 import { DevTools } from '@/components/layouts/dev-tools'
+import { Toaster } from '@/components/layouts/toaster'
 import { APP_DESCRIPTION, APP_NAME, SITE_URL } from '@/config/app'
 import { notoSansMono } from '@/styles/fonts'
 
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
     <html lang="en" className={notoSansMono.variable}>
       <body>
         <AppShell>{children}</AppShell>
+        <Toaster />
         <DevTools />
       </body>
     </html>

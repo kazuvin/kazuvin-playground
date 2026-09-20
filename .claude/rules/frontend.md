@@ -34,6 +34,9 @@ paths:
 - **既定は Server Component**。`'use client'` を付けるのは、本当にブラウザで動く必要が
   あるものだけ。境界はできるだけ葉に寄せる（レール全体ではなくナビだけ、表全体ではなく
   再生ボタンだけ）。
+- **状態は既定で `useState`**。島をまたいで共有する必要が出てから Zustand のストアに移し、
+  ドメインに閉じるなら `features/<domain>/stores/`、またぐなら `src/stores/` に置く。
+  Context + useReducer を新たに足さない（理由は `docs/directory-structure.md`）。
 - **Static Export なので実行時のサーバーは無い**。SSR / ISR / Middleware / 画像最適化 API /
   動的な Route Handler は使えない。データはビルド時に読む。
 - **色は `src/styles/globals.css` の `@theme` にあるものだけ**。
@@ -48,6 +51,9 @@ paths:
   （Server Component）か `features/` で行い、コンポーネントは props で受け取る。
 - **Client Component の中で `fetch` しない**。ビルド時に解決できない場合
   （コマンドパレットの検索インデックスなど）だけの例外。
+- **`console.error` を通知に置き換えない**。開発者向けのトレースと利用者向けの告知は
+  宛先が違うので併置する。画面に残るべきことはトーストではなくインラインに書く
+  （`docs/coding-standards.md` の「失敗の伝え方」）。
 - **`useMemo` / `useCallback` / `memo` を手で足さない**。まず本当に遅いのかを測る。
 - **コメントに設計の説明を書き写さない**。docs にあることはコードに複製せず、残すのは
   コードだけでは復元できない「なぜ」に限る（1〜3 行）。基準は

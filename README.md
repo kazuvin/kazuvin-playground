@@ -10,6 +10,7 @@ MDX で書いたノートを静的サイトとして配信する個人サイト�
 | ---------------- | -------------------------------------------------------------------------------- |
 | フレームワーク   | Next.js App Router (Static Export)                                               |
 | UI               | React 19 (Server Component 既定 + 必要な箇所だけ Client) + Tailwind CSS v4       |
+| 状態             | 島に閉じるものは `useState`、島をまたぐものだけ Zustand (`stores/`)              |
 | デザインシステム | Kotoba Design System (`src/styles/globals.css` / `docs/kotoba-design-system.md`) |
 | コンテンツ       | MDX (`content/notes`) + zod で frontmatter を検証                                |
 | テスト           | Vitest (unit) + Storybook のブラウザテスト                                       |
@@ -85,7 +86,7 @@ dev サーバーだけを手元のターミナルに出したいときは `pnpm 
 ## ノートを書く
 
 `content/notes/` に `.mdx` を追加する。frontmatter のスキーマは
-`src/features/notes/notes.ts` で定義されており、ビルド時に検証される。
+`src/features/notes/api/notes.ts` で定義されており、ビルド時に検証される。
 
 ```mdx
 ---

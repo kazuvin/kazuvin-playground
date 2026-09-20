@@ -10,7 +10,7 @@ import {
   TimelineSeparator,
   TimelineTitle,
 } from '@/components/ui/timeline'
-import type { NotesByMonth } from '@/lib/types'
+import type { NotesByMonth } from '../types/note'
 import { NoteTimelineItem } from './note-timeline-item'
 
 export interface NotesTimelineProps {

@@ -1,4 +1,4 @@
-import { getPublishedNotes, toSearchableItem } from '@/features/notes/notes'
+import { getPublishedNotes, toSearchableItem } from '@/features/notes/api/notes'
 
 /* コマンドパレットが開かれてから fetch する検索インデックス
    (src/features/notes/search-index.ts)。 */

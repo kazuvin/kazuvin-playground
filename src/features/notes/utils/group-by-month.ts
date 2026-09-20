@@ -1,5 +1,5 @@
 import { toMonthKey, toMonthLabel } from '@/lib/date'
-import type { NotesByMonth, SearchableItem } from '@/lib/types'
+import type { NotesByMonth, SearchableItem } from '../types/note'
 
 export function groupNotesByMonth(notes: SearchableItem[]): Record<string, NotesByMonth> {
   return notes.reduce(

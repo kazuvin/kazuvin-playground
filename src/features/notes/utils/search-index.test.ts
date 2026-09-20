@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { SearchableItem } from '@/lib/types'
+import type { SearchableItem } from '../types/note'
 import { filterSearchableItems, groupSearchableItemsByType } from './search-index'
 
 function item(

@@ -2,10 +2,10 @@ import { readdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
 import matter from 'gray-matter'
 import { z } from 'zod'
-import type { NoteSummary, SearchableItem } from '@/lib/types'
+import type { NoteSummary, SearchableItem } from '../types/note'
 
 /* node:fs を触るのでビルド時からしか呼べない (.oxlintrc.json の import/no-nodejs-modules 例外)。
-   MDX 本文の変換は ./mdx。あちらは重いので frontmatter だけで済む経路では読まない。 */
+   MDX 本文の変換は ../utils/mdx。あちらは重いので frontmatter だけで済む経路では読まない。 */
 
 const NOTES_DIR = path.join(process.cwd(), 'content', 'notes')
 

@@ -108,11 +108,14 @@ features (コマンドパレット) を参照する必要があるためです�
   ページで両方を呼んで合成する。
 - **自 feature 内は相対 import で書く**（`@/features/**` は自分自身を含めて全面禁止のため）。
   feature ごとに例外を書かず、1 つの override で境界を表現するための割り切り。
-- **`components/ui/` はドメインを知らない**。`@/lib/types` の `NoteSummary` のような型を
+  同じ feature の別ディレクトリは `../utils/group-by-month` のように 1 階層だけ上がれる。
+- **`components/ui/` はドメインを知らない**。`@/lib/types` の `MarkdownHeading` のような型を
   import した時点で、その画面でしか使えない部品になる。表示に必要な値は素の props
-  (string / number) で受け取り、ドメインの型からの変換は `features/<domain>/` の UI で行う。
-- **親を遡る相対 import (`../`) は共有層・features・ui・layouts で禁止**。この記法を許すと
-  `@/` エイリアスに対する境界チェックを表記の違いだけですり抜けられるため。
+  (string / number) で受け取り、ドメインの型からの変換は `features/<domain>/components/` で行う。
+- **親を遡る相対 import (`../`) は共有層・ui・layouts と feature 直下で禁止**。この記法を許すと
+  `@/` エイリアスに対する境界チェックを表記の違いだけですり抜けられるため。feature の中の
+  ディレクトリ (`<domain>/api/` など) だけは、そこから見た `../` が必ず自 feature の中に
+  収まるので 1 階層を開けてあり、境界を越える `../../` は引き続き落ちる。
 - `overrides` の rules 設定はグローバル設定を**マージではなく上書き**する。そのため各 override で
   React まるごと取り込み禁止の `paths` を再掲している。消すとその配下だけ素通りになる。
 
@@ -153,7 +156,7 @@ hooks を同階層にコロケーションすることは技術的には可能�
 
 ```tsx
 // src/app/notes/page.tsx
-import { getPublishedNotes, toNoteSummary } from '@/features/notes/notes'
+import { getPublishedNotes, toNoteSummary } from '@/features/notes/api/notes'
 import { PageShell } from '@/components/layouts/page-shell'
 
 export const metadata = { title: 'Notes', alternates: { canonical: '/notes' } }
@@ -186,6 +189,8 @@ src/components/layouts/
 ├── command-search-trigger.tsx  # 　└ ⌘K のボタン (Client。押されて初めて本体を読む)
 ├── page-shell.tsx              # <main> + 右レール。各ページが使う
 ├── toc-sidebar.tsx             # 右レール: ページ専用ナビ (記事の目次)
+├── toaster.tsx                 # 通知の置き場 (最初の 1 件まで何も読まない)
+├── toast-list.tsx              # 　└ Radix の木。積まれて初めて落ちてくる
 └── dev-tools.tsx               # 開発時だけ Agentation を載せる
 ```
 
@@ -250,44 +255,84 @@ features を使うコンポーネントは `components/layouts/` か `app/` に�
 ドメイン固有のロジックを置きます。`src/app/` に置かないものの受け皿であり、
 コンテンツの取得・変換・純粋関数・ドメイン固有のフックが対象です。
 
+**feature の中は役割ごとのディレクトリに分けます** (bulletproof-react と同じ切り方)。
+使うのは `api/` `components/` `hooks/` `stores/` `types/` `utils/` の 6 つで、
+**必要になったものだけを作ります** (今ある 2 つの feature に `hooks/` はまだありません)。
+ファイルを feature 直下に置くのは、どの役割にも収まらない 1 つきりのファイルが
+出たときだけです。
+
+| ディレクトリ | 入るもの |
+| --- | --- |
+| `api/` | 外からデータを取ってくるもの (`node:fs` でのコンテンツ読み取り、`fetch`) |
+| `components/` | ドメインの型を受け取る UI |
+| `hooks/` | その feature でしか使わないフック |
+| `stores/` | その feature に閉じた共有ステート |
+| `types/` | その feature の中だけで使う型 |
+| `utils/` | 取得も描画もしない純粋関数・変換 |
+
 ```
 src/features/
 ├── notes/
-│   ├── notes.ts                 # content/notes の読み取り・検証・変換 (frontmatter の出典)
-│   ├── mdx.ts                   # MDX 本文をコンポーネントと目次に変える
-│   ├── group-by-month.ts        # 純粋関数
-│   ├── group-by-month.test.ts   # 対応するテスト
-│   ├── search-index.ts          # 検索インデックスの取得・絞り込み・グループ化
-│   ├── search-index.test.ts
-│   ├── note-card.tsx            # ドメインの型を受け取る UI
-│   ├── notes-timeline.tsx
-│   ├── note-timeline-item.tsx
-│   └── command-search.tsx       # コマンドパレット (開かれた時に初めて読まれる)
+│   ├── api/
+│   │   ├── notes.ts                 # content/notes の読み取り・検証・変換 (frontmatter の出典)
+│   │   └── search-index.ts          # /notes-index.json の取得 (ブラウザから呼ばれる)
+│   ├── components/
+│   │   ├── note-card.tsx            # ドメインの型を受け取る UI
+│   │   ├── notes-timeline.tsx
+│   │   ├── note-timeline-item.tsx
+│   │   └── command-search.tsx       # コマンドパレット (開かれた時に初めて読まれる)
+│   ├── stores/
+│   │   ├── command-search-store.ts  # コマンドパレットの開閉・検索語・インデックス
+│   │   └── command-search-store.test.ts
+│   ├── types/
+│   │   └── note.ts                  # NoteSummary / SearchableItem / NotesByMonth
+│   └── utils/
+│       ├── mdx.ts                   # MDX 本文をコンポーネントと目次に変える
+│       ├── group-by-month.ts        # 純粋関数
+│       ├── group-by-month.test.ts   # 対応するテスト
+│       ├── search-index.ts          # 検索インデックスの絞り込み・グループ化
+│       └── search-index.test.ts
 └── design-system/
-    ├── parse-theme.ts           # globals.css の @theme をトークン一覧に落とす
-    ├── parse-theme.test.ts
-    ├── token-groups.ts          # トークンをカタログの節に振り分ける
-    ├── token-groups.test.ts
-    ├── catalog.ts               # globals.css をファイルとして読み、目次と節を組む
-    ├── token-table.tsx          # 1 節ぶんの表 (Server Component)
-    ├── motion-button.tsx        # 　└ 再生ボタンだけが Client
-    ├── section-heading.tsx      # 見出し。id から catalog.ts を引く
-    ├── dialog-demo.tsx          # compound をひとまとまりで動かす Client Component
-    └── command-demo.tsx
+    ├── api/
+    │   └── catalog.ts               # globals.css をファイルとして読み、目次と節を組む
+    ├── components/
+    │   ├── token-table.tsx          # 1 節ぶんの表 (Server Component)
+    │   ├── motion-button.tsx        # 　└ 再生ボタンだけが Client
+    │   ├── section-heading.tsx      # 見出し。id から api/catalog.ts を引く
+    │   ├── dialog-demo.tsx          # compound をひとまとまりで動かす Client Component
+    │   └── command-demo.tsx
+    └── utils/
+        ├── parse-theme.ts           # globals.css の @theme をトークン一覧に落とす
+        ├── parse-theme.test.ts
+        ├── token-groups.ts          # トークンをカタログの節に振り分ける
+        └── token-groups.test.ts
 ```
+
+検索インデックスが `api/` と `utils/` に分かれているのは、**取りに行く側とその結果を
+扱う側で実行のされ方が違う**ためです。`fetchSearchIndex` はブラウザから `/notes-index.json`
+を叩く 1 本だけ、絞り込みとグループ化は入力だけで結果が決まる純粋関数で、単体テストが
+付いているのは後者です。
+
+**`types/` に置くのは、その feature の外に出ない型だけです。** `NoteSummary` /
+`SearchableItem` / `NotesByMonth` は notes の中でしか使われないのでここにあります。
+逆に目次の `MarkdownHeading` は 2 つの feature と layouts (`toc-sidebar`) がまたいで使うため
+`@/lib/types` に残してあり、片方の feature に引き取らせると feature 間 import になって
+lint で落ちます。「2 つ目の feature が知る必要が出たら共有層へ」が引き上げの合図です。
 
 `/design-system` のカタログが値を持たないのは、この feature が `src/styles/globals.css` の
 `@theme` を**ビルド時に読んで**組み立てているからです。トークンを 1 つ足せばカタログの行も
 右の目次も増え、接頭辞を知らないトークンは Uncategorised の節に出ます。プレビューの色や
 サイズが Tailwind のクラスではなく inline style なのは、Tailwind が**使われていない
 `@theme` 変数を出力から落とす**ためで、解決済みの実値を流す以外に一致させる方法が
-ありません (経緯は `parse-theme.ts` 冒頭)。CSS をバンドラ経由ではなく `node:fs` で
+ありません (経緯は `utils/parse-theme.ts` 冒頭)。CSS をバンドラ経由ではなく `node:fs` で
 読むのも同じ理由です。
 
-**features には UI を置けます。** ドメインを知っているコンポーネントは、`components/` では
-なくここが居場所です (`components/` は features を import できないため)。
+**features には UI を置けます。** ドメインを知っているコンポーネントは、`src/components/`
+ではなく feature の `components/` が居場所です (`src/components/` は features を import
+できないため)。
 
-`index.ts` は置きません。利用側は `@/features/notes/notes` のように実ファイルを直接指します。
+`index.ts` は置きません。利用側は `@/features/notes/api/notes` のように実ファイルを
+直接指します。
 
 #### ビルド時とクライアントの責務分離
 
@@ -299,7 +344,7 @@ src/features/
 | ----------------------------------- | ------------ | -------------------------------- |
 | `app/**/page.tsx` (Server)          | ビルド時     | データ取得・整形の呼び出し       |
 | `app/**/route.ts`                   | ビルド時     | 静的ファイル (JSON など) の出力  |
-| `features/*.ts` (Server)            | ビルド時     | コンテンツ取得、変換、純粋関数   |
+| `features/*/{api,utils}/*.ts` (Server) | ビルド時  | コンテンツ取得、変換、純粋関数   |
 | `'use client'` を付けた `*.tsx`     | 両方         | ビルド時に HTML を出し、そこから先はブラウザ |
 | `stores/*.ts`                       | クライアント | Client Component 間で共有するステート |
 | `lib/*.ts`                          | 両方         | 純粋関数、共通型                 |
@@ -319,7 +364,7 @@ JS が来る前から HTML に入っているのはこのためです。
 コンポーネントはビルド時に HTML へ描画されて JS を送りません。
 
 ```tsx
-// src/features/design-system/dialog-demo.tsx
+// src/features/design-system/components/dialog-demo.tsx
 'use client'
 
 export function DialogDemo() { … }
@@ -338,7 +383,7 @@ export function DialogDemo() { … }
 ```tsx
 // src/components/layouts/command-search-trigger.tsx
 const CommandSearch = dynamic(
-  async () => (await import('@/features/notes/command-search')).CommandSearch,
+  async () => (await import('@/features/notes/components/command-search')).CommandSearch,
   { ssr: false },
 )
 
@@ -358,6 +403,12 @@ export function CommandSearchTrigger() {
 **React + Radix + cmdk (gzip 約 17KB)** は初めて押されるまで落ちてきません。
 同じ形を `dev-tools.tsx` が Agentation ツールバーに使っています (あちらはさらに
 `NODE_ENV` の枝に入れてあるので、本番ではチャンクごと生まれません)。
+
+`toaster.tsx` も同じ形ですが、**門にしているのはローカルの state ではなくストアの
+`hasNotified`** です。通知は押されて出るとは限らないので、開閉のような手元の state では
+門を作れません。また `toasts.length > 0` ではなく「一度でも積まれたか」を見ています。
+最後の 1 つが消えるたびに Radix の木ごと外すと、live region が消えて次の通知が
+読み上げられない恐れがあるためです。**一度出したら出したままにします。**
 
 判断の順序は **Server Component → `next/dynamic` → `'use client'` を直接**。
 状態を持つ UI が初期表示から画面に出ているならそのまま Client に、押されて初めて
@@ -389,14 +440,15 @@ src/components/
 │   ├── page-header.tsx
 │   ├── screen.tsx
 │   ├── text.tsx
-│   └── timeline.tsx
+│   ├── timeline.tsx
+│   └── toast.tsx           # Radix Toast のラップ。通知の中身は知らない
 └── dev/                    # 開発時だけ動くもの。本番のバンドルには入らない
     └── agentation-toolbar.tsx
 ```
 
 **`src/components/` は、`layouts/` を除けばドメインを知らない部品だけの置き場です。**
 ドメインを知っている UI (`NoteSummary` のような型を受け取るもの) は
-`features/<domain>/` に置きます。bulletproof-react
+`features/<domain>/components/` に置きます。bulletproof-react
 と同じ切り方で、1 つのドメインを理解するのに 2 つのツリーを行き来せずに済みます。
 
 `shared` のような広い名前のディレクトリは作りません。何でも入ってしまうためです。
@@ -411,7 +463,7 @@ src/components/
 | 問い | 置き場所 |
 | --- | --- |
 | ページを包む外枠 (レール・grid) か、features を呼ぶ? | `src/components/layouts/` |
-| ドメインの型 (`NoteSummary` など) を受け取る? | `src/features/<domain>/` |
+| ドメインの型 (`NoteSummary` など) を受け取る? | `src/features/<domain>/components/` |
 | 1 ページでしか使わない静的なマークアップ? | そのページに直接書く |
 | どちらでもない (ドメインを知らない部品) | `src/components/ui/` |
 
@@ -435,11 +487,11 @@ ui プリミティブを組み合わせただけの部品も、ドメインを�
 | 状況 | 行き先 | 例 |
 | --- | --- | --- |
 | 2 つ目の利用者が現れた | `src/hooks/` | `use-keyboard-shortcut.ts` |
-| ドメインの知識が入っている | `src/features/<domain>/` | `notes/search-index.ts` |
+| ドメインの知識が入っている | `src/features/<domain>/` | `notes/utils/search-index.ts` |
 | ドメインに依らない純粋関数 | `src/lib/` | `lib/date.ts` |
 
 **ドメインの知識が入っているものは、テストのためにも切り出します。** 検索の絞り込みが
-`features/notes/search-index.ts` にあるのは、コンポーネントに閉じたままでは
+`features/notes/utils/search-index.ts` にあるのは、コンポーネントに閉じたままでは
 単体テストが書けなかったためです。
 
 variant のクラス定義も同じで、コンポーネント本体に private な定数として置きます。
@@ -469,7 +521,7 @@ bulletproof-react、vercel/commerce、Next.js の公式サンプルには**コ�
    └── use-window-scroll.test.ts
    ```
 
-2. **src/features/<domain>/use-\*.ts**: ドメインの知識を持つフック
+2. **src/features/<domain>/hooks/use-\*.ts**: ドメインの知識を持つフック
 
 `src/components/` にフックのファイルは置きません。ドメインを知らない部品に、
 切り出すほどのロジックは生まれないためです。
@@ -478,6 +530,7 @@ bulletproof-react、vercel/commerce、Next.js の公式サンプルには**コ�
 
 ページ単位のサーバーステートは存在しない (ビルド時に解決される) ため、
 ストアが扱うのは **Client Component 間で共有するクライアントステート**だけです。
+実装は [Zustand](https://zustand.docs.pmnd.rs/) を使います。
 
 置き場所はフックと同じ基準です。**1 つのコンポーネントに閉じた状態は `useState` のまま
 コンポーネントに置き**、島をまたいで共有する必要が出てからストアにします。
@@ -486,11 +539,70 @@ bulletproof-react、vercel/commerce、Next.js の公式サンプルには**コ�
 
    ```
    src/stores/
-   ├── theme-store.ts
-   └── theme-store.test.ts
+   ├── toast-store.ts       # 通知の待ち行列。積む側と描く側が別の島にある
+   └── toast-store.test.ts
    ```
 
-2. **src/features/<domain>/<name>-store.ts**: ドメインに閉じた共有ステート
+2. **src/features/<domain>/stores/<name>-store.ts**: ドメインに閉じた共有ステート
+
+#### なぜ Context + useReducer ではなく Zustand か
+
+**この構成には、島をまたぐ共通の Client Component の祖先が無いためです。**
+`app/layout.tsx` も `app-shell` も `app-sidebar` も Server Component のままで、
+`'use client'` は葉 (`site-nav` / `mobile-nav` / `command-search-trigger` / `toc-sidebar`)
+に散っています。Context を使うには Provider をどこか上に立てることになり、
+「境界は葉に寄せる」という方針と正面からぶつかります。Zustand はモジュールスコープの
+外部ストアなので、島が独立したまま同じ値を見られます。
+
+対価は初期 JS の増加ですが、コマンドパレットをストアに移したときの実測で
+**gzip 約 0.7KB** (ホームの初期スクリプト 212.4KB → 213.1KB) でした。
+
+**状態が 1 つの Client サブツリーに閉じているなら Context のほうが素直です。**
+その場合は `stores/` に上げず、そのサブツリーの中で完結させてください。
+
+#### ストアに移す基準
+
+コマンドパレット (`features/notes/stores/command-search-store.ts`) が唯一の例です。
+開くボタンは `components/layouts/command-search-trigger.tsx`、中身は
+`features/notes/components/command-search.tsx` にあり、**別の島に割れていました**。
+props で `open` を降ろして `onClose` で戻す形だったため、次の 2 つが effect になっていました。
+
+- 閉じたときに検索語を消す処理 (閉じ方が Esc・背景クリック・⌘K の 3 通りあるので、
+  ハンドラではなく `open` の変化で拾うしかなかった)
+- インデックスを一度だけ取る再入ガード (`items.length` と `isLoading` を deps に入れていた)
+
+どちらもストアのアクション (`close` / `loadIndex`) に移すと消えます。**render サイクルの
+外に出るぶん、テストもダイアログを描画せずに書けます** (`command-search-store.test.ts`)。
+
+逆に `toc-sidebar` の `activeSlug` / `marker` は移していません。複雑さの正体は DOM 実測と
+スクロール購読であって状態の共有ではなく、ストアに移しても effect の数は変わらないためです。
+
+#### ストアの書き方
+
+```ts
+// src/features/notes/stores/command-search-store.ts
+export const useCommandSearchStore = create<CommandSearchState>()((set, get) => ({
+  ...INITIAL_STATE,
+  close: () => {
+    set({ isOpen: false, query: '' })
+  },
+  loadIndex: async () => {
+    if (get().status !== 'idle') {
+      return
+    }
+    …
+  },
+}))
+```
+
+- **購読はセレクタ単位**で取ります (`useCommandSearchStore((state) => state.query)`)。
+  ストアごと受け取ると、関係のないフィールドの更新でも再レンダーします。
+- **非同期の再入ガードはアクションの中**に置きます。state を deps に入れた effect で
+  弾くと、取得中の再レンダーごとに評価し直されます。
+- **初期値は `INITIAL_STATE` にまとめます。** モジュールスコープのストアはテストを
+  またいで状態が残るので、テストの `beforeEach` で `setState` して戻します。
+- `'use client'` は要りません。ストアはただのモジュールで、`'use client'` を付けるのは
+  それを購読するコンポーネント側です。
 
 ## その他のディレクトリ
 
@@ -503,10 +615,10 @@ bulletproof-react、vercel/commerce、Next.js の公式サンプルには**コ�
    ├── cn.ts                   # className 結合ユーティリティ
    ├── cn.test.ts
    ├── date.ts                 # 日付を組み立てる唯一の場所 (生の Date は lint で禁止)
-   └── types.ts                # 複数レイヤーで共有する型 (SearchableItem など)
+   └── types.ts                # 層や feature をまたいで共有する型 (MarkdownHeading)
    ```
 
-2. **src/features/<domain>/**: ドメイン固有のロジック
+2. **src/features/<domain>/utils/**: ドメイン固有のロジック
 
 `src/components/` にユーティリティのファイルは置きません。コンポーネントの中で完結する
 処理は本体に書き、切り出す段になったら上の 2 つのどちらかに行き先が決まります。
@@ -526,7 +638,7 @@ src/config/
 
 ### content/ ディレクトリ
 
-MDX などのコンテンツファイルを配置します。スキーマは `src/features/notes/notes.ts` の
+MDX などのコンテンツファイルを配置します。スキーマは `src/features/notes/api/notes.ts` の
 zod で定義し、frontmatter はビルド時に検証されます。**frontmatter の型はここが唯一の出典**です
 (`z.infer` で TypeScript の型が導出されます)。
 
@@ -544,13 +656,13 @@ content/
 テストファイルは**対象と同じ階層**に `*.test.ts` として置きます。
 
 ```
-src/features/notes/
+src/features/notes/utils/
 ├── group-by-month.ts
 └── group-by-month.test.ts
 ```
 
-関連するユーティリティやフックが 3 つ以上に増えたら、`utils/` や `hooks/` の
-サブディレクトリでまとめ、その中でも同じくテストを同階層に置きます。
+feature の中は役割ごとのディレクトリ (`api/` `utils/` など) に分かれていますが、
+テストの置き方は変わりません。対象と同じディレクトリに置きます。
 
 なお、`src/app/` 配下にはテストを置きません。ページから呼ばれるロジックを `features/` に
 置くのは、テスト可能にするためでもあります。
@@ -587,7 +699,7 @@ export function NoteCard() {
 }
 
 // ✅ Good: props でデータを受け取る (ドメインの型を受けるので置き場所は features)
-// src/features/notes/note-card.tsx
+// src/features/notes/components/note-card.tsx
 export function NoteCard({ note }: { note: NoteSummary }) {
   return <div>{note.metadata.title}</div>
 }
@@ -605,8 +717,11 @@ Client Component の中で `fetch` してデータを取りに行くのは、ビ
 
 ### 4. 型の出典を一箇所にする
 
-コンテンツの型は `src/features/notes/notes.ts` の zod スキーマから導出します
+コンテンツの型は `src/features/notes/api/notes.ts` の zod スキーマから導出します
 (`z.infer`)。同じ形の interface を複数箇所に書き写さないでください。
+
+feature に閉じたドメインの型は `src/features/<domain>/types/` に置き、
+2 つ目の feature や layouts が知る必要が出たときだけ `src/lib/types.ts` へ引き上げます。
 
 ### 5. 未使用のファイル・export は溜めない
 

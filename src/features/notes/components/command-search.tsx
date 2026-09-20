@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import {
   Command,
   CommandEmpty,
@@ -11,69 +11,63 @@ import {
   CommandList,
 } from '@/components/ui/command'
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
-import type { SearchableItem } from '@/lib/types'
-import { fetchSearchIndex, filterSearchableItems, groupSearchableItemsByType } from './search-index'
+import type { IndexStatus } from '../stores/command-search-store'
+import { useCommandSearchStore } from '../stores/command-search-store'
+import { filterSearchableItems, groupSearchableItemsByType } from '../utils/search-index'
 
 /* 読み込むのは command-search-trigger だけで、初めて開かれたときに next/dynamic
-   越しに落ちてくる (docs/directory-structure.md)。 */
+   越しに落ちてくる (docs/directory-structure.md)。開閉も検索語もストアが持つので、
+   このファイルは「今の状態をどう見せるか」だけを持つ。 */
 
-export interface CommandSearchProps {
-  open: boolean
-  /** Esc・背景クリック・⌘K のいずれで閉じてもここに来る */
-  onClose: () => void
+/* 取得に失敗したことを「0 件」と言わない。失敗の告知は通知が引き受けるので、
+   ここは一覧が空である理由だけを短く出す。 */
+function emptyMessage(status: IndexStatus): string {
+  switch (status) {
+    case 'loading':
+      return '読み込み中...'
+    case 'failed':
+      return '検索を読み込めませんでした'
+    case 'idle':
+    case 'ready':
+      return '検索結果が見つかりませんでした'
+  }
 }
 
-export function CommandSearch({ open, onClose }: CommandSearchProps) {
+export function CommandSearch() {
   const router = useRouter()
-  const [search, setSearch] = useState('')
-  const [items, setItems] = useState<SearchableItem[]>([])
-  const [isLoading, setIsLoading] = useState(false)
+  const isOpen = useCommandSearchStore((state) => state.isOpen)
+  const query = useCommandSearchStore((state) => state.query)
+  const items = useCommandSearchStore((state) => state.items)
+  const status = useCommandSearchStore((state) => state.status)
+  const close = useCommandSearchStore((state) => state.close)
+  const setQuery = useCommandSearchStore((state) => state.setQuery)
+  const loadIndex = useCommandSearchStore((state) => state.loadIndex)
 
-  // 開いたときに一度だけ。閉じてもインデックスは捨てない
+  /* 木に載るのは初めて開かれたときだけなので、mount がそのまま「初回に開かれた」。
+     2 度目以降を弾くのはストアの status で、ここは呼ぶだけでよい。 */
   useEffect(() => {
-    if (!open || items.length > 0 || isLoading) {
-      return
-    }
+    void loadIndex()
+  }, [loadIndex])
 
-    setIsLoading(true)
-    void fetchSearchIndex()
-      .then(setItems)
-      .catch((error: unknown) => {
-        console.error('検索インデックスを読み込めませんでした', error)
-      })
-      .finally(() => {
-        setIsLoading(false)
-      })
-  }, [open, items.length, isLoading])
-
-  // 閉じ方が 2 通り (Radix と ⌘K) あるので、ハンドラ側ではなく open の変化で拾う
-  useEffect(() => {
-    if (!open) {
-      setSearch('')
-    }
-  }, [open])
-
-  const groups = groupSearchableItemsByType(filterSearchableItems(items, search))
+  const groups = groupSearchableItemsByType(filterSearchableItems(items, query))
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={close}>
       <DialogContent className="max-w-lg overflow-hidden p-0">
         <DialogTitle className="sr-only">検索</DialogTitle>
         {/* 枠と角丸はダイアログが持っているので、Command 側は面だけ出す。
             両方が border を引くと 1px の線が二重に見える。 */}
         <Command className="rounded-none border-0 bg-transparent">
-          <CommandInput placeholder="検索..." value={search} onValueChange={setSearch} />
+          <CommandInput placeholder="検索..." value={query} onValueChange={setQuery} />
           <CommandList>
-            <CommandEmpty>
-              {isLoading ? '読み込み中...' : '検索結果が見つかりませんでした'}
-            </CommandEmpty>
+            <CommandEmpty>{emptyMessage(status)}</CommandEmpty>
             {groups.map((group) => (
               <CommandGroup key={group.type} heading={group.type}>
                 {group.items.map((item) => (
                   <CommandItem
                     key={item.url}
                     onSelect={() => {
-                      onClose()
+                      close()
                       /* location.href だと App Router の外に出て、左レールごと組み直しになる */
                       router.push(item.url)
                     }}

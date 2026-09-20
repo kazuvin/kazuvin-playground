@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatDate } from '@/lib/date'
-import type { NoteSummary } from '@/lib/types'
+import type { NoteSummary } from '../types/note'
 
 interface NoteCardProps {
   note: NoteSummary

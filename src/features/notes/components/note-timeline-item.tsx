@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import type { SearchableItem } from '@/lib/types'
+import type { SearchableItem } from '../types/note'
 
 export interface NoteTimelineItemProps {
   note: SearchableItem

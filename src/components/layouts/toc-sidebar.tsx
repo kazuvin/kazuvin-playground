@@ -100,6 +100,7 @@ export function TocSidebar({ headings = [] }: TocSidebarProps) {
       })
     }
 
+    // oxlint-disable-next-line react/set-state-in-effect -- 購読を張る前に現在地を 1 度読む。スクロール位置は React の外にあるので、これは外部システムとの同期にあたる
     setActiveSlug(activeEntry())
     window.addEventListener('scroll', schedule, { passive: true })
     window.addEventListener('resize', schedule)

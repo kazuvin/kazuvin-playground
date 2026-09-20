@@ -2,22 +2,24 @@
 
 import dynamic from 'next/dynamic'
 import { useState } from 'react'
+import { useCommandSearchStore } from '@/features/notes/stores/command-search-store'
 import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
 
 const CommandSearch = dynamic(
   // oxlint-disable-next-line kazuvin/no-namespace-import -- 遅延読み込みそのものが目的。動的 import は名前空間の取り込みとして拾われるが、静的な import に直すと分けた意味が無くなる
-  async () => (await import('@/features/notes/command-search')).CommandSearch,
+  async () => (await import('@/features/notes/components/command-search')).CommandSearch,
   { ssr: false },
 )
 
 export function CommandSearchTrigger() {
-  /* false のあいだ <CommandSearch /> は木に無く、チャンクの要求も起きない */
+  /* false のあいだ <CommandSearch /> は木に無く、チャンクの要求も起きない。
+     ストアではなくここに置くのは、ドメインの状態ではなく描画の都合だから。 */
   const [isMounted, setIsMounted] = useState(false)
-  const [isOpen, setIsOpen] = useState(false)
+  const toggleSearch = useCommandSearchStore((state) => state.toggle)
 
   function toggle(): void {
     setIsMounted(true)
-    setIsOpen((previous) => !previous)
+    toggleSearch()
   }
 
   /* ボタンは lg 未満で隠れる (行き先はハンバーガーが引き取る) が、⌘K は幅に
@@ -67,14 +69,7 @@ export function CommandSearchTrigger() {
           K
         </span>
       </button>
-      {isMounted && (
-        <CommandSearch
-          open={isOpen}
-          onClose={() => {
-            setIsOpen(false)
-          }}
-        />
-      )}
+      {isMounted && <CommandSearch />}
     </>
   )
 }

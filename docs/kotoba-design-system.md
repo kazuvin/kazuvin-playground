@@ -280,6 +280,36 @@ DOM は 2 層になっている。外側の `<button>` がタップ領域とフ�
 - `as` で既定タグを上書きできる。見た目の段と HTML の見出しレベルは別物なので、
   h2 の位置に `heading` 以外を置きたいときはここで調整する。
 
+### `Toast`
+
+画面の外で起きたことの告知。実装は `@radix-ui/react-toast` のラップで、右下に積む。
+
+```tsx
+useToastStore.getState().notify({
+  tone: 'error',
+  title: '検索を読み込めませんでした',
+  description: '通信を確かめて、開き直してください',
+})
+```
+
+| prop          | 値                   | 既定     |
+| ------------- | -------------------- | -------- |
+| `tone`        | `info` / `error`     | `info`   |
+| `title`       | string               | (必須)   |
+| `description` | string               | なし     |
+
+- **`tone` は見た目を変えない。** このシステムに色分けされたステータスは無いので
+  (「壊してはいけない 3 つの制約」)、面も文字色も 2 つで同じ。`tone` が決めるのは
+  **読み上げの強さと表示時間**だけ — `error` は `aria-live="assertive"` (Radix の
+  `type="foreground"`) で 10 秒、`info` は polite で 5 秒。
+- **影は使わない。** 面は `bg-card`、分離は 1px の `border-border`。他のカードと同じ。
+- 入場は `fade-slide-up`、退場は `fade-out`。どちらも `motion-safe:` の内側。
+- **トーストで状態を代替しない。** 一覧が空である理由のように画面に残るべきことは、
+  その場所にインラインで書く。トーストは消えるので、消えて困るものを載せない
+  (コマンドパレットの取得失敗が両方を出しているのはこのため)。
+- 通知そのものはストア (`src/stores/toast-store.ts`) が持ち、描くのは
+  `components/layouts/toaster.tsx`。**Radix のチャンクは最初の通知まで落ちてこない。**
+
 ### `Screen`
 
 tier-1 の画面端スペーシング (24 / 32 / 24) を供給するシェル。
@@ -378,6 +408,6 @@ role 名のトークンは**もう存在しない**。
   どちらも `motion-safe:` の内側なので、動きを減らす設定では止まる。
 - `note-card.tsx` に `dark:` クラスが残っている。Kotoba にダークモードは無く、
   ダークテーマの切り替え機構もこのリポジトリには無いので現状は無害。
-- `card` / `dialog` / `command` / `timeline` と `features/notes/*` はまだ `Text` を通さず、
+- `card` / `dialog` / `command` / `timeline` と `features/notes/components/*` はまだ `Text` を通さず、
   スケールのユーティリティ (`text-sm` 等) を直接書いている。値としては system 内なので
   破綻はしないが、色と太さの組が role として保証されていない。

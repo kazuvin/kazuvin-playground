@@ -145,6 +145,24 @@ React 19 + Next.js の App Router。`.oxlintrc.json` が機械的に落とすの
 ファイル冒頭に長い解説を置かないでください。書きたくなったら、それは docs に
 足りていない節がある合図です。docs 側に書いて、コードからは 1 行で参照します。
 
+## 失敗の伝え方
+
+**宛先が 3 つあるので、混ぜない。**
+
+| 宛先 | 手段 | 使う場面 |
+| --- | --- | --- |
+| ビルド | `throw` | frontmatter が不正など、配信してはいけないもの |
+| 開発者 | `console.error` | 原因を追うためのスタックトレース |
+| 利用者 | `notify()` ([Toast](kotoba-design-system.md#toast)) | 画面の外で起きたことの告知 |
+
+- **`console.error` を通知に置き換えない。併置する。** 利用者向けの文言だけを残すと、
+  調査の手がかり (元の `error`) が消えます。`command-search-store.ts` の `loadIndex` が
+  両方を出しているのがこの形です。
+- **ビルド時の `throw` を通知にしない。** `features/*/api/` の `throw` はビルドを止める
+  ためのもので、握り潰すと壊れた成果物がそのまま配信されます。
+- **画面に残るべきことはトーストにしない。** 一覧が空である理由のように、見た時点で
+  読めていないと困るものはその場所にインラインで書きます。トーストは消えます。
+
 ## 日付の扱い
 
 **日付を組み立てる入口は `src/lib/date.ts` だけ。** 生の `new Date()` と `Date.now()` は
@@ -155,7 +173,7 @@ React 19 + Next.js の App Router。`.oxlintrc.json` が機械的に落とすの
 
 - ノートの日付は frontmatter の `YYYY-MM-DD` が出典。**画面側でもその形の文字列のまま
   持ち回り**、日付として解釈するのは `lib/date.ts` の中だけにする。
-- 月ごとのグループ化（`features/notes/group-by-month.ts`）も `toMonthKey` /
+- 月ごとのグループ化（`features/notes/utils/group-by-month.ts`）も `toMonthKey` /
   `toMonthLabel` を経由する。Date を挟むと解釈のタイムゾーン次第で月末・月初が
   隣の月に落ちる。
 - 例外は `.oxlintrc.json` の `overrides` で外してある。`lib/date.ts` 本体と、テスト。

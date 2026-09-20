@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { PageShell } from '@/components/layouts/page-shell'
-import { renderMdx } from '@/features/notes/mdx'
-import { getPublishedNote, getPublishedNotes } from '@/features/notes/notes'
+import { getPublishedNote, getPublishedNotes } from '@/features/notes/api/notes'
+import { renderMdx } from '@/features/notes/utils/mdx'
 
 export async function generateStaticParams(): Promise<{ slug: string }[]> {
   const notes = await getPublishedNotes()

@@ -1,5 +1,5 @@
 import { Text } from '@/components/ui/text'
-import { findCatalogSection } from './catalog'
+import { findCatalogSection } from '../api/catalog'
 
 /*
  * 文言と段は catalog.ts が持ち、ページは id しか書かない (無い id はビルドが落ちる)。

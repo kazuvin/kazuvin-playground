@@ -23,11 +23,12 @@ import {
   TimelineSeparator,
   TimelineTitle,
 } from '@/components/ui/timeline'
-import { CATALOG_HEADINGS, TOKEN_GROUPS } from '@/features/design-system/catalog'
-import { CommandDemo } from '@/features/design-system/command-demo'
-import { DialogDemo } from '@/features/design-system/dialog-demo'
-import { SectionHeading } from '@/features/design-system/section-heading'
-import { TokenTable } from '@/features/design-system/token-table'
+import { CATALOG_HEADINGS, TOKEN_GROUPS } from '@/features/design-system/api/catalog'
+import { CommandDemo } from '@/features/design-system/components/command-demo'
+import { DialogDemo } from '@/features/design-system/components/dialog-demo'
+import { SectionHeading } from '@/features/design-system/components/section-heading'
+import { ToastDemo } from '@/features/design-system/components/toast-demo'
+import { TokenTable } from '@/features/design-system/components/token-table'
 import { cn } from '@/lib/cn'
 
 /* トークン名やクラス名を地の文に混ぜるための小さな見た目。globals.css の
@@ -227,6 +228,13 @@ export default function DesignSystemPage() {
           <SectionHeading id="component-command" />
           <div className="mt-block-tight">
             <CommandDemo />
+          </div>
+        </div>
+
+        <div>
+          <SectionHeading id="component-toast" />
+          <div className="mt-block-tight">
+            <ToastDemo />
           </div>
         </div>
 
