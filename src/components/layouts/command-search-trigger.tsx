@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic'
 import { useState } from 'react'
 import { useCommandSearchStore } from '@/features/notes/stores/command-search-store'
 import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
+import { useMobileNavStore } from '@/stores/mobile-nav-store'
 
 const CommandSearch = dynamic(
   // oxlint-disable-next-line kazuvin/no-namespace-import -- 遅延読み込みそのものが目的。動的 import は名前空間の取り込みとして拾われるが、静的な import に直すと分けた意味が無くなる
@@ -16,9 +17,14 @@ export function CommandSearchTrigger() {
      ストアではなくここに置くのは、ドメインの状態ではなく描画の都合だから。 */
   const [isMounted, setIsMounted] = useState(false)
   const toggleSearch = useCommandSearchStore((state) => state.toggle)
+  const closeMobileNav = useMobileNavStore((state) => state.close)
 
   function toggle(): void {
     setIsMounted(true)
+    /* パレットとナビパネルを同時に開かない。⌘K は幅に関係なく効くので、lg 未満では
+       パネルが開いたまま重なりうる (パネルはダイアログの背面に残り、閉じても開いたまま)。
+       両方を知ってよいのは層として app に立つ layouts だけなので、ここで断つ。 */
+    closeMobileNav()
     toggleSearch()
   }
 

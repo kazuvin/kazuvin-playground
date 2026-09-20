@@ -1,16 +1,15 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useKeyboardShortcut } from '@/hooks/use-keyboard-shortcut'
+import { useMobileNavStore } from '@/stores/mobile-nav-store'
 import { SiteNav } from './site-nav'
 
 export function MobileNav() {
   const rootRef = useRef<HTMLDivElement>(null)
-  const [isOpen, setIsOpen] = useState(false)
-
-  function close(): void {
-    setIsOpen(false)
-  }
+  const isOpen = useMobileNavStore((state) => state.isOpen)
+  const close = useMobileNavStore((state) => state.close)
+  const toggle = useMobileNavStore((state) => state.toggle)
 
   useKeyboardShortcut({ key: 'Escape', enabled: isOpen, preventDefault: false }, close)
 
@@ -26,7 +25,7 @@ export function MobileNav() {
       if (root !== null && event.target instanceof Node && root.contains(event.target)) {
         return
       }
-      setIsOpen(false)
+      close()
     }
 
     document.addEventListener('pointerdown', handlePointerDown)
@@ -34,7 +33,7 @@ export function MobileNav() {
     return () => {
       document.removeEventListener('pointerdown', handlePointerDown)
     }
-  }, [isOpen])
+  }, [isOpen, close])
 
   return (
     <div ref={rootRef} className="lg:hidden">
@@ -42,9 +41,7 @@ export function MobileNav() {
         type="button"
         aria-label="メニュー"
         aria-expanded={isOpen}
-        onClick={() => {
-          setIsOpen((previous) => !previous)
-        }}
+        onClick={toggle}
         /* -mr-3 = hitslop 2 + 面 (40) の中で 20px の図形が余らせる 10。ロゴの左端と
            図形の右端を同じ px-edge-h に揃えるための光学的な寄せ */
         className="-m-hitslop -mr-3 cursor-pointer p-hitslop"

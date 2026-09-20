@@ -539,11 +539,19 @@ bulletproof-react、vercel/commerce、Next.js の公式サンプルには**コ�
 
    ```
    src/stores/
-   ├── toast-store.ts       # 通知の待ち行列。積む側と描く側が別の島にある
-   └── toast-store.test.ts
+   ├── toast-store.ts           # 通知の待ち行列。積む側と描く側が別の島にある
+   ├── toast-store.test.ts
+   ├── mobile-nav-store.ts      # lg 未満のナビパネルの開閉。⌘K の島から閉じる
+   └── mobile-nav-store.test.ts
    ```
 
 2. **src/features/<domain>/stores/<name>-store.ts**: ドメインに閉じた共有ステート
+
+**島をまたぐ調整は layouts で行います。** 「コマンドパレットとナビパネルを同時に
+開かない」のような、複数のストアを見ないと書けない規則がその例です。共有層のストアは
+features を知れず、features のストアが layouts の都合を知るのも向きが逆なので、
+**両方を知ってよい層 (app / layouts) のイベントハンドラに置きます**
+(`command-search-trigger.tsx` の `toggle`)。
 
 #### なぜ Context + useReducer ではなく Zustand か
 
@@ -615,6 +623,8 @@ export const useCommandSearchStore = create<CommandSearchState>()((set, get) => 
    ├── cn.ts                   # className 結合ユーティリティ
    ├── cn.test.ts
    ├── date.ts                 # 日付を組み立てる唯一の場所 (生の Date は lint で禁止)
+   ├── nav.ts                  # 現在地の判定 (ナビのリンク・目次の見出し)
+   ├── nav.test.ts
    └── types.ts                # 層や feature をまたいで共有する型 (MarkdownHeading)
    ```
 
