@@ -1,5 +1,5 @@
-export const APP_NAME = 'Kazuvin Playground'
-export const APP_DESCRIPTION = 'Kazuvin Playground is a place to experiment with code and ideas.'
+export const APP_NAME = 'Kazuvin'
+export const APP_DESCRIPTION = 'A place to experiment with code and ideas.'
 
 /**
  * canonical と sitemap の絶対 URL の出典。Static Export には実行時のリクエストが
