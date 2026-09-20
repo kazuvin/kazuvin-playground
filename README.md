@@ -1,4 +1,4 @@
-# kazuvin-playground
+# kazuvin.me
 
 MDX で書いたノートを静的サイトとして配信する個人サイト。
 [Next.js](https://nextjs.org) の App Router を Static Export (`output: "export"`) で
