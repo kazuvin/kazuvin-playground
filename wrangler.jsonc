@@ -13,5 +13,9 @@
   "assets": {
     "directory": "./out",
     "not_found_handling": "404-page"
-  }
+  },
+  // 独自ドメインと同じ内容が workers.dev 側でも配信されると検索エンジンに重複として
+  // 扱われるため、workers.dev のサブドメインは閉じている。
+  "workers_dev": false,
+  "routes": [{ "pattern": "kazuvin.me", "custom_domain": true }]
 }

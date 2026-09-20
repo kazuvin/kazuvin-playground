@@ -4,10 +4,8 @@ export const APP_DESCRIPTION = 'Kazuvin Playground is a place to experiment with
 /**
  * canonical と sitemap の絶対 URL の出典。Static Export には実行時のリクエストが
  * 無いので、ホスト名を知る手段がここしかない。
- *
- * TODO: 実際のデプロイ先ドメインに差し替える。
  */
-export const SITE_URL = 'https://kazuvin-playground.workers.dev'
+export const SITE_URL = 'https://kazuvin.me'
 
 /**
  * サイト全体の行き先の出典。配列の順がそのまま表示順。href に末尾スラッシュは付けない
