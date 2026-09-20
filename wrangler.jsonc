@@ -8,7 +8,7 @@
  */
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "kazuvin-playground",
+  "name": "kazuvin",
   "compatibility_date": "2025-03-01",
   "assets": {
     "directory": "./out",
